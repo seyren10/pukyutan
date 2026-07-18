@@ -1,0 +1,74 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    container_name: pukyutan_app
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+    environment:
+      - DB_HOST=db
+      - REDIS_HOST=redis
+    depends_on:
+      - db
+      - redis
+    networks:
+      - pukyutan
+
+  webserver:
+    image: nginx:stable-alpine
+    container_name: pukyutan_webserver
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - ./:/var/www/html
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
+    networks:
+      - pukyutan
+
+  db:
+    image: mysql:8.0
+    container_name: pukyutan_db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE:-pukyutan}
+      MYSQL_USER: ${DB_USERNAME:-pukyutan}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-secret}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootsecret}
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - pukyutan
+
+  redis:
+    image: redis:7-alpine
+    container_name: pukyutan_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - pukyutan
+
+  mailpit:
+    image: axllent/mailpit
+    container_name: pukyutan_mailpit
+    restart: unless-stopped
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+    networks:
+      - pukyutan
+
+networks:
+  pukyutan:
+    driver: bridge
+
+volumes:
+  db_data:
