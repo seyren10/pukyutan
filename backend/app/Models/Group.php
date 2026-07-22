@@ -6,6 +6,7 @@ use App\Enums\FrequencyUnitType;
 use App\Enums\GroupStatus;
 use App\Models\Member;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -33,6 +34,7 @@ use Illuminate\Support\Str;
 ])]
 class Group extends Model
 {
+    use HasFactory;
     protected function casts(): array
     {
         return [
@@ -51,6 +53,7 @@ class Group extends Model
     }
 
 
+    #region =============== RELATIONS =============== 
     public function members(): HasMany
     {
         return $this->hasMany(Member::class);
@@ -60,4 +63,22 @@ class Group extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function cycles(): HasMany
+    {
+        return $this->hasMany(Cycle::class);
+    }
+
+    #endregion =============== RELATIONS ===============
+
+
+
+    #region =============== HELPERS ================ */
+
+    public function isDraft(): bool
+    {
+        return $this->status === GroupStatus::DRAFT;
+    }
+    #region =============== HELPERS ================ */
+
 }

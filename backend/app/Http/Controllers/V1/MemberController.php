@@ -28,6 +28,11 @@ class MemberController extends Controller
      */
     public function store(StoreMemberRequest $request, Group $group)
     {
+
+        if (!$group->isDraft())
+            return response()->json(["message" => "Cannot add members to an active group"], 400);
+
+
         $validated = $request->validated();
         $validated["payout_order"] = $group->members()->max("payout_order") + 1;
         $member = $group->members()->create($validated);
@@ -65,6 +70,9 @@ class MemberController extends Controller
     public function destroy(Member $member)
     {
         Gate::authorize("delete", $member);
+
+        if (!$member->group->isDraft())
+            return response()->json(["message" => "Cannot delete members from an active group"], 400);
 
         $member->delete();
 

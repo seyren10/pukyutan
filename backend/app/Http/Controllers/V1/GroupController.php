@@ -5,6 +5,7 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\V1\StoreGroupRequest;
 use App\Http\Requests\V1\UpdateGroupRequest;
+use App\Http\Resources\V1\GroupResource;
 use App\Models\Group;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -21,7 +22,7 @@ class GroupController extends Controller
 
         $userGroups = $user->groups()->get();
 
-        return response()->json($userGroups);
+        return GroupResource::collection($userGroups);
     }
 
     /**
@@ -33,7 +34,7 @@ class GroupController extends Controller
 
         $group = Auth::user()->groups()->create($validated);
 
-        return response()->json($group, 201);
+        return (new GroupResource($group))->response()->setStatusCode(201);
     }
 
     /**
@@ -45,7 +46,7 @@ class GroupController extends Controller
 
         $group->load("members", "user:id,name,email");
 
-        return response()->json($group);
+        return new GroupResource($group);
     }
 
     /**
@@ -59,7 +60,7 @@ class GroupController extends Controller
         $group->update($validated);
         $group->refresh();
 
-        return response()->json($group);
+        return new GroupResource($group);
     }
 
     /**

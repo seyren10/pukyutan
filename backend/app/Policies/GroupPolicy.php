@@ -48,6 +48,11 @@ class GroupPolicy
         return $this->update($user, $group);
     }
 
+    public function activate(User $user, Group $group): bool
+    {
+        return $this->update($user, $group);
+    }
+
     /**
      * Determine whether the user can restore the model.
      */
