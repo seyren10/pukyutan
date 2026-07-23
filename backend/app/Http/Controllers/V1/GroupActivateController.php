@@ -21,7 +21,7 @@ class GroupActivateController extends Controller
         Gate::authorize("activate", $group);
 
         if ($group->status !== GroupStatus::DRAFT)
-            return response()->json(["message" => "Group is already activated", 400]);
+            abort(400, "Group is already activated");
 
         $cycles = $cycleGeneratorService->generateRound($group, roundNumber: 1);
 

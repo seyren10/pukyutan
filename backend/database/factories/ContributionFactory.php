@@ -2,13 +2,13 @@
 
 namespace Database\Factories;
 
-use App\Models\Member;
+use App\Models\Contribution;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<Member>
+ * @extends Factory<Contribution>
  */
-class MemberFactory extends Factory
+class ContributionFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -18,9 +18,7 @@ class MemberFactory extends Factory
     public function definition(): array
     {
         return [
-            "name" => fake()->name(),
-            "email" => fake()->unique()->safeEmail(),
-            "payout_order" => fake()->unique()->numberBetween(1,30_000)
+            //
         ];
     }
 }

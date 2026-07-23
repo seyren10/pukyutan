@@ -29,6 +29,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 ])]
 class Cycle extends Model
 {
+    use HasFactory;
     protected function casts(): array
     {
         return [
@@ -38,13 +39,30 @@ class Cycle extends Model
         ];
     }
 
+    #region ============== RELATIONS ===============
+    /**
+     * @return BelongsTo<Group, Cycle>
+     */
     public function group(): BelongsTo
     {
         return $this->belongsTo(Group::class);
     }
 
+    /**
+     * @return BelongsTo<Member, Cycle>
+     */
     public function recipient(): BelongsTo
     {
         return $this->belongsTo(Member::class, "recipient_member_id");
     }
+
+    /**
+     * @return HasMany<Contribution, Cycle>
+     */
+    public function contributions(): HasMany
+    {
+        return $this->hasMany(Contribution::class);
+    }
+
+    #endregion
 }

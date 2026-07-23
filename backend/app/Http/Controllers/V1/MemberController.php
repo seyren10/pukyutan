@@ -5,6 +5,7 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\V1\StoreMemberRequest;
 use App\Http\Requests\V1\UpdateMemberRequest;
+use App\Http\Resources\V1\MemberResource;
 use App\Models\Group;
 use App\Models\Member;
 use Illuminate\Http\Request;
@@ -20,7 +21,7 @@ class MemberController extends Controller
         Gate::authorize("view", $group);
         $members = $group->members()->get();
 
-        return response()->json($members);
+        return MemberResource::collection($members);
     }
 
     /**
@@ -30,14 +31,17 @@ class MemberController extends Controller
     {
 
         if (!$group->isDraft())
-            return response()->json(["message" => "Cannot add members to an active group"], 400);
+            abort(400, "Cannot add members to an active group");
 
 
         $validated = $request->validated();
         $validated["payout_order"] = $group->members()->max("payout_order") + 1;
         $member = $group->members()->create($validated);
 
-        return response()->json($member, 201);
+        return (new MemberResource($member))
+            ->response()
+            ->setStatusCode(201);
+
     }
 
     /**
@@ -47,7 +51,7 @@ class MemberController extends Controller
     {
         Gate::authorize("view", $member);
 
-        return response()->json($member);
+        return new MemberResource($member);
     }
 
     /**
@@ -61,7 +65,7 @@ class MemberController extends Controller
         $member->update($validated);
         $member->refresh();
 
-        return response()->json($member);
+        return new MemberResource($member);
     }
 
     /**
@@ -72,7 +76,7 @@ class MemberController extends Controller
         Gate::authorize("delete", $member);
 
         if (!$member->group->isDraft())
-            return response()->json(["message" => "Cannot delete members from an active group"], 400);
+            abort(400, "Cannot delete members from an active group");
 
         $member->delete();
 
