@@ -69,7 +69,7 @@ class Group extends Model
         return $this->hasMany(Cycle::class);
     }
 
-    #endregion =============== RELATIONS ===============
+    #endregion
 
 
 
@@ -79,6 +79,24 @@ class Group extends Model
     {
         return $this->status === GroupStatus::DRAFT;
     }
-    #region =============== HELPERS ================ */
+
+    /**
+     * Determine if the current round is completed by looking at the cycle's
+     * maximum round_number and see if it is already disbursed
+     * @return bool
+     */
+    public function isRoundCompleted(): bool
+    {
+        $currentRound = $this->cycles()->max("round_number");
+
+        if (!$currentRound)
+            return false;
+        
+        return $this->cycles()
+            ->where("round_number", $currentRound)
+            ->whereNull('disbursed_at')
+            ->doesntExist();
+    }
+    #endregion
 
 }

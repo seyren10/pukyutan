@@ -14,6 +14,10 @@ class GroupResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        $data = parent::toArray($request);
+        $data["is_round_completed"] = $this->whenLoaded("cycles", $this->isRoundCompleted());
+
+
+        return $data;
     }
 }

@@ -44,7 +44,7 @@ class GroupController extends Controller
     {
         Gate::authorize("view", $group);
 
-        $group->load("members", "user:id,name,email");
+        $group->load(["members", "user:id,name,email", "cycles"]);
 
         return new GroupResource($group);
     }

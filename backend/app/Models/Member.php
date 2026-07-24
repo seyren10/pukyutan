@@ -25,7 +25,6 @@ class Member extends Model
 {
     use HasFactory, SoftDeletes;
 
-
     #region ============ RELATIONSHIPS ============
     /**
      * @return BelongsTo<Group, Member>
