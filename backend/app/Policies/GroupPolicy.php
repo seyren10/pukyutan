@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Enums\GroupShareStatus;
 use App\Models\Group;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
@@ -21,7 +22,13 @@ class GroupPolicy
      */
     public function view(User $user, Group $group): bool
     {
-        return $this->update($user, $group);
+        if ($user->id === $group->user_id)
+            return true;
+
+        return $group->groupShares()
+            ->where("user_id", $user->id)
+            ->where("status", GroupShareStatus::ACCEPTED)
+            ->exists();
     }
 
     /**

@@ -48,12 +48,12 @@ class Group extends Model
     protected static function booted()
     {
         static::creating(function (Group $group) {
-            $group->invite_code = Str::random(6);
+            $group->invite_code = Str::of(Str::random(6))->upper();
         });
     }
 
 
-    #region =============== RELATIONS =============== 
+    #region RELATIONS 
     public function members(): HasMany
     {
         return $this->hasMany(Member::class);
@@ -69,11 +69,16 @@ class Group extends Model
         return $this->hasMany(Cycle::class);
     }
 
+    public function groupShares(): HasMany
+    {
+        return $this->hasmany(GroupShare::class);
+    }
+
     #endregion
 
 
 
-    #region =============== HELPERS ================ */
+    #region HELPERS
 
     public function isDraft(): bool
     {
@@ -91,7 +96,7 @@ class Group extends Model
 
         if (!$currentRound)
             return false;
-        
+
         return $this->cycles()
             ->where("round_number", $currentRound)
             ->whereNull('disbursed_at')

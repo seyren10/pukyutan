@@ -3,13 +3,14 @@
 namespace Database\Factories;
 
 use App\Models\Group;
-use App\Models\Member;
+use App\Models\GroupShare;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<Member>
+ * @extends Factory<GroupShare>
  */
-class MemberFactory extends Factory
+class GroupShareFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -19,10 +20,9 @@ class MemberFactory extends Factory
     public function definition(): array
     {
         return [
-            "name" => fake()->name(),
-            "email" => fake()->unique()->safeEmail(),
-            "payout_order" => fake()->unique()->numberBetween(1,30_000),
-            "group_id" => Group::factory()
+           "requested_at" => now(),
+           "group_id" => Group::factory(),
+           "user_id" => User::factory()
         ];
     }
 }
