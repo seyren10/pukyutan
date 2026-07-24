@@ -28,6 +28,13 @@ class GroupShareController extends Controller
         $share_request->responded_at = now();
         $share_request->save();
 
+        //log activity
+        activity()
+            ->performedOn($share_request->group)
+            ->causedBy(auth()->user())
+            ->withProperty("requested_by", $share_request->user->name)
+            ->log("Share request accepted");
+
         return response()->noContent();
     }
     public function reject(GroupShare $share_request)
@@ -37,6 +44,13 @@ class GroupShareController extends Controller
         $share_request->status = GroupShareStatus::REJECTED;
         $share_request->responded_at = now();
         $share_request->save();
+
+        //log activity
+        activity()
+            ->performedOn($share_request->group)
+            ->causedBy(auth()->user())
+            ->withProperty("requested_by", $share_request->user->name)
+            ->log("Share request rejected");
 
         return response()->noContent();
 

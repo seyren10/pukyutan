@@ -27,6 +27,11 @@ class GroupRoundController extends Controller
         $group->cycles()->createMany($cycles);
         $group->load(["cycles"]);
 
+        activity()
+            ->performedOn($group)
+            ->causedBy(auth()->user())
+            ->log("Round {$nextRoundNumber} started.");
+
         return new GroupResource($group);
     }
 }

@@ -30,6 +30,12 @@ class GroupActivateController extends Controller
         $group->save();
         $group->load(["cycles"]);
 
+        //log the activity
+        activity()
+            ->performedOn($group)
+            ->causedBy(auth()->user())
+            ->log("Group activated.");
+
         return new GroupResource($group);
     }
 }

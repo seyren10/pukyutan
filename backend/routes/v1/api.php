@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\V1\CycleDisburseController;
 use App\Http\Controllers\V1\GroupActivateController;
+use App\Http\Controllers\V1\GroupActivityController;
+use App\Http\Controllers\V1\GroupCompleteController;
 use App\Http\Controllers\V1\GroupController;
 use App\Http\Controllers\V1\GroupJoinController;
 use App\Http\Controllers\V1\GroupRoundController;
@@ -13,8 +15,11 @@ use Illuminate\Support\Facades\Route;
 Route::apiResource("groups", GroupController::class);
 Route::post("groups/{group}/activate", GroupActivateController::class);
 Route::post("groups/{group}/rounds", GroupRoundController::class);
+Route::post("groups/{group}/complete", GroupCompleteController::class);
+Route::get("groups/{group}/activities", GroupActivityController::class);
 Route::post("groups/join/{invite_code}", GroupJoinController::class)
     ->whereAlphaNumeric("invite_code");
+
 Route::get("groups/{group}/share-requests", [GroupShareController::class, "index"]);
 Route::post("share-requests/{share_request}/accept", [GroupShareController::class, "accept"]);
 Route::post("share-requests/{share_request}/reject", [GroupShareController::class, "reject"]);
