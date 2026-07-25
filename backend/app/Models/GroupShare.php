@@ -31,8 +31,8 @@ class GroupShare extends Model
     {
         return [
             "status" => GroupShareStatus::class,
-            "requested_at" => "timestamp",
-            "responded_at" => "timestamp"
+            "requested_at" => "datetime",
+            "responded_at" => "datetime"
         ];
     }
 
