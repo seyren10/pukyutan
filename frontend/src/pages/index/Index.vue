@@ -4,7 +4,10 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription, EmptyContent } from '@/components/ui/empty'
-import { Layers, Wallet, Users, Inbox, Plus, PackageOpen } from '@lucide/vue'
+import { Layers, Wallet, Users, Inbox, Plus, PackageOpen, FlagIcon } from '@lucide/vue'
+import { useUserStore } from '@/stores/user'
+import { storeToRefs } from 'pinia'
+import UnverifiedAlert from './components/UnverifiedAlert.vue'
 
 // Sample data — replace with real store/query data. Shapes shown here
 // are what GroupCard and the stats row expect.
@@ -57,10 +60,15 @@ const sharedGroups = [
         sharedByName: 'Corine S.',
     },
 ]
+
+const userStore = useUserStore()
+const { isEmailVerified } = storeToRefs(userStore)
 </script>
 
 <template>
     <div class="flex flex-col gap-6">
+        <UnverifiedAlert :verified="isEmailVerified" />
+
         <Alert v-if="pendingRequestCount > 0" variant="accent">
             <Inbox />
             <AlertTitle>{{ pendingRequestCount }} pending join requests</AlertTitle>
@@ -69,6 +77,7 @@ const sharedGroups = [
                 <Button size="sm" variant="outline">Review requests</Button>
             </AlertDescription>
         </Alert>
+
 
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <Card v-for="stat in stats" :key="stat.label">

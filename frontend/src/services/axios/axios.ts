@@ -8,3 +8,4 @@ export const httpClient = axios.create({
     Accept: 'application/json',
   },
 })
+

@@ -1,9 +1,26 @@
 <script setup lang="ts">
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card'
-import { FieldGroup, Field, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { Lock } from '@lucide/vue'
+import { CircleXIcon, Lock } from '@lucide/vue'
+import { useAuthMutations } from '@/features/auth/mutations'
+import { useForm } from 'vee-validate'
+import { loginCredentialSchema } from '@/features/auth/schema'
+import { toTypedSchema } from '@vee-validate/zod'
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import AppButtonLoaderSwap from '@/components/app/AppButtonLoaderSwap.vue'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import type { LaravelError } from '@/types/common'
+
+const { loginMutation } = useAuthMutations()
+const { mutate, isPending, isError, error } = loginMutation
+const laravelError = error as unknown as LaravelError;
+
+const { handleSubmit } = useForm({
+    validationSchema: toTypedSchema(loginCredentialSchema)
+})
+
+const submit = handleSubmit((v) => mutate(v))
 </script>
 
 <template>
@@ -13,29 +30,47 @@ import { Lock } from '@lucide/vue'
             <CardDescription>Enter your email and password to continue.</CardDescription>
         </CardHeader>
 
-        <CardContent>
-            <FieldGroup>
-                <Field>
-                    <FieldLabel for="email">Email</FieldLabel>
-                    <Input id="email" type="email" placeholder="name@example.com" autocomplete="email" />
-                </Field>
+        <CardContent class="space-y-4">
+            <Alert variant="destructive" v-if="isError">
+                <CircleXIcon />
+                <AlertTitle>An error occured</AlertTitle>
+                <AlertDescription>{{ laravelError.response?.data?.message }}</AlertDescription>
+            </Alert>
+            <form @submit="submit" class="space-y-4">
+                <FormField #="{ componentField }" name="email">
+                    <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                            <Input v-bind="componentField" type="email" placeholder="name@example.com" />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                </FormField>
 
-                <Field>
-                    <div class="flex items-center justify-between">
-                        <FieldLabel for="password">Password</FieldLabel>
-                        <RouterLink :to="{ name: 'forgot-password' }"
-                            class="text-sm text-muted-foreground hover:text-foreground">
-                            Forgot password?
-                        </RouterLink>
-                    </div>
-                    <Input id="password" type="password" autocomplete="current-password" />
-                </Field>
+                <FormField #="{ componentField }" name="password">
+                    <FormItem>
+                        <div class="flex items-center justify-between">
+                            <FormLabel>Password</FormLabel>
+                            <RouterLink :to="{ name: 'forgot-password' }"
+                                class="text-sm text-muted-foreground hover:text-foreground">
+                                Forgot password?
+                            </RouterLink>
+                        </div>
 
-                <Button type="submit" class="w-full">
-                    <Lock data-icon="inline-start" />
+                        <FormControl>
+                            <Input v-bind="componentField" type="password" />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                </FormField>
+
+                <Button type="submit" class="w-full" :disabled="isPending">
+                    <AppButtonLoaderSwap :loading="isPending">
+                        <Lock data-icon="inline-start" />
+                    </AppButtonLoaderSwap>
                     Log in
                 </Button>
-            </FieldGroup>
+            </form>
         </CardContent>
 
         <CardFooter class="justify-center text-sm text-muted-foreground">

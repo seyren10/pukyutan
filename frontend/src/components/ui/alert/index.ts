@@ -15,6 +15,8 @@ export const alertVariants = cva(
           "text-destructive bg-card [&>svg]:text-current *:data-[slot=alert-description]:text-destructive/90",
         accent:
           "text-accent-foreground bg-accent border-accent-foreground/20 [&>svg]:text-accent-foreground *:data-[slot=alert-description]:text-accent-foreground/80",
+        warning:
+          "text-accent-foreground bg-accent border-2 border-accent-foreground/35 font-medium [&>svg]:text-accent-foreground *:data-[slot=alert-description]:text-accent-foreground/80",
       },
     },
     defaultVariants: {
