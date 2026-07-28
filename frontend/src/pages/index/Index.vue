@@ -10,6 +10,8 @@ import { useInfiniteQuery } from '@tanstack/vue-query'
 import { getGroupsInfiniteQueryOptions, getSharedGroupsInfiniteQueryOptions } from '@/features/group/query.ts'
 import { computed } from 'vue'
 import { GroupCard, GroupCardEmpty, GroupCardSkeleton } from '@/components/groups/GroupCard'
+import CreateGroupDialog from './components/CreateGroupDialog.vue'
+
 
 const { data, isPending } = useInfiniteQuery(getGroupsInfiniteQueryOptions())
 const groups = computed(() => data.value?.pages?.flatMap((g) => g.data));
@@ -63,10 +65,12 @@ const { isEmailVerified } = storeToRefs(userStore)
         <div class="flex flex-col gap-3">
             <div class="flex items-center justify-between">
                 <h2 class="font-heading text-lg font-semibold text-foreground">Your groups</h2>
-                <Button size="sm" v-if="isEmailVerified">
-                    <Plus data-icon="inline-start" />
-                    New group
-                </Button>
+                <CreateGroupDialog>
+                    <Button size="sm" v-if="isEmailVerified">
+                        <Plus data-icon="inline-start" />
+                        New group
+                    </Button>
+                </CreateGroupDialog>
             </div>
 
             <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3" v-if="isPending">

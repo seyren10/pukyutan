@@ -2,7 +2,7 @@
 import { Button } from '@/components/ui/button';
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty';
 import { useUserStore } from '@/stores/user';
-import { PackageOpen } from '@lucide/vue';
+import { PackageOpen, Plus } from '@lucide/vue';
 import { storeToRefs } from 'pinia';
 
 

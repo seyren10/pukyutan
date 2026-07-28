@@ -1,6 +1,6 @@
 import { httpClient } from "@/services/axios/axios";
 import type { SimplePaginatedResponse } from "@/types/paginate";
-import type { Group, GroupQueryParams } from "./type";
+import type { CreateGroupSchema, Group, GroupQueryParams } from "./type";
 
 //  api/v1/groups ................................................................................................................................................. groups.index › V1\GroupController@index
 //   POST            api/v1/groups ................................................................................................................................................. groups.store › V1\GroupController@store
@@ -29,5 +29,10 @@ export const getSharedGroups = async (params?: GroupQueryParams) => {
     "/api/v1/groups/shared",
     { params },
   );
+  return res.data;
+};
+
+export const createGroup = async (payload: CreateGroupSchema) => {
+  const res = await httpClient.post<Group>("/api/v1/groups", payload);
   return res.data;
 };
