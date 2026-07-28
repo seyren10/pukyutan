@@ -82,7 +82,7 @@ const submit = handleSubmit((v) => mutate(v))
         </CardContent>
 
         <CardFooter class="justify-center text-sm text-muted-foreground">
-            <RouterLink to="/login" class="flex items-center gap-1 text-foreground hover:underline">
+            <RouterLink :to="{ name: 'login' }" class="flex items-center gap-1 text-foreground hover:underline">
                 <ArrowLeft class="size-4" />
                 Back to log in
             </RouterLink>

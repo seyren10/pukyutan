@@ -34,6 +34,12 @@ export const useAuthMutations = () => {
 
   const verifyEmailMutation = useMutation({
     mutationFn: sendEmailVerification,
+    onSuccess: () => {
+      toast.success("Verification link sent!", {
+        description:
+          "We sent a verification link to your email address. Click the link to activate your account.",
+      });
+    },
     onError: errorCallback,
   });
 
