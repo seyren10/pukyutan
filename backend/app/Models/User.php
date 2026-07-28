@@ -36,4 +36,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Group::class);
     }
+
+    public function groupShares(): HasMany
+    {
+        return $this->hasMany(GroupShare::class);
+    }
 }

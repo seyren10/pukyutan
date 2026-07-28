@@ -23,7 +23,8 @@ class GroupJoinController extends Controller
         abort_if($group === null, 404, "No group found with that invitation code");
         abort_if(Auth::id() === $group->user_id, 400, "You cannot invite yourself");
 
-        GroupShare::updateOrCreate(
+
+        auth()->user()->groupShares()->updateOrCreate(
             [
                 "group_id" => $group->id
             ],

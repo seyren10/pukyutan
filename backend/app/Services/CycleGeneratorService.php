@@ -74,15 +74,15 @@ class CycleGeneratorService
         // calling ->addDays() etc. would modify $baseDate itself, which
         // would corrupt every subsequent loop iteration that reuses it.
         return match ($unit) {
-            FrequencyUnitType::DAILY => $baseDate->copy()->addDays($interval * $steps),
-            FrequencyUnitType::WEEKLY => $baseDate->copy()->addWeeks($interval * $steps),
+            FrequencyUnitType::DAY => $baseDate->copy()->addDays($interval * $steps),
+            FrequencyUnitType::WEEK => $baseDate->copy()->addWeeks($interval * $steps),
                 // addMonthsNoOverflow (not addMonths!) is deliberate.
                 // Example: Jan 31 + 1 month.
                 //   addMonths()          -> Mar 3  (rolls over, since Feb has no 31st)
                 //   addMonthsNoOverflow() -> Feb 28 (clamps to the last valid day)
                 // The clamped behavior is what you want for a predictable
                 // recurring schedule.
-            FrequencyUnitType::MONTHLY => $baseDate->copy()->addMonthsNoOverflow($interval * $steps),
+            FrequencyUnitType::MONTH => $baseDate->copy()->addMonthsNoOverflow($interval * $steps),
         };
     }
 

@@ -16,7 +16,7 @@ return new class extends Migration {
             $table->id();
             $table->string("name");
             $table->decimal("contribution_amount", 10, 2);
-            $table->string("frequency_unit")->default(FrequencyUnitType::WEEKLY);
+            $table->string("frequency_unit")->default(FrequencyUnitType::WEEK);
             $table->unsignedInteger("frequency_interval")->default(1);
             $table->date("start_date");
             $table->string("status")->default(GroupStatus::DRAFT);

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\V1;
 
+use App\Enums\GroupShareStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\V1\StoreGroupRequest;
 use App\Http\Requests\V1\UpdateGroupRequest;
@@ -10,19 +11,45 @@ use App\Models\Group;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
 
 class GroupController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
 
-        $userGroups = $user->groups()->get();
+        $perPage = $request->query("per_page", 15);
+        $userGroups = $user->groups()
+            ->with(["recentMembers", 'nextCycle'])
+            ->withCount(['members', 'cycles'])
+            ->latest()
+            ->simplePaginate($perPage);
 
         return GroupResource::collection($userGroups);
+    }
+
+    /**
+     * List all the groups that are shared to a user
+     */
+    public function shared(Request $request)
+    {
+        $user = Auth::user();
+        $perPage = $request->query("per_page", 15);
+
+        $groups = Group::query()->
+            whereHas("groupShares", fn($query) =>
+                $query->where("user_id", $user->id)
+                    ->where("status", GroupShareStatus::ACCEPTED))
+            ->with(["user:id,name", 'recentMembers', 'nextCycle'])
+            ->withCount(["members"])
+            ->latest()
+            ->simplePaginate($perPage);
+
+        return GroupResource::collection($groups);
     }
 
     /**

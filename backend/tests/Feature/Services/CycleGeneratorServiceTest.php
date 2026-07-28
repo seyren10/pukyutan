@@ -32,7 +32,7 @@ function makeGroupWithMembers(array $groupAttributes, int $memberCount): Group
 it('generates one cycle per member for round 1', function () {
     $group = makeGroupWithMembers([
         'start_date' => '2026-01-05',
-        'frequency_unit' => FrequencyUnitType::WEEKLY,
+        'frequency_unit' => FrequencyUnitType::WEEK,
         'frequency_interval' => 1,
     ], memberCount: 4);
 
@@ -44,7 +44,7 @@ it('generates one cycle per member for round 1', function () {
 it('assigns sequential cycle numbers starting at 1 for round 1', function () {
     $group = makeGroupWithMembers([
         'start_date' => '2026-01-05',
-        'frequency_unit' => FrequencyUnitType::WEEKLY,
+        'frequency_unit' => FrequencyUnitType::WEEK,
         'frequency_interval' => 1,
     ], memberCount: 3);
 
@@ -58,7 +58,7 @@ it('assigns sequential cycle numbers starting at 1 for round 1', function () {
 it('assigns the recipient in payout_order sequence', function () {
     $group = makeGroupWithMembers([
         'start_date' => '2026-01-05',
-        'frequency_unit' => FrequencyUnitType::WEEKLY,
+        'frequency_unit' => FrequencyUnitType::WEEK,
         'frequency_interval' => 1,
     ], memberCount: 3);
 
@@ -74,7 +74,7 @@ it('assigns the recipient in payout_order sequence', function () {
 it('calculates weekly due dates correctly', function () {
     $group = makeGroupWithMembers([
         'start_date' => '2026-01-05', // a Monday
-        'frequency_unit' => FrequencyUnitType::WEEKLY,
+        'frequency_unit' => FrequencyUnitType::WEEK,
         'frequency_interval' => 1,
     ], memberCount: 3);
 
@@ -88,7 +88,7 @@ it('calculates weekly due dates correctly', function () {
 it('calculates custom-interval due dates correctly (every 9 days)', function () {
     $group = makeGroupWithMembers([
         'start_date' => '2026-01-01',
-        'frequency_unit' => FrequencyUnitType::DAILY,
+        'frequency_unit' => FrequencyUnitType::DAY,
         'frequency_interval' => 9,
     ], memberCount: 3);
 
@@ -107,7 +107,7 @@ it('calculates custom-interval due dates correctly (every 9 days)', function () 
 it('clamps monthly due dates at month-end instead of overflowing', function () {
     $group = makeGroupWithMembers([
         'start_date' => '2026-01-31',
-        'frequency_unit' => FrequencyUnitType::MONTHLY,
+        'frequency_unit' => FrequencyUnitType::MONTH,
         'frequency_interval' => 1,
     ], memberCount: 3);
 
@@ -123,7 +123,7 @@ it('clamps monthly due dates at month-end instead of overflowing', function () {
 it('continues cycle numbering and dates into a new round without resetting', function () {
     $group = makeGroupWithMembers([
         'start_date' => '2026-01-05',
-        'frequency_unit' => FrequencyUnitType::WEEKLY,
+        'frequency_unit' => FrequencyUnitType::WEEK,
         'frequency_interval' => 1,
     ], memberCount: 2);
 
@@ -150,7 +150,7 @@ it('continues cycle numbering and dates into a new round without resetting', fun
 it('only includes active (non soft-deleted) members', function () {
     $group = makeGroupWithMembers([
         'start_date' => '2026-01-05',
-        'frequency_unit' => FrequencyUnitType::WEEKLY,
+        'frequency_unit' => FrequencyUnitType::WEEK,
         'frequency_interval' => 1,
     ], memberCount: 3);
 

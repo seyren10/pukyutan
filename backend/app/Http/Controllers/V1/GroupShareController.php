@@ -12,6 +12,12 @@ use Illuminate\Support\Facades\Gate;
 
 class GroupShareController extends Controller
 {
+    /**
+     * list all the groups-share requests
+     * @param Request $request
+     * @param Group $group
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     */
     public function index(Request $request, Group $group)
     {
         Gate::authorize("update", $group);
@@ -19,6 +25,8 @@ class GroupShareController extends Controller
 
         return GroupShareResource::collection($groupShares);
     }
+
+
 
     public function accept(GroupShare $share_request)
     {

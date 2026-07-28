@@ -16,7 +16,7 @@ class GroupResource extends JsonResource
     {
         $data = parent::toArray($request);
         $data["is_round_completed"] = $this->whenLoaded("cycles", $this->isRoundCompleted());
-
+        $data['invite_code'] = $this->when($request->user()?->id === $this->user_id, $this->invite_code);
 
         return $data;
     }

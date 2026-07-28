@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Str;
 use Spatie\Activitylog\Models\Activity;
@@ -60,6 +61,13 @@ class Group extends Model
     {
         return $this->hasMany(Member::class);
     }
+    public function recentMembers(): HasMany
+    {
+        return $this->members()
+            ->select(['id', 'name', 'email', 'group_id'])
+            ->latest()
+            ->limit(5);
+    }
 
     public function user(): BelongsTo
     {
@@ -69,6 +77,14 @@ class Group extends Model
     public function cycles(): HasMany
     {
         return $this->hasMany(Cycle::class);
+    }
+
+    public function nextCycle(): HasOne
+    {
+        return $this->hasOne(Cycle::class)->ofMany(
+            ["due_date" => "min"],
+            fn($query) => $query->whereNull("disbursed_at")
+        );
     }
 
     public function groupShares(): HasMany

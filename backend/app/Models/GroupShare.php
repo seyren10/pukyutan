@@ -20,7 +20,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 #[Fillable([
     "status",
     "requested_at",
-    "responded_at"
+    "responded_at",
+    "group_id"
 ])]
 class GroupShare extends Model
 {
