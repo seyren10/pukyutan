@@ -2,11 +2,10 @@
 import { computed, ref, watch } from 'vue'
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
-import { CalendarIcon, Plus } from '@lucide/vue'
+import { CalendarIcon, ChevronDown, Plus, PlusIcon } from '@lucide/vue'
 import { DateFormatter, getLocalTimeZone, parseDate, today, type DateValue } from '@internationalized/date'
 
 import { Button } from '@/components/ui/button'
-import { Spinner } from '@/components/ui/spinner'
 import { Input } from '@/components/ui/input'
 import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from '@/components/ui/input-group'
 import {
@@ -26,6 +25,8 @@ import type { GROUP_FREQUENCY_UNIT } from '@/features/group/constant'
 import { createGroupSchema } from '@/features/group/schema'
 import type { GroupFrequencyUnit, GroupSchema } from '@/features/group/type'
 import AppButtonLoaderSwap from '../app/AppButtonLoaderSwap.vue'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown-menu/index.ts'
+import { ButtonGroup, ButtonGroupSeparator } from '../ui/button-group/index.ts'
 
 const emit = defineEmits<{
     (e: 'submit', payload: GroupSchema): void
@@ -34,6 +35,8 @@ const { initialValues, loading } = defineProps<{
     loading?: boolean,
     initialValues?: GroupSchema
 }>()
+
+const addMembers = defineModel<boolean>('addMembers', { default: false })
 
 const frequencyUnitOptions: { value: (typeof GROUP_FREQUENCY_UNIT)[number]; label: string }[] = [
     { value: 'day', label: 'days' },
@@ -96,8 +99,14 @@ const startDate = computed<DateValue | undefined>({
     },
 })
 
+
+
 const onSubmit = handleSubmit((values) => emit('submit', values))
 
+const handleCreateGroupOnly = () => {
+    addMembers.value = false;
+    onSubmit()
+}
 </script>
 
 <template>
@@ -185,11 +194,37 @@ const onSubmit = handleSubmit((values) => emit('submit', values))
             </FormItem>
         </FormField>
 
-        <Button type="submit" :disabled="loading" class="mt-2 w-full">
-            <AppButtonLoaderSwap :loading="loading">
-                <Plus data-icon="inline-start" />
-            </AppButtonLoaderSwap>
-            {{ initialValues ? 'Update' : 'Create' }} group
-        </Button>
+
+
+        <ButtonGroup class="w-full">
+            <Button type="submit" :disabled="loading" class="grow" @click="addMembers = true">
+                <AppButtonLoaderSwap :loading="loading">
+                    <Plus data-icon="inline-start" />
+                </AppButtonLoaderSwap>
+                <span class="truncate max-w-full">
+                    {{ initialValues ? 'Update' : 'Create and add Members' }}
+                </span>
+            </Button>
+            <template v-if="true">
+                <ButtonGroupSeparator />
+                <DropdownMenu>
+                    <DropdownMenuTrigger as-child>
+                        <Button size="icon" :disabled="loading" aria-label="more options">
+                            <ChevronDown />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                        <DropdownMenuItem @select="handleCreateGroupOnly">
+                            <PlusIcon />
+                            <div class="flex flex-col">
+                                <span class="font-medium">Create group</span>
+                                <span class="text-muted-foreground">Create only the group and add members
+                                    later.</span>
+                            </div>
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            </template>
+        </ButtonGroup>
     </form>
 </template>

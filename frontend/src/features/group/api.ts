@@ -33,6 +33,6 @@ export const getSharedGroups = async (params?: GroupQueryParams) => {
 };
 
 export const createGroup = async (payload: CreateGroupSchema) => {
-  const res = await httpClient.post<Group>("/api/v1/groups", payload);
+  const res = await httpClient.post<{ data: Group }>("/api/v1/groups", payload);
   return res.data;
 };

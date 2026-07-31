@@ -3,12 +3,13 @@ import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
-import { Eye, ArrowRight, Wallet, CalendarClock } from '@lucide/vue'
+import { Eye, ArrowRight, Wallet, CalendarClock, UserPlus2Icon } from '@lucide/vue'
 import type { Group } from '@/features/group/type'
 import { computed } from 'vue'
 import { formatFrequencyLabel, getInitials } from '@/lib/helpers'
 import { GroupCycleVisual } from '.'
 import { format } from 'date-fns'
+import AddMemberDialog from '@/pages/index/components/AddMemberDialog.vue'
 
 const { group } = defineProps<{
     group: Group
@@ -77,8 +78,15 @@ const isShared = computed(() => user?.name)
             </p>
         </CardContent>
 
-        <CardFooter>
-            <Button variant="ghost" size="sm" class="ml-auto">
+        <CardFooter class="gap-2">
+            <AddMemberDialog :group="group">
+                <Button variant="outline" size="sm">
+                    <UserPlus2Icon data-icon="inline-end" />
+                    Add Members
+                </Button>
+            </AddMemberDialog>
+
+            <Button variant="ghost" size="sm">
                 View group
                 <ArrowRight data-icon="inline-end" />
             </Button>

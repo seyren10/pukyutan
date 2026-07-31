@@ -1,7 +1,8 @@
 import type { AxiosError } from "axios";
 
-export type LaravelError = AxiosError<{
+export type LaravelError<T = any> = AxiosError<{
   message?: string;
+  errors?: T;
 }>;
 
 export type TimeStamp = {

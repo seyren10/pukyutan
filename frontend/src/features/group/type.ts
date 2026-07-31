@@ -29,7 +29,7 @@ export type Group = TimeStamp & {
 export type RecentMember = {
   id: number;
   name: string;
-  email: string | null;
+  email: string;
   group_id: number;
 };
 
