@@ -29,7 +29,7 @@ class MemberPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return $this->view($user, new Member);
     }
 
     /**

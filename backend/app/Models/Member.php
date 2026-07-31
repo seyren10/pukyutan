@@ -12,6 +12,7 @@ use App\Models\Group;
 
 /**
  * @property int $id
+ * @property int $group_id
  * @property string $name
  * @property string|null $email
  * @property int $payout_order

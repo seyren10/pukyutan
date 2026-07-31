@@ -65,7 +65,7 @@ class Group extends Model
     {
         return $this->members()
             ->select(['id', 'name', 'email', 'group_id'])
-            ->latest()
+            ->orderBy('payout_order')
             ->limit(5);
     }
 

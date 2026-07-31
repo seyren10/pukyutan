@@ -10,6 +10,7 @@ use App\Http\Controllers\V1\GroupRoundController;
 use App\Http\Controllers\V1\GroupShareController;
 use App\Http\Controllers\V1\MemberController;
 use App\Http\Controllers\V1\MemberLedgerController;
+use App\Http\Controllers\V1\MemberReorderController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('groups/shared', [GroupController::class, 'shared']);
@@ -18,6 +19,8 @@ Route::post("groups/{group}/activate", GroupActivateController::class);
 Route::post("groups/{group}/rounds", GroupRoundController::class);
 Route::post("groups/{group}/complete", GroupCompleteController::class);
 Route::get("groups/{group}/activities", GroupActivityController::class);
+Route::put('groups/{group}/members/reorder', MemberReorderController::class);
+
 Route::post("groups/join/{invite_code}", GroupJoinController::class)
     ->whereAlphaNumeric("invite_code");
 
@@ -27,5 +30,6 @@ Route::post("share-requests/{share_request}/reject", [GroupShareController::clas
 
 Route::apiResource("groups.members", MemberController::class)->shallow();
 Route::get("members/{member}/ledger", MemberLedgerController::class);
+
 
 Route::post("cycles/{cycle}/disburse", CycleDisburseController::class);

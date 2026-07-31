@@ -19,7 +19,9 @@ class MemberController extends Controller
     public function index(Group $group)
     {
         Gate::authorize("view", $group);
-        $members = $group->members()->get();
+        $members = $group->members()
+            ->orderBy('payout_order')
+            ->get();
 
         return MemberResource::collection($members);
     }
@@ -29,6 +31,8 @@ class MemberController extends Controller
      */
     public function store(StoreMemberRequest $request, Group $group)
     {
+
+        Gate::authorize('update', $group);
 
         if (!$group->isDraft())
             abort(400, "Cannot add members to an active group");
