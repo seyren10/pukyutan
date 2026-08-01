@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\V1\ContributionController;
+use App\Http\Controllers\V1\CycleController;
 use App\Http\Controllers\V1\CycleDisburseController;
 use App\Http\Controllers\V1\GroupActivateController;
 use App\Http\Controllers\V1\GroupActivityController;
@@ -31,5 +33,5 @@ Route::post("share-requests/{share_request}/reject", [GroupShareController::clas
 Route::apiResource("groups.members", MemberController::class)->shallow();
 Route::get("members/{member}/ledger", MemberLedgerController::class);
 
-
 Route::post("cycles/{cycle}/disburse", CycleDisburseController::class);
+Route::apiResource('cycles.contributions', ContributionController::class)->shallow()->only(['index', 'store']);

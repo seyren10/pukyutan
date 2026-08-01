@@ -11,7 +11,6 @@ use App\Models\Group;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Log;
 
 class GroupController extends Controller
 {
@@ -24,7 +23,7 @@ class GroupController extends Controller
 
         $perPage = $request->query("per_page", 15);
         $userGroups = $user->groups()
-            ->with(["recentMembers", 'nextCycle'])
+            ->with(["recentMembers", 'nextCycle', 'nextCycle.recipient:id,name'])
             ->withCount(['members', 'cycles'])
             ->latest()
             ->simplePaginate($perPage);
@@ -71,7 +70,8 @@ class GroupController extends Controller
     {
         Gate::authorize("view", $group);
 
-        $group->load(["members", "user:id,name,email", "cycles"]);
+        $group->load(["members", "user:id,name,email", 'nextCycle.recipient:id,name','nextCycle.members']);
+        $group->loadCount(['cycles']);
 
         return new GroupResource($group);
     }

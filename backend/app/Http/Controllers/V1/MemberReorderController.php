@@ -18,6 +18,9 @@ class MemberReorderController extends Controller
     {
         Gate::authorize('update', $group);
 
+        if (!$group->isDraft())
+            abort(400, "Cannot reorder members in an active group");
+
         $validated = $request->validated();
 
         $service->execute($group, $validated['member_ids']);

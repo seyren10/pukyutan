@@ -25,9 +25,9 @@ class StoreContributionRequest extends FormRequest
     {
         return [
             "amount" => ["required", "numeric", "min:0.01"],
-            "member_id" => ["required", Rule::exists("members")],
+            "member_id" => ["required", Rule::exists("members", 'id')],
             "paid_at" => ["required", "date"],
-            "note" => ["nullable", "max:255"]
+            "notes" => ["nullable", "max:255"]
         ];
     }
 }

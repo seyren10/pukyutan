@@ -5,6 +5,7 @@ namespace App\Policies;
 use App\Models\Cycle;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
+use Illuminate\Support\Facades\Log;
 
 class CyclePolicy
 {
@@ -31,7 +32,7 @@ class CyclePolicy
      */
     public function view(User $user, Cycle $cycle): bool
     {
-        return false;
+        return $cycle->group->user_id === $user->id;
     }
 
     /**

@@ -23,11 +23,25 @@ class CycleDisburseController extends Controller
 
         $validated = $request->validate(["disbursed_amount" => ['required', 'numeric', 'min:0.01']]);
         $disbursedAmount = (float) $validated["disbursed_amount"];
+
+        $reserveBalance = $ledgerCalculatorService->treasuryBalanceForGroup($cycle->group);
+
+        // Not a soft judgment call — this is a fact about how much money
+        // actually exists. The frontend already nudges the leader toward a
+        // safe default (this cycle's expected total, capped at reserve) and
+        // lets them exceed *that* deliberately, but it can never physically
+        // send out more than the group has collected and not yet paid out.
+        abort_if(
+            $disbursedAmount > $reserveBalance,
+            422,
+            "Can't disburse more than what's currently on hand (₱" . number_format($reserveBalance, 2) . ")."
+        );
+
         $cycle->disbursed_amount = $disbursedAmount;
         $cycle->disbursed_at = now();
         $cycle->save();
 
-        $summary = $ledgerCalculatorService->collectionSummaryForCycle($cycle);
+        $summary = $ledgerCalculatorService->collectionSummaryForCycle($cycle->fresh());
 
         activity()
             ->performedOn($cycle)
