@@ -11,5 +11,18 @@ export type Member = TimeStamp & {
   group_id: number;
 };
 
+export type RecentMember = {
+  id: number;
+  name: string;
+  email: string;
+  group_id: number;
+};
+
+export type MemberWithLedger = Member & {
+  expected_total: number;
+  paid_total: number;
+  balance: number;
+};
+
 export type MemberSchema = z.infer<typeof memberSchema>;
 export type CreateMemberPayload = MemberSchema;

@@ -1,6 +1,11 @@
 import { httpClient } from "@/services/axios/axios";
 import type { SimplePaginatedResponse } from "@/types/paginate";
-import type { CreateGroupSchema, Group, GroupQueryParams } from "./type";
+import type {
+  CreateGroupSchema,
+  Group,
+  GroupDetail,
+  GroupQueryParams,
+} from "./type";
 
 //  api/v1/groups ................................................................................................................................................. groups.index › V1\GroupController@index
 //   POST            api/v1/groups ................................................................................................................................................. groups.store › V1\GroupController@store
@@ -24,6 +29,13 @@ export const getGroups = async (params?: GroupQueryParams) => {
   return res.data;
 };
 
+export const getGroupDetail = async (groupId: number) => {
+  const res = await httpClient.get<{ data: GroupDetail }>(
+    `/api/v1/groups/${groupId}`,
+  );
+  return res.data;
+};
+
 export const getSharedGroups = async (params?: GroupQueryParams) => {
   const res = await httpClient.get<SimplePaginatedResponse<Group>>(
     "/api/v1/groups/shared",
@@ -34,5 +46,13 @@ export const getSharedGroups = async (params?: GroupQueryParams) => {
 
 export const createGroup = async (payload: CreateGroupSchema) => {
   const res = await httpClient.post<{ data: Group }>("/api/v1/groups", payload);
+  return res.data;
+};
+
+export const activateGroup = async (groupId: number) => {
+  const res = await httpClient.post<{ data: Group }>(
+    `/api/v1/groups/${groupId}/activate`,
+  );
+
   return res.data;
 };

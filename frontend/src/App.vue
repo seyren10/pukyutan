@@ -2,11 +2,14 @@
 import { VueQueryDevtools } from '@tanstack/vue-query-devtools';
 import 'vue-sonner/style.css'
 import { Toaster } from './components/ui/sonner';
+import { TooltipProvider } from './components/ui/tooltip';
 </script>
 
 <template>
   <div>
-    <RouterView />
+    <TooltipProvider>
+      <RouterView />
+    </TooltipProvider>
     <Toaster />
     <VueQueryDevtools />
   </div>

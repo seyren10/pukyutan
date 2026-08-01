@@ -24,6 +24,9 @@ import { useDebounceFn } from '@vueuse/core'
 const { groupId } = defineProps<{
     groupId: number
 }>()
+const emit = defineEmits<{
+    (e: 'updated'): void
+}>()
 
 const { data } = useQuery(getGroupMembersQueryOptions(() => groupId))
 const membersData = computed(() => data.value?.data)
@@ -33,6 +36,7 @@ const { mutate: removeMemberMutate } = useRemoveMemberMutation(groupId)
 const { mutate: reorderMembersMutate } = useReorderMembersMutation(groupId)
 
 const members = ref<Member[]>([])
+const membersCount = computed(() => members.value.length)
 
 
 const { handleSubmit, resetForm, setErrors, resetField, values } = useForm({
@@ -63,6 +67,7 @@ const onSubmit = handleSubmit((payload) => {
         },
         onSuccess: () => {
             resetForm()
+            emit('updated');
         }
     })
 })
@@ -78,11 +83,22 @@ const commitReorder = useDebounceFn(() => {
 
     const snapshot = dragSnapshot
     reorderMembersMutate(memberIds, {
+        onSuccess: () => {
+            emit('updated')
+        },
         onError: () => {
             members.value = snapshot.value
         },
     })
 }, 1000)
+
+const handleRemovemember = (memberId: number) => {
+    removeMemberMutate(memberId, {
+        onSuccess: () => {
+            emit('updated')
+        }
+    })
+}
 
 watchEffect(() => {
     if (!membersData.value) return;
@@ -105,7 +121,7 @@ watchEffect(() => {
         <Card>
             <CardContent>
                 <form class="space-y-4" @submit="onSubmit">
-                    <FormField v-slot="{ componentField }" name="name">
+                    <FormField v-slot="{ componentField }" name="name" :validate-on-blur="false">
                         <FormItem class="flex-1">
                             <FormLabel>Name</FormLabel>
                             <FormControl>
@@ -181,12 +197,14 @@ watchEffect(() => {
 
                         <Button variant="ghost" size="icon" type="button"
                             class="shrink-0 text-muted-foreground hover:text-destructive"
-                            @click="removeMemberMutate(member.id)">
+                            @click="handleRemovemember(member.id)">
                             <X />
                         </Button>
                     </div>
                 </VueDraggable>
             </CardContent>
         </Card>
+
+        <slot :members-count="membersCount" />
     </div>
 </template>

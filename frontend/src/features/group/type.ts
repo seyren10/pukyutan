@@ -3,6 +3,7 @@ import type { GROUP_FREQUENCY_UNIT, GROUP_STATUS } from "./constant";
 import type { Cycle } from "../cycle/type";
 import type z from "zod";
 import type { createGroupSchema } from "./schema";
+import type { MemberWithLedger, RecentMember } from "../members/type";
 
 export type GroupFrequencyUnit = (typeof GROUP_FREQUENCY_UNIT)[number];
 export type GroupStatus = (typeof GROUP_STATUS)[number];
@@ -26,11 +27,9 @@ export type Group = TimeStamp & {
   user?: { id: number; name: string };
 };
 
-export type RecentMember = {
-  id: number;
-  name: string;
-  email: string;
-  group_id: number;
+export type GroupDetail = Omit<Group, "recent_members" | "members_count"> & {
+  members: MemberWithLedger[];
+  is_round_completed: boolean;
 };
 
 export type GroupQueryParams = QueryParams;
