@@ -23,17 +23,15 @@ class CycleResource extends JsonResource
         // edit here every time the service's return shape grows.
         $data = array_merge($data, app(LedgerCalculatorService::class)->collectionSummaryForCycle($this->resource));
 
-        // Per-member status *as of this cycle*, not "as of today" — this is
-        // what member rows inside a cycle's detail view should render from.
-        // Using group.members here (not a fresh query) relies on the caller
-        // having eager-loaded it; falls back to a query if not, at the cost
-        // of an extra round trip.
-        $ledger = app(LedgerCalculatorService::class);
-        $data['members'] = $this->resource->group->members->map(function ($member) use ($ledger) {
-            return [
+
+        $data['members'] = $this->whenLoaded('members', function () {
+            $ledger = app(LedgerCalculatorService::class);
+            $balances = $ledger->balancesForMembersAsOfCycle($this->resource->members, $this->resource);
+
+            return $this->resource->members->map(fn($member) => [
                 ...$member->toArray(),
-                ...$ledger->balanceForMemberAsOfCycle($member, $this->resource)
-            ];
+                ...$balances[$member->id],
+            ]);
         });
 
 

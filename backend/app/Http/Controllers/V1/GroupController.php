@@ -70,7 +70,7 @@ class GroupController extends Controller
     {
         Gate::authorize("view", $group);
 
-        $group->load(["members", "user:id,name,email", 'nextCycle.recipient:id,name','nextCycle.members']);
+        $group->load(["user:id,name,email", 'nextCycle.recipient:id,name', 'nextCycle.members', 'members']);
         $group->loadCount(['cycles']);
 
         return new GroupResource($group);

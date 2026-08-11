@@ -6,6 +6,7 @@ use App\Models\Contribution;
 use App\Models\Cycle;
 use App\Models\Group;
 use App\Models\Member;
+use Illuminate\Support\Collection;
 
 class LedgerCalculatorService
 {
@@ -123,5 +124,40 @@ class LedgerCalculatorService
             'paid_total' => $paidTotal,
             'balance' => $expectedTotal - $paidTotal,
         ];
+    }
+
+    public function balancesForMembersAsOfCycle(Collection $members, Cycle $cycle): array
+    {
+        $memberIds = $members->pluck('id');
+
+        $paidTotals = Contribution::query()
+            ->whereIn('member_id', $memberIds)
+            ->whereHas('cycle', fn($q) => $q->where('due_date', '<=', $cycle->due_date))
+            ->groupBy('member_id')
+            ->selectRaw('member_id, SUM(amount) as total_paid')
+            ->pluck('total_paid', 'member_id');
+
+        $cyclesElapsed = Cycle::query()
+            ->where('group_id', $cycle->group_id)
+            ->where('due_date', '<=', $cycle->due_date)
+            ->count();
+
+        $expectedPerMember = $cyclesElapsed * $cycle->group->contribution_amount;
+
+        return $members->mapWithKeys(function ($member) use ($paidTotals, $expectedPerMember) {
+            $paid = (float) ($paidTotals[$member->id] ?? 0);
+
+            return [
+                $member->id => [
+                    'expected_total' => $expectedPerMember,
+                    'paid_total' => $paid,
+                    // Positive = owes money. Negative = has credit.
+                    // Rollover is free — this single subtraction already
+                    // accounts for every over/underpayment across every
+                    // prior cycle. No per-cycle bookkeeping needed.
+                    'balance' => $expectedPerMember - $paid,
+                ],
+            ];
+        })->all();
     }
 }

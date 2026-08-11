@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 /**
  * @property int $id
@@ -64,6 +65,18 @@ class Cycle extends Model
     public function contributions(): HasMany
     {
         return $this->hasMany(Contribution::class);
+    }
+
+    public function members(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            Member::class,
+            Group::class,
+            'id',        // groups.id — matched against cycles.group_id
+            'group_id',  // members.group_id — matched against groups.id
+            'group_id',  // cycles.group_id (local key)
+            'id',        // groups.id (local key on the through table)
+        );
     }
 
     #endregion
