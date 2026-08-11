@@ -23,7 +23,7 @@ class GroupController extends Controller
 
         $perPage = $request->query("per_page", 15);
         $userGroups = $user->groups()
-            ->with(["recentMembers", 'nextCycle', 'nextCycle.recipient:id,name'])
+            ->with(["recentMembers", 'nextCycle', 'nextCycle.recipient:id,name', 'cycles'])
             ->withCount(['members', 'cycles'])
             ->latest()
             ->simplePaginate($perPage);
@@ -70,8 +70,14 @@ class GroupController extends Controller
     {
         Gate::authorize("view", $group);
 
-        $group->load(["user:id,name,email", 'nextCycle.recipient:id,name', 'nextCycle.members', 'members']);
-        $group->loadCount(['cycles']);
+        $group->load([
+            "user:id,name,email",
+            'nextCycle.recipient:id,name',
+            'nextCycle.members',
+            'members',
+            'cycles', // <-- added
+        ]);
+        $group->loadCount(['cycles']); // kept — cycles_count is a separate, still-useful field
 
         return new GroupResource($group);
     }

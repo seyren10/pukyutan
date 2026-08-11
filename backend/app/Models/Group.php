@@ -115,13 +115,30 @@ class Group extends Model
      */
     public function isRoundCompleted(): bool
     {
-        $currentRound = $this->cycles()->max("round_number");
+        // Use the already-loaded collection when available — avoids extra
+        // queries on index(), where cycles is eager-loaded specifically so
+        // this check doesn't have to hit the database per group.
+        if ($this->relationLoaded('cycles')) {
+            $currentRound = $this->cycles->max('round_number');
 
-        if (!$currentRound)
+            if (!$currentRound) {
+                return false;
+            }
+
+            return $this->cycles
+                ->where('round_number', $currentRound)
+                ->every(fn($cycle) => $cycle->disbursed_at !== null);
+        }
+
+        // Fallback for when cycles wasn't eager-loaded — same logic, via query.
+        $currentRound = $this->cycles()->max('round_number');
+
+        if (!$currentRound) {
             return false;
+        }
 
         return $this->cycles()
-            ->where("round_number", $currentRound)
+            ->where('round_number', $currentRound)
             ->whereNull('disbursed_at')
             ->doesntExist();
     }

@@ -20,8 +20,8 @@ class GroupActivateController extends Controller
         // Check if the user is authorized to activate the group
         Gate::authorize("activate", $group);
 
-        if ($group->status !== GroupStatus::DRAFT)
-            abort(400, "Group is already activated");
+        abort_if($group->status !== GroupStatus::DRAFT, 400, "Group is already activated");
+        abort_if($group->members()->count() <= 0, 400, 'Group has no members');
 
         $cycles = $cycleGeneratorService->generateRound($group, roundNumber: 1);
 

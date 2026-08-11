@@ -15,7 +15,7 @@ class GroupResource extends JsonResource
     public function toArray(Request $request): array
     {
         $data = parent::toArray($request);
-        $data["is_round_completed"] = $this->whenLoaded("cycles", $this->isRoundCompleted());
+        $data["is_round_completed"] = $this->whenLoaded("cycles", fn () => $this->resource->isRoundCompleted());
         $data['invite_code'] = $this->when($request->user()?->id === $this->user_id, $this->invite_code);
         $data['next_cycle'] = new CycleResource($this->whenLoaded('nextCycle'));
         $data['members'] = MemberResource::collection($this->whenLoaded('members'));
