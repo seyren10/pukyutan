@@ -25,11 +25,12 @@ export type Group = TimeStamp & {
   cycles_count: number;
   next_cycle: Cycle | null;
   user?: { id: number; name: string };
+  cycles: Cycle[];
+  is_round_completed: boolean;
 };
 
 export type GroupDetail = Omit<Group, "recent_members" | "members_count"> & {
   members: MemberWithLedger[];
-  is_round_completed: boolean;
 };
 
 export type GroupQueryParams = QueryParams;

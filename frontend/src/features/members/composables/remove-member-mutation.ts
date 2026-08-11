@@ -1,8 +1,9 @@
 import { useMutation, useQueryClient } from "@tanstack/vue-query";
 import { removeMember } from "../api";
 import { getGroupMembersQueryOptions } from "../query";
+import type { MaybeRefOrGetter } from "vue";
 
-export const useRemoveMemberMutation = (groupId: number) => {
+export const useRemoveMemberMutation = (groupId: MaybeRefOrGetter<number>) => {
   const queryClient = useQueryClient();
   const queryKey = getGroupMembersQueryOptions(groupId).queryKey;
 

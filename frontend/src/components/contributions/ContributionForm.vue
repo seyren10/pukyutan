@@ -19,11 +19,13 @@ const { cycleId, groupId, memberId, remainingAmount } = defineProps<{
     remainingAmount: number
 }>()
 
-const emit = defineEmits<{ recorded: [] }>()
+const emit = defineEmits<{
+    (e: 'recorded'): void
+}>()
 
 const { mutate, isPending } = useAddContributionMutation({ cycleId, groupId })
 
-const { handleSubmit, resetForm, setErrors } = useForm({
+const { handleSubmit, resetForm } = useForm({
     validationSchema: toTypedSchema(contributionSchema),
     initialValues: {
         member_id: memberId,

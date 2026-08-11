@@ -13,6 +13,9 @@ import AddMemberDialog from '@/pages/index/components/AddMemberDialog.vue'
 import GroupCardDropdown from './GroupCardDropdown.vue'
 import { useGroup } from '@/features/group/composables/use-group.ts'
 import { ContributionDialog } from '@/components/contributions/ContributionDialog/index.ts'
+import ActivateGroupDialog from '@/pages/index/components/ActivateGroupDialog.vue'
+import { useGroupActivateMutation } from '@/features/group/composables/use-group-active-mutation.ts'
+import StartNewRoundDialog from '../dialogs/StartNewRoundDialog.vue'
 
 const { group } = defineProps<{
     group: Group
@@ -30,6 +33,9 @@ const { contributionAmount,
     user } = useGroup(() => group)
 
 const isShared = computed(() => user.value?.name)
+
+const { isPending: isGroupActivePending, mutate: groupActivateMutate } = useGroupActivateMutation()
+
 </script>
 
 <template>
@@ -81,19 +87,25 @@ const isShared = computed(() => user.value?.name)
         </CardContent>
 
         <CardFooter class="gap-2">
-            <AddMemberDialog :group="group" v-if="status === 'draft'">
-                <Button variant="outline" size="sm">
-                    <UserPlus2Icon data-icon="inline-end" />
-                    Add Members
-                </Button>
-            </AddMemberDialog>
-
-            <ContributionDialog :group-id="group.id" v-if="status === 'active'">
+            <ContributionDialog :group-id="group.id" v-if="status === 'active' && !group.is_round_completed">
                 <Button variant="outline" size="sm">
                     <HandCoins />
                     Add Contribution
                 </Button>
             </ContributionDialog>
+            <AddMemberDialog :group="group" v-else-if="status === 'draft' && group.members_count <= 0">
+                <Button variant="outline" size="sm">
+                    <UserPlus2Icon data-icon="inline-end" />
+                    Add Members
+                </Button>
+            </AddMemberDialog>
+            <StartNewRoundDialog :member-count="membersCount" :group-name="name" :members-with-outstanding-balance="4"
+                :completed-round-number="2" next-round-first-due-label="tae" :next-round-number="3"
+                :total-collected-last-round="400" :total-expected-last-round="300"
+                v-else-if="group.is_round_completed" />
+            <ActivateGroupDialog :group="group" :members-count="group.members_count" v-else
+                @confirm="groupActivateMutate(group.id)" :loading="isGroupActivePending" />
+
 
             <GroupCardDropdown>
                 <Button variant="ghost" class="ml-auto">

@@ -27,6 +27,14 @@ const handleFormUpdated = () => {
     updateGroupsWhenUpdated.value = true;
 }
 
+const handleActivateGroup = () => {
+    mutate(group.id, {
+        onSuccess: () => {
+            dialog.value = false
+        }
+    })
+}
+
 
 /**
  * Invalidate the group query when the dialog is closed and the form was updated.
@@ -59,7 +67,7 @@ watch(dialog, () => {
 
             <AddMemberForm :group-id="group.id" @updated="handleFormUpdated" #="{ membersCount }">
                 <ActivateGroupDialog :group="group" :members-count="membersCount" :loading="isPending"
-                    @confirm="mutate(group.id)" />
+                    @confirm="handleActivateGroup" v-if="membersCount > 0" />
             </AddMemberForm>
         </DialogScrollContent>
     </Dialog>

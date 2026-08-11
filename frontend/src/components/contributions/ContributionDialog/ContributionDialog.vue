@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import {
     Dialog,
-    DialogContent,
     DialogDescription,
     DialogHeader,
     DialogScrollContent,
@@ -9,7 +8,7 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { ChevronDown, ChevronsUpDown, HandCoins, PiggyBank, Trophy, Wallet } from '@lucide/vue'
+import { ChevronsUpDown, HandCoins, PiggyBank, Trophy, Wallet } from '@lucide/vue'
 import { useQuery } from '@tanstack/vue-query';
 import { getGroupDetailQueryOptions } from '@/features/group/query.ts';
 import { computed, ref } from 'vue';
@@ -124,7 +123,7 @@ const collectedPercent = computed(() => {
                     :disbursed-at="nextCycle.disbursed_at" :expected-total="nextCycle.expected_total"
                     :group-id="groupId" :recipient-name="nextCycle.recipient.name"
                     :recommended-disbursement="nextCycle.recommended_disbursement"
-                    :reserve-balance="nextCycle.reserve_balance">
+                    :reserve-balance="nextCycle.reserve_balance" @recorded="dialog = false">
                     <Button class="w-full">
                         <HandCoins />
                         Disburse payout

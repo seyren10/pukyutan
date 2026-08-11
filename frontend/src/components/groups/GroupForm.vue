@@ -30,14 +30,12 @@ import { ButtonGroup, ButtonGroupSeparator } from '../ui/button-group/index.ts'
 
 const emit = defineEmits<{
     (e: 'submit', payload: GroupSchema): void
+    (e: 'addMembers'): void
 }>()
 const { initialValues, loading } = defineProps<{
     loading?: boolean,
     initialValues?: GroupSchema
 }>()
-
-const addMembers = defineModel<boolean>('addMembers', { default: false })
-
 const frequencyUnitOptions: { value: (typeof GROUP_FREQUENCY_UNIT)[number]; label: string }[] = [
     { value: 'day', label: 'days' },
     { value: 'week', label: 'weeks' },
@@ -101,11 +99,15 @@ const startDate = computed<DateValue | undefined>({
 
 
 
-const onSubmit = handleSubmit((values) => emit('submit', values))
+const onSubmit = handleSubmit((values) => {
+    emit('submit', values)
+    emit('addMembers')
+})
 
-const handleCreateGroupOnly = () => {
-    addMembers.value = false;
-    onSubmit()
+const handleCreateGroupOnly = async () => {
+    handleSubmit((values) => {
+        emit('submit', values)
+    })()
 }
 </script>
 
@@ -197,7 +199,7 @@ const handleCreateGroupOnly = () => {
 
 
         <ButtonGroup class="w-full">
-            <Button type="submit" :disabled="loading" class="grow" @click="addMembers = true">
+            <Button type="submit" :disabled="loading" class="grow">
                 <AppButtonLoaderSwap :loading="loading">
                     <Plus data-icon="inline-start" />
                 </AppButtonLoaderSwap>

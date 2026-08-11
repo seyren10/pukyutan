@@ -2,37 +2,43 @@
 import GroupForm from '@/components/groups/GroupForm.vue';
 import { Dialog, DialogDescription, DialogHeader, DialogScrollContent, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { createGroup } from '@/features/group/api';
-import type { GroupSchema } from '@/features/group/type';
-import { useMutation } from '@tanstack/vue-query';
+import type { Group, GroupSchema } from '@/features/group/type';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import { ref } from 'vue';
 
 const dialog = defineModel({
     default: false
 })
+const emit = defineEmits<{
+    (e: 'addMembers'): void
+}>()
+const queryClient = useQueryClient()
 const addMembers = ref(false)
-const showAddMembersDialog = ref(false);
-const selectedGroupId = ref<number | null>(null)
+const selectedGroup = ref<Group | null>(null)
 
 const { mutate: createGroupMutate, isPending: isCrateGroupPending } = useMutation({
     mutationFn: createGroup,
 })
+
 const handleSubmit = (payload: GroupSchema) => {
-    if (addMembers.value) {
-        createGroupMutate(payload, {
-            onSuccess: (group) => {
-                selectedGroupId.value = group.data.id
-                showAddMembersDialog.value = true
-            }
-        })
-    }
+    createGroupMutate(payload, {
+        onSuccess: (group) => {
+            selectedGroup.value = group.data;
+            dialog.value = false;
+
+        },
+        onSettled: () => queryClient.invalidateQueries({ queryKey: ['groups'] })
+    })
+
 }
+
 </script>
 
 
 <template>
-    <Dialog v-model:open="dialog">
+    <Dialog v-model:open="dialog" unmount-on-hide>
         <DialogTrigger as-child>
-            <slot />
+            <slot :add-members="addMembers" :group="selectedGroup" />
         </DialogTrigger>
 
         <DialogScrollContent>
@@ -41,8 +47,7 @@ const handleSubmit = (payload: GroupSchema) => {
                 <DialogDescription>Fill out the form to create a new group</DialogDescription>
             </DialogHeader>
 
-            <GroupForm @submit="handleSubmit" v-model:add-members="addMembers" :loading="isCrateGroupPending" />
-
+            <GroupForm @submit="handleSubmit" @add-members="emit('addMembers')" :loading="isCrateGroupPending" />
         </DialogScrollContent>
     </Dialog>
 </template>

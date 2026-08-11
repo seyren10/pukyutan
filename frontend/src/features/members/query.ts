@@ -6,6 +6,6 @@ export const getGroupMembersQueryOptions = (
   groupId: MaybeRefOrGetter<number>,
 ) =>
   queryOptions({
-    queryKey: ["groups", toValue(groupId), "members", "list"],
+    queryKey: () => ["groups", toValue(groupId), "members", "list"],
     queryFn: () => getGroupMembers(toValue(groupId)),
   });

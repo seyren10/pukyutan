@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { CheckCircle2, ChevronsUpDownIcon, CirclePlus } from '@lucide/vue'
@@ -16,12 +17,22 @@ const { groupDetail } = defineProps<{
 
 const emit = defineEmits<{ submit: [payload: { member_id: number; amount: number }[]] }>()
 const { nextCycle } = useGroupDetail(() => groupDetail)
+
+// Per-member controlled open state, keyed by member id — a plain ref
+// holding an object is still deep-reactive in Vue 3, so assigning a
+// new key here (openStates.value[id] = false) triggers updates fine.
+const openStates = ref<Record<number, boolean>>({})
+
+function closeCollapsible(memberId: number) {
+    openStates.value[memberId] = false
+}
 </script>
 
 <template>
     <div class="flex flex-col gap-2 py-1">
-        <Collapsible v-for="member in nextCycle?.members" :key="member.id" class="rounded-lg border border-border p-2.5"
-            #="{ open }">
+        <Collapsible v-for="member in nextCycle?.members" :key="member.id" :open="openStates[member.id] ?? false"
+            class="rounded-lg border border-border p-2.5" #="{ open }"
+            @update:open="(value) => (openStates[member.id] = value)">
             <div class="flex items-center gap-4">
                 <Avatar class="size-8 shrink-0">
                     <AvatarFallback class="bg-accent text-xs text-accent-foreground">
@@ -71,7 +82,7 @@ const { nextCycle } = useGroupDetail(() => groupDetail)
 
             <CollapsibleContent v-if="nextCycle" class="p-4">
                 <ContributionForm :cycle-id="nextCycle.id" :remaining-amount="Math.max(member.balance, 0)"
-                    :group-id="groupDetail.id" :member-id="member.id" />
+                    :group-id="groupDetail.id" :member-id="member.id" @recorded="closeCollapsible(member.id)" />
             </CollapsibleContent>
         </Collapsible>
     </div>

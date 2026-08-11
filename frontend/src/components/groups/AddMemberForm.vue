@@ -21,14 +21,16 @@ import { useRemoveMemberMutation } from '@/features/members/composables/remove-m
 import { useReorderMembersMutation } from '@/features/members/composables/reorder-member-mutation'
 import { useDebounceFn } from '@vueuse/core'
 
-const { groupId } = defineProps<{
+const props = defineProps<{
     groupId: number
 }>()
 const emit = defineEmits<{
     (e: 'updated'): void
 }>()
 
-const { data } = useQuery(getGroupMembersQueryOptions(() => groupId))
+const groupId = computed(() => props.groupId)
+
+const { data } = useQuery(getGroupMembersQueryOptions(() => groupId.value))
 const membersData = computed(() => data.value?.data)
 
 const { addMemberMutate } = useAddMemberMutation()
@@ -57,7 +59,10 @@ const onDragEnd = () => {
     commitReorder()
 }
 const onSubmit = handleSubmit((payload) => {
-    addMemberMutate({ groupId, payload }, {
+    addMemberMutate({
+        groupId: groupId.value,
+        payload
+    }, {
         onError: (error) => {
             if (isAxiosError(error)) {
                 const formError = error as LaravelError<MemberSchema>

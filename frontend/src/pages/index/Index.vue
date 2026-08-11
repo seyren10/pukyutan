@@ -8,9 +8,10 @@ import { storeToRefs } from 'pinia'
 import UnverifiedAlert from './components/UnverifiedAlert.vue'
 import { useInfiniteQuery } from '@tanstack/vue-query'
 import { getGroupsInfiniteQueryOptions, getSharedGroupsInfiniteQueryOptions } from '@/features/group/query.ts'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { GroupCard, GroupCardEmpty, GroupCardSkeleton } from '@/components/groups/GroupCard'
 import CreateGroupDialog from './components/CreateGroupDialog.vue'
+import AddMemberDialog from './components/AddMemberDialog.vue'
 
 
 const { data, isPending } = useInfiniteQuery(getGroupsInfiniteQueryOptions())
@@ -18,6 +19,8 @@ const groups = computed(() => data.value?.pages?.flatMap((g) => g.data));
 
 const { data: sharedGroupsData, isPending: isSharedGroupsPending } = useInfiniteQuery(getSharedGroupsInfiniteQueryOptions())
 const sharedGroups = computed(() => sharedGroupsData.value?.pages?.flatMap(g => g.data))
+
+const showAddMemberDialog = ref(false)
 
 
 const stats = [
@@ -30,6 +33,7 @@ const pendingRequestCount = 2
 
 const userStore = useUserStore()
 const { isEmailVerified } = storeToRefs(userStore)
+
 </script>
 
 <template>
@@ -65,11 +69,13 @@ const { isEmailVerified } = storeToRefs(userStore)
         <div class="flex flex-col gap-3">
             <div class="flex items-center justify-between">
                 <h2 class="font-heading text-lg font-semibold text-foreground">Your groups</h2>
-                <CreateGroupDialog>
+                <CreateGroupDialog #="{ group }" @add-members="showAddMemberDialog = true">
                     <Button size="sm" v-if="isEmailVerified">
                         <Plus data-icon="inline-start" />
                         New group
                     </Button>
+
+                    <AddMemberDialog v-model="showAddMemberDialog" :group="group" v-if="group" />
                 </CreateGroupDialog>
             </div>
 
