@@ -9,9 +9,9 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
-import { Hexagon, Search, Bell, User, LogOut } from '@lucide/vue'
+import { Search, Bell, User, LogOut } from '@lucide/vue'
 import AppModeToggler from '@/components/app/AppModeToggler.vue'
-import Logo from '@/assets/mascot.png'
+import Logo from '@/assets/logo.svg'
 withDefaults(
   defineProps<{
     userName?: string
@@ -36,8 +36,8 @@ const navItems = [
       <header
         class="flex items-center justify-between gap-4 rounded-2xl border border-border bg-card px-4 py-3 shadow-sm">
         <div class="flex items-center gap-2">
-          <img :src="Logo" class="size-6 fill-primary text-primary" />
-          <span class="font-heading text-lg font-semibold text-foreground">Pukyutan</span>
+          <img :src="Logo" class="size-10 fill-primary text-primary" />
+          <span class="font-heading text-lg font-semibold text-foreground">Puyo</span>
         </div>
 
         <nav class="hidden items-center gap-6 md:flex">

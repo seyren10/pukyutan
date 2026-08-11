@@ -9,7 +9,7 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { ChevronDown, ChevronsUpDown, HandCoins, Trophy, Wallet } from '@lucide/vue'
+import { ChevronDown, ChevronsUpDown, HandCoins, PiggyBank, Trophy, Wallet } from '@lucide/vue'
 import { useQuery } from '@tanstack/vue-query';
 import { getGroupDetailQueryOptions } from '@/features/group/query.ts';
 import { computed, ref } from 'vue';
@@ -75,6 +75,20 @@ const collectedPercent = computed(() => {
                 </div>
 
                 <Separator />
+
+                <template v-if="nextCycle?.reserve_balance && nextCycle.reserve_balance > 0">
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="flex items-center gap-1.5 text-muted-foreground">
+                            <PiggyBank class="size-3.5" />
+                            On hand right now
+                        </span>
+                        <span class="font-medium text-foreground">
+                            ₱{{ nextCycle.reserve_balance }}
+                        </span>
+                    </div>
+                    <Separator />
+                </template>
+
 
                 <div class="flex flex-col gap-1.5">
                     <div class="flex items-center justify-between text-sm">

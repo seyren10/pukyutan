@@ -22,6 +22,7 @@ export type MemberWithLedger = Member & {
   expected_total: number;
   paid_total: number;
   balance: number;
+  laravel_through_key: number
 };
 
 export type MemberSchema = z.infer<typeof memberSchema>;

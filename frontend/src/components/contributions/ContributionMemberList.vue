@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { BadgeInfo, CheckCircle2, ChevronsUpDownIcon, CirclePlus, CoinsIcon, PiggyBank } from '@lucide/vue'
-import type { MemberWithLedger } from '@/features/members/type'
+import { CheckCircle2, ChevronsUpDownIcon, CirclePlus } from '@lucide/vue'
 import { getInitials } from '@/lib/helpers'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../ui/collapsible'
 import ContributionForm from './ContributionForm.vue'
@@ -10,24 +9,18 @@ import type { GroupDetail } from '@/features/group/type.ts'
 import { useGroupDetail } from '@/features/group/composables/use-group.ts'
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip/index.ts'
 
-const {
-    groupDetail
-} = defineProps<{
+const { groupDetail } = defineProps<{
     loading?: boolean
     groupDetail: GroupDetail
 }>()
+
 const emit = defineEmits<{ submit: [payload: { member_id: number; amount: number }[]] }>()
-const { contributionAmount, members, nextCycle } = useGroupDetail(() => groupDetail)
-
-const remainingFor = (member: MemberWithLedger) => {
-    return Math.max(+contributionAmount.value - member.paid_total, 0)
-}
-
+const { nextCycle } = useGroupDetail(() => groupDetail)
 </script>
 
 <template>
     <div class="flex flex-col gap-2 py-1">
-        <Collapsible v-for="member in members" :key="member.id" class="rounded-lg border border-border p-2.5"
+        <Collapsible v-for="member in nextCycle?.members" :key="member.id" class="rounded-lg border border-border p-2.5"
             #="{ open }">
             <div class="flex items-center gap-4">
                 <Avatar class="size-8 shrink-0">
@@ -39,31 +32,34 @@ const remainingFor = (member: MemberWithLedger) => {
                 <div class="flex min-w-0 flex-1 flex-col">
                     <span class="truncate text-sm font-medium text-foreground">{{ member.name }}</span>
 
-                    <div v-if="member.paid_total >= +contributionAmount" class="flex gap-2 text-xs text-success">
-                        <span class="flex items-center gap-1 ">
+                    <span v-if="member.balance === member.expected_total" class="text-xs text-muted-foreground">
+                        No payments yet
+                    </span>
+
+                    <div v-else-if="member.balance <= 0" class="flex gap-2 text-xs text-success">
+                        <span class="flex items-center gap-1">
                             <CheckCircle2 class="size-3" />
-                            Fully paid
+                            All caught up
                         </span>
                         <Tooltip v-if="member.balance < 0">
                             <TooltipTrigger>
                                 <span class="flex items-center gap-1">
                                     <CirclePlus class="size-3" />
-                                    ₱{{ Math.abs(member.balance) }}
+                                    ₱{{ Math.abs(member.balance).toLocaleString() }}
                                 </span>
                             </TooltipTrigger>
                             <TooltipContent class="max-w-xs">
                                 <p>
-                                    An excess payment of ₱{{ Math.abs(member.balance) }} has been recorded and will be
-                                    applied as a credit to next cycle.
+                                    ₱{{ Math.abs(member.balance).toLocaleString() }} in credit, automatically applied to
+                                    whatever they owe next.
                                 </p>
                             </TooltipContent>
                         </Tooltip>
                     </div>
-                    <span v-else-if="member.paid_total > 0" class="text-xs text-accent-foreground">
-                        Paid ₱{{ member.paid_total.toLocaleString() }} · ₱{{ remainingFor(member).toLocaleString() }}
-                        left
+
+                    <span v-else class="text-xs text-accent-foreground">
+                        Owes ₱{{ member.balance.toLocaleString() }}
                     </span>
-                    <span v-else class="text-xs text-muted-foreground">Not yet paid</span>
                 </div>
 
                 <CollapsibleTrigger as-child>
@@ -73,8 +69,8 @@ const remainingFor = (member: MemberWithLedger) => {
                 </CollapsibleTrigger>
             </div>
 
-            <CollapsibleContent class="p-4" v-if="nextCycle">
-                <ContributionForm :cycle-id="nextCycle.id" :remaining-amount="remainingFor(member)"
+            <CollapsibleContent v-if="nextCycle" class="p-4">
+                <ContributionForm :cycle-id="nextCycle.id" :remaining-amount="Math.max(member.balance, 0)"
                     :group-id="groupDetail.id" :member-id="member.id" />
             </CollapsibleContent>
         </Collapsible>
