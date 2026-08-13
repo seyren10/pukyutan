@@ -1,6 +1,11 @@
 import { infiniteQueryOptions, queryOptions } from "@tanstack/vue-query";
 import type { GroupQueryParams } from "./type";
-import { getGroupDetail, getGroups, getSharedGroups } from "./api";
+import {
+  getGroupDetail,
+  getGroupRoundSummary,
+  getGroups,
+  getSharedGroups,
+} from "./api";
 import { toValue, type MaybeRefOrGetter } from "vue";
 
 export const getGroupsInfiniteQueryOptions = (
@@ -37,4 +42,19 @@ export const getGroupDetailQueryOptions = (
     queryKey: ["groups", "detail", toValue(groupId)],
     queryFn: () => getGroupDetail(toValue(groupId)),
     enabled: () => toValue(enabled),
+  });
+
+/**
+ * GROUP ROUNDS
+ */
+
+export const getGroupRoundSummaryQueryOptions = (
+  groupId: MaybeRefOrGetter<number>,
+  round: MaybeRefOrGetter<number>,
+  enabled: MaybeRefOrGetter<boolean> = true,
+) =>
+  queryOptions({
+    queryKey: ["groups", "detail", toValue(groupId), "rounds", toValue(round)],
+    queryFn: () => getGroupRoundSummary(toValue(groupId), toValue(round)),
+    enabled,
   });

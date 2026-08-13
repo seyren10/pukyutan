@@ -7,8 +7,8 @@ import {
 import { queryClient } from "./services/tanstack-query/query-client";
 import "./style.css";
 import { createPinia } from "pinia";
-import { useUserStore } from "./stores/user.ts";
 import router from "./router";
+import { useBootstrapStore } from "./stores/bootstrap.ts";
 
 const vueQueryOptions: VueQueryPluginOptions = {
   queryClient,
@@ -18,12 +18,8 @@ const pinia = createPinia();
 const app = createApp(App);
 
 app.use(VueQueryPlugin, vueQueryOptions);
+app.use(router);
 app.use(pinia);
 
-useUserStore()
-  .bootstrap()
-  .finally(async () => {
-    app.use(router);
-    await router.isReady();
-    app.mount("#app");
-  });
+useBootstrapStore().bootstrap();
+app.mount("#app");

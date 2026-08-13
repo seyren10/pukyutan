@@ -67,7 +67,7 @@ const { isPending: isGroupActivePending, mutate: groupActivateMutate } = useGrou
         </CardHeader>
 
         <CardContent class="flex flex-col gap-3 grow">
-            <GroupCycleVisual v-if="nextCycle" :current-cycle="nextCycle.cycle_number" :cycles-count="cyclesCount" />
+            <GroupCycleVisual :current-cycle="nextCycle?.cycle_number" :cycles-count="cyclesCount" />
 
             <div class="flex items-center justify-between font-mono text-xs text-muted-foreground">
                 <span class="flex items-center gap-1.5" v-if="frequencyUnit && frequencyInterval">
@@ -99,14 +99,9 @@ const { isPending: isGroupActivePending, mutate: groupActivateMutate } = useGrou
                     Add Members
                 </Button>
             </AddMemberDialog>
-            <StartNewRoundDialog :member-count="membersCount" :group-name="name" :members-with-outstanding-balance="4"
-                :completed-round-number="2" next-round-first-due-label="tae" :next-round-number="3"
-                :total-collected-last-round="400" :total-expected-last-round="300"
-                v-else-if="group.is_round_completed" />
+            <StartNewRoundDialog v-else-if="group.is_round_completed" :group="group" />
             <ActivateGroupDialog :group="group" :members-count="group.members_count" v-else
                 @confirm="groupActivateMutate(group.id)" :loading="isGroupActivePending" />
-
-
             <GroupCardDropdown>
                 <Button variant="ghost" class="ml-auto">
                     More

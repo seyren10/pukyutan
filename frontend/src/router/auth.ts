@@ -19,7 +19,7 @@ export const authRoutes: RouteRecordRaw = {
       name: "register",
       component: () => import("@/pages/auth/Register.vue"),
       meta: {
-        requiresAuth: true,
+        requiresGuest: true,
       },
     },
     {

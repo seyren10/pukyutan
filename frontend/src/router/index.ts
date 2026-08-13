@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import { authRoutes } from "./auth";
 import { useUserStore } from "@/stores/user";
 import { storeToRefs } from "pinia";
+import { useBootstrapStore } from "@/stores/bootstrap";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -27,9 +28,12 @@ const router = createRouter({
   ],
 });
 
-router.beforeEach((to) => {
+router.beforeEach(async (to) => {
   const userStore = useUserStore();
+  const bootstrapStore = useBootstrapStore();
   const { isLoggedIn } = storeToRefs(userStore);
+
+  await bootstrapStore.bootstrap();
 
   if (to.meta.requiresAuth && !isLoggedIn.value) {
     return { name: "login", query: { redirect: to.fullPath } };

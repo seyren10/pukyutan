@@ -29,6 +29,14 @@ export type Group = TimeStamp & {
   is_round_completed: boolean;
 };
 
+export type GroupRoundSummary = {
+  round_number: number;
+  is_complete: boolean;
+  total_collected: number;
+  total_expected: number;
+  members_with_outstanding_balance: number;
+};
+
 export type GroupDetail = Omit<Group, "recent_members" | "members_count"> & {
   members: MemberWithLedger[];
 };
