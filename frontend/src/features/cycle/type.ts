@@ -20,7 +20,27 @@ export type Cycle = TimeStamp & {
   collected_total: number;
   reserve_balance: number;
   recommended_disbursement: number;
-  members: MemberWithLedger[] | null
+  members: MemberWithLedger[] | null;
+};
+
+export type CycleSummary = Pick<
+  Cycle,
+  | "id"
+  | "round_number"
+  | "cycle_number"
+  | "due_date"
+  | "group_id"
+  | "recipient_member_id"
+  | "disbursed_at"
+  | "disbursed_amount"
+  | "created_at"
+  | "updated_at"
+> & {
+  // Added via `withSum('contributions', 'amount')` on the group-detail
+  // endpoint — total contributed toward this specific cycle, regardless of
+  // its current status. Laravel returns aggregate columns as raw numeric
+  // strings, so this stays untyped as `number | string` until parsed.
+  contributions_sum_amount?: number | string | null;
 };
 
 export type DisburseCycleSchema = z.infer<typeof disburseCycleSchema>;

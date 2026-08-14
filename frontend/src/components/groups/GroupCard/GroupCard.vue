@@ -42,7 +42,10 @@ const { isPending: isGroupActivePending, mutate: groupActivateMutate } = useGrou
     <Card class="transition-shadow hover:shadow-md" :class="status === 'draft' ? 'border-dashed' : ''">
         <CardHeader class="flex flex-row items-start justify-between gap-2">
             <div class="flex flex-col gap-1">
-                <span class="font-heading text-base font-semibold text-foreground capitalize">{{ name }}</span>
+                <RouterLink :to="{ name: 'group-detail', params: { id: group.id } }"
+                    class="w-fit font-heading text-base font-semibold text-foreground capitalize hover:underline">
+                    {{ name }}
+                </RouterLink>
                 <div class="flex -space-x-2">
                     <Avatar v-for="(member, i) in recentMembers.slice(0, 4)" :key="i"
                         class="size-6 border-2 border-card">
@@ -102,7 +105,7 @@ const { isPending: isGroupActivePending, mutate: groupActivateMutate } = useGrou
             <StartNewRoundDialog v-else-if="group.is_round_completed" :group="group" />
             <ActivateGroupDialog :group="group" :members-count="group.members_count" v-else
                 @confirm="groupActivateMutate(group.id)" :loading="isGroupActivePending" />
-            <GroupCardDropdown>
+            <GroupCardDropdown :group-id="group.id">
                 <Button variant="ghost" class="ml-auto">
                     More
                     <ChevronDown />

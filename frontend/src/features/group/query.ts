@@ -1,6 +1,7 @@
 import { infiniteQueryOptions, queryOptions } from "@tanstack/vue-query";
 import type { GroupQueryParams } from "./type";
 import {
+  getGroupActivities,
   getGroupDetail,
   getGroupRoundSummary,
   getGroups,
@@ -57,4 +58,34 @@ export const getGroupRoundSummaryQueryOptions = (
     queryKey: ["groups", "detail", toValue(groupId), "rounds", toValue(round)],
     queryFn: () => getGroupRoundSummary(toValue(groupId), toValue(round)),
     enabled,
+  });
+
+/**
+ * GROUP ACTIVITY
+ */
+
+export const getGroupActivitiesInfiniteQueryOptions = (
+  groupId: MaybeRefOrGetter<number>,
+) =>
+  infiniteQueryOptions({
+    queryKey: ["groups", toValue(groupId), "activities", "infinite-list"],
+    queryFn: ({ pageParam }) =>
+      getGroupActivities(toValue(groupId), { page: pageParam }),
+    initialPageParam: 1,
+    getNextPageParam: (page) =>
+      page.next_page_url !== null ? page.current_page + 1 : undefined,
+  });
+
+// A small, single-shot fetch for the group-detail page's "recent activity"
+// card — capped server-side via per_page rather than fetching a full page
+// and slicing client-side. The full, filterable history lives on the
+// activity page (via the infinite query above).
+export const getRecentGroupActivitiesQueryOptions = (
+  groupId: MaybeRefOrGetter<number>,
+  limit: MaybeRefOrGetter<number> = 5,
+) =>
+  queryOptions({
+    queryKey: ["groups","detail", toValue(groupId), "activities", "recent", toValue(limit)],
+    queryFn: () =>
+      getGroupActivities(toValue(groupId), { per_page: toValue(limit) }),
   });

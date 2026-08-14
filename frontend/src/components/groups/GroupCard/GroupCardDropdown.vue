@@ -2,8 +2,13 @@
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { EyeIcon, MoreVertical, Users2Icon } from '@lucide/vue';
+import { useRouter } from 'vue-router';
 
+const { groupId } = defineProps<{
+    groupId: number
+}>()
 
+const router = useRouter()
 </script>
 
 <template>
@@ -17,7 +22,7 @@ import { EyeIcon, MoreVertical, Users2Icon } from '@lucide/vue';
         </DropdownMenuTrigger>
 
         <DropdownMenuContent align="end">
-            <DropdownMenuItem>
+            <DropdownMenuItem @select="router.push({ name: 'group-detail', params: { id: groupId } })">
                 <EyeIcon /> View Group
             </DropdownMenuItem>
             <DropdownMenuItem>

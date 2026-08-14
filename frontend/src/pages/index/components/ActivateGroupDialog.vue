@@ -12,12 +12,12 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { useGroup } from '@/features/group/composables/use-group';
-import type { Group } from '@/features/group/type'
+import type { GroupLike } from '@/features/group/type'
 import { Rocket, Lock, CalendarCheck, Ban } from '@lucide/vue'
 import { computed } from 'vue';
 
 const { group, loading, membersCount } = defineProps<{
-    group: Group,
+    group: GroupLike,
     loading?: boolean,
     membersCount?: number
 }>()

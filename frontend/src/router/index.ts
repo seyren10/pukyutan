@@ -22,6 +22,12 @@ const router = createRouter({
           alias: "dashboard",
           component: () => import("@/pages/index/Index.vue"),
         },
+        {
+          path: "groups/:id",
+          name: "group-detail",
+          component: () => import("@/pages/groups/show/Index.vue"),
+          props: (route) => ({ groupId: Number(route.params.id) }),
+        },
       ],
     },
     authRoutes,

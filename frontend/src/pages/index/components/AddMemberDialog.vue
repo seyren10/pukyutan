@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import AddMemberForm from '@/components/groups/AddMemberForm.vue';
 import { Dialog, DialogDescription, DialogHeader, DialogScrollContent, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { getGroupsInfiniteQueryOptions } from '@/features/group/query';
-import type { Group } from '@/features/group/type';
+import { getGroupDetailQueryOptions, getGroupsInfiniteQueryOptions } from '@/features/group/query';
+import type { GroupLike } from '@/features/group/type';
 import { useQueryClient } from '@tanstack/vue-query';
 import { ref, watch } from 'vue';
 import ActivateGroupDialog from './ActivateGroupDialog.vue';
 import { useGroupActivateMutation } from '@/features/group/composables/use-group-active-mutation.ts';
 
 const { group } = defineProps<{
-    group: Group
+    group: GroupLike
 }>()
 
 const dialog = defineModel({
@@ -46,6 +46,8 @@ watch(dialog, () => {
     if (updateGroupsWhenUpdated.value && !dialog.value) {
         const queryKey = getGroupsInfiniteQueryOptions().queryKey
         queryClient.invalidateQueries({ queryKey })
+
+        queryClient.invalidateQueries({ queryKey: ['groups', 'details', group.id] })
     }
 })
 </script>

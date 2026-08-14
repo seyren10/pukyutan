@@ -1,8 +1,9 @@
 import { httpClient } from "@/services/axios/axios";
-import type { SimplePaginatedResponse } from "@/types/paginate";
+import type { SimplePaginatedResponse, LaravelPaginatedResponse } from "@/types/paginate";
 import type {
   CreateGroupSchema,
   Group,
+  GroupActivity,
   GroupDetail,
   GroupQueryParams,
   GroupRoundSummary,
@@ -59,6 +60,22 @@ export const getGroupRoundSummary = async (groupId: number, round: number) => {
 export const startNewRound = async (groupId: number) => {
   const res = await httpClient.post<{ data: Group }>(
     `/api/v1/groups/${groupId}/rounds`,
+  );
+
+  return res.data;
+};
+
+/**
+ * GROUP ACTIVITY
+ */
+
+export const getGroupActivities = async (
+  groupId: number,
+  params?: GroupQueryParams,
+) => {
+  const res = await httpClient.get<LaravelPaginatedResponse<GroupActivity>>(
+    `/api/v1/groups/${groupId}/activities`,
+    { params },
   );
 
   return res.data;

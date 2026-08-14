@@ -14,7 +14,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { RefreshCw, Trophy, Lock, CalendarCheck, CircleAlert } from '@lucide/vue'
-import type { Group } from '@/features/group/type'
+import type { GroupLike } from '@/features/group/type'
 import { useGroup } from '@/features/group/composables/use-group'
 import { useRoundSummaryHelper } from '@/features/group/composables/use-round-summary-helper'
 import { useQuery } from '@tanstack/vue-query'
@@ -23,7 +23,7 @@ import { formatNextRoundFirstDueLabel } from '@/lib/date'
 import { useStartNewRoundMutation } from '@/features/group/composables/use-start-new-round-mutation'
 
 const { group } = defineProps<{
-    group: Group
+    group: GroupLike
 }>()
 
 const dialog = defineModel<boolean>({ default: false })

@@ -17,14 +17,16 @@ export const httpClient = axios.create({
 httpClient.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
+    console.log(location.pathname)
     const isAuthRoute = location.pathname.startsWith(authRoutes.path);
 
     if (error.response?.status === 401 && !isAuthRoute) {
+      toast.warning("Session Expired. Please login to continue");
+
       useUserStore().setUser(null);
       queryClient.clear();
       router.replace({ name: "login" });
 
-      toast.info("Session Expired. Please login to continue");
     }
 
     return Promise.reject(error);

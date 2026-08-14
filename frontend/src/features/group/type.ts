@@ -1,14 +1,16 @@
 import type { QueryParams, TimeStamp } from "@/types/common";
 import type { GROUP_FREQUENCY_UNIT, GROUP_STATUS } from "./constant";
-import type { Cycle } from "../cycle/type";
+import type { Cycle, CycleSummary } from "../cycle/type";
 import type z from "zod";
 import type { createGroupSchema } from "./schema";
-import type { MemberWithLedger, RecentMember } from "../members/type";
+import type { Member, RecentMember } from "../members/type";
 
 export type GroupFrequencyUnit = (typeof GROUP_FREQUENCY_UNIT)[number];
 export type GroupStatus = (typeof GROUP_STATUS)[number];
 export type GroupSchema = z.infer<typeof createGroupSchema>;
 export type CreateGroupSchema = GroupSchema;
+
+
 
 export type Group = TimeStamp & {
   id: number;
@@ -25,7 +27,7 @@ export type Group = TimeStamp & {
   cycles_count: number;
   next_cycle: Cycle | null;
   user?: { id: number; name: string };
-  cycles: Cycle[];
+  cycles: CycleSummary[];
   is_round_completed: boolean;
 };
 
@@ -38,7 +40,21 @@ export type GroupRoundSummary = {
 };
 
 export type GroupDetail = Omit<Group, "recent_members" | "members_count"> & {
-  members: MemberWithLedger[];
+  members: Member[];
 };
 
+export type GroupLike = Group | GroupDetail;
+
 export type GroupQueryParams = QueryParams;
+
+export type GroupActivity = TimeStamp & {
+  id: number;
+  log_name: string | null;
+  description: string;
+  event: string | null;
+  causer_type: string | null;
+  causer_id: number | null;
+  subject_type: string | null;
+  subject_id: number | null;
+  properties: Record<string, unknown>;
+};
