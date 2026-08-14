@@ -17,7 +17,10 @@ class ContributionController extends Controller
      */
     public function index(Cycle $cycle)
     {
-        $contributions = $cycle->contributions()->simplePaginate();
+        $contributions = $cycle->contributions()
+            ->with('member:id,name')
+            ->latest('paid_at')
+            ->simplePaginate();
 
         return ContributionResource::collection($contributions);
     }

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -25,6 +26,14 @@ use App\Models\Group;
 class Member extends Model
 {
     use HasFactory, SoftDeletes;
+
+     protected static function booted(): void
+    {
+        static::addGlobalScope('payoutOrder', function (Builder $builder) {
+            $builder->orderBy('payout_order');
+        });
+    }
+ 
 
     #region ============ RELATIONSHIPS ============
     /**

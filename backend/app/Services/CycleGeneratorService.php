@@ -26,10 +26,9 @@ class CycleGeneratorService
      */
     public function generateRound(Group $group, int $roundNumber): array
     {
-        // 1. Get active members ordered by payout_order
-        $members = $group->members()
-            ->orderBy("payout_order")
-            ->get();
+        // 1. Get active members (already payout-order sorted — see Member's
+        //    global scope)
+        $members = $group->members()->get();
 
 
         // 2. Figure out the starting cycle_number and starting due_date

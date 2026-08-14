@@ -75,7 +75,10 @@ class GroupController extends Controller
             'nextCycle.recipient:id,name',
             'nextCycle.members',
             'members',
-            'cycles', // <-- added
+            // withSum adds a `contributions_sum_amount` attribute to each cycle
+            // via one aggregate query — lets the group-detail timeline show how
+            // much came in per cycle without an N+1 or a per-cycle resource call.
+            'cycles' => fn ($query) => $query->withSum('contributions', 'amount'),
         ]);
         $group->loadCount(['cycles']); // kept — cycles_count is a separate, still-useful field
 

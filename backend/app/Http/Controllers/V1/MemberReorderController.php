@@ -26,7 +26,7 @@ class MemberReorderController extends Controller
         $service->execute($group, $validated['member_ids']);
 
         return MemberResource::collection(
-            $group->members()->orderBy('payout_order')->get()
+            $group->members()->get()
         );
     }
 }

@@ -20,7 +20,6 @@ class MemberController extends Controller
     {
         Gate::authorize("view", $group);
         $members = $group->members()
-            ->orderBy('payout_order')
             ->get();
 
         return MemberResource::collection($members);

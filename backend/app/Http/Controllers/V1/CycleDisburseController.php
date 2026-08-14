@@ -47,7 +47,7 @@ class CycleDisburseController extends Controller
             ->performedOn($cycle)
             ->causedBy(auth()->user())
             ->withProperty("disbursed_amount", $disbursedAmount)
-            ->log("Cycle Disbursed");
+            ->log("Cycle {$cycle->cycle_number} disbursed ₱" . number_format($disbursedAmount, 2) . " to {$cycle->recipient->name}.");
 
         return response()->json(["cycle" => $cycle, "summary" => $summary]);
 
