@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\V1;
 
+use App\Enums\GroupActivityEvent;
 use App\Enums\GroupShareStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\V1\GroupShareResource;
@@ -37,9 +38,10 @@ class GroupShareController extends Controller
         $share_request->save();
 
         //log activity
-        activity()
+        activity("group.{$share_request->group->id}")
             ->performedOn($share_request->group)
             ->causedBy(auth()->user())
+            ->event(GroupActivityEvent::ShareAccepted->value)
             ->withProperty("requested_by", $share_request->user->name)
             ->log("Share request accepted");
 
@@ -54,9 +56,10 @@ class GroupShareController extends Controller
         $share_request->save();
 
         //log activity
-        activity()
+        activity("group.{$share_request->group->id}")
             ->performedOn($share_request->group)
             ->causedBy(auth()->user())
+            ->event(GroupActivityEvent::ShareRejected->value)
             ->withProperty("requested_by", $share_request->user->name)
             ->log("Share request rejected");
 

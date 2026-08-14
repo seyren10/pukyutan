@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\V1;
 
+use App\Enums\GroupActivityEvent;
 use App\Http\Controllers\Controller;
 use App\Models\Cycle;
 use App\Services\LedgerCalculatorService;
@@ -43,9 +44,10 @@ class CycleDisburseController extends Controller
 
         $summary = $ledgerCalculatorService->collectionSummaryForCycle($cycle->fresh());
 
-        activity()
+        activity("group.{$cycle->group_id}")
             ->performedOn($cycle)
             ->causedBy(auth()->user())
+            ->event(GroupActivityEvent::CycleDisbursed->value)
             ->withProperty("disbursed_amount", $disbursedAmount)
             ->log("Cycle {$cycle->cycle_number} disbursed ₱" . number_format($disbursedAmount, 2) . " to {$cycle->recipient->name}.");
 

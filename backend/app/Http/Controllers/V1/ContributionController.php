@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\V1;
 
+use App\Enums\GroupActivityEvent;
 use App\Enums\GroupStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\V1\StoreContributionRequest;
@@ -38,6 +39,13 @@ class ContributionController extends Controller
 
         $validated = $request->validated();
         $contribution = $cycle->contributions()->create($validated);
+
+        activity("group.{$cycle->group_id}")
+            ->performedOn($contribution)
+            ->causedBy(auth()->user())
+            ->event(GroupActivityEvent::ContributionRecorded->value)
+            ->withProperty("amount", $contribution->amount)
+            ->log("{$contribution->member->name} contributed ₱" . number_format($contribution->amount, 2) . " for cycle {$cycle->cycle_number}.");
 
         return (new ContributionResource($contribution))
             ->response()

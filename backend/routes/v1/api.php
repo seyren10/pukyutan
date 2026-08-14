@@ -12,9 +12,11 @@ use App\Http\Controllers\V1\GroupShareController;
 use App\Http\Controllers\V1\MemberController;
 use App\Http\Controllers\V1\MemberLedgerController;
 use App\Http\Controllers\V1\MemberReorderController;
+use App\Http\Controllers\V1\UserActivityController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('activities', UserActivityController::class);
     Route::get('groups/shared', [GroupController::class, 'shared']);
     Route::apiResource("groups", GroupController::class);
     Route::post("groups/{group}/activate", GroupActivateController::class);

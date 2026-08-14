@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\V1;
 
+use App\Enums\GroupActivityEvent;
 use App\Enums\GroupStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Group;
@@ -22,9 +23,10 @@ class GroupCompleteController extends Controller
         $group->save();
 
         //log the activity
-        activity()
+        activity("group.{$group->id}")
             ->performedOn($group)
             ->causedBy(auth()->user())
+            ->event(GroupActivityEvent::GroupCompleted->value)
             ->log("Group marked as completed");
             
         return response()->noContent();

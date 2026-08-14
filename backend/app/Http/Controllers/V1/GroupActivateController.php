@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\V1;
 
+use App\Enums\GroupActivityEvent;
 use App\Enums\GroupStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\V1\GroupResource;
@@ -31,9 +32,10 @@ class GroupActivateController extends Controller
         $group->load(["cycles"]);
 
         //log the activity
-        activity()
+        activity("group.{$group->id}")
             ->performedOn($group)
             ->causedBy(auth()->user())
+            ->event(GroupActivityEvent::GroupActivated->value)
             ->log("Group activated.");
 
         return new GroupResource($group);

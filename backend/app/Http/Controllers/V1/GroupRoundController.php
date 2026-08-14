@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\V1;
 
+use App\Enums\GroupActivityEvent;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\V1\GroupResource;
 use App\Models\Contribution;
@@ -29,9 +30,10 @@ class GroupRoundController extends Controller
         $group->cycles()->createMany($cycles);
         $group->load(["cycles"]);
 
-        activity()
+        activity("group.{$group->id}")
             ->performedOn($group)
             ->causedBy(auth()->user())
+            ->event(GroupActivityEvent::RoundStarted->value)
             ->log("Round {$nextRoundNumber} started.");
 
         return new GroupResource($group);
