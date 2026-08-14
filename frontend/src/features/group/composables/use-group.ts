@@ -73,6 +73,20 @@ export const useGroupDetail = (
   const base = useGroup(groupDetail);
 
   const members = computed(() => groupDetailValue.value?.members ?? []);
+  // Both overrides below fix the same root cause: GroupDetail never has
+  // recent_members/members_count (only Group's list-view shape does),
+  // so base's versions of these are unconditionally empty/0 here.
+  //
+  // recentMembers: rather than re-impose the list-view's "5 most recent"
+  // cap (which existed specifically for a card preview, a concept that
+  // doesn't obviously apply on a page already showing the full roster),
+  // this just exposes the full members array under the same name for
+  // symmetry with membersCount below. If you actually want a capped
+  // "recently added" preview here too, this needs sorting by
+  // created_at first, since `members` itself is payout_order-sorted
+  // (global scope on Member), not recency-sorted.
+  const recentMembers = computed(() => members.value);
+  const membersCount = computed(() => members.value.length);
   const isRoundCompleted = computed(
     () => groupDetailValue.value?.is_round_completed ?? false,
   );
@@ -80,6 +94,8 @@ export const useGroupDetail = (
   return {
     ...base,
     members,
+    recentMembers,
+    membersCount,
     isRoundCompleted,
   };
 };

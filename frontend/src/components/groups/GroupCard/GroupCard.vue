@@ -42,7 +42,7 @@ const { isPending: isGroupActivePending, mutate: groupActivateMutate } = useGrou
     <Card class="transition-shadow hover:shadow-md" :class="status === 'draft' ? 'border-dashed' : ''">
         <CardHeader class="flex flex-row items-start justify-between gap-2">
             <div class="flex flex-col gap-1">
-                <RouterLink :to="{ name: 'group-detail', params: { id: group.id } }"
+                <RouterLink :to="{ name: 'groups.detail', params: { id: group.id } }"
                     class="w-fit font-heading text-base font-semibold text-foreground capitalize hover:underline">
                     {{ name }}
                 </RouterLink>

@@ -2,12 +2,13 @@
 import { computed } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
 import { formatDistanceToNow } from 'date-fns'
-import { History, HandCoins } from '@lucide/vue'
+import { History, HandCoins, Coins, ArrowRight } from '@lucide/vue'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription } from '@/components/ui/empty'
 import { getRecentGroupActivitiesQueryOptions } from '@/features/group/query'
 import type { GroupActivity } from '@/features/group/type'
+import { Button } from '@/components/ui/button'
 
 const RECENT_LIMIT = 5
 
@@ -19,18 +20,31 @@ const { data, isPending } = useQuery(getRecentGroupActivitiesQueryOptions(() => 
 
 const activities = computed(() => data.value?.data ?? [])
 
-// Cycle-scoped logs (currently just disbursements — see CycleDisburseController)
-// are mixed in alongside group-level ones, so they get their own icon rather
-// than reading as unexplained duplicates of the group's own history.
+// subject_type is the fully-qualified model class (e.g. "App\Models\Cycle").
+// Map by the class's short name rather than string-matching the FQCN, so
+// adding a new auditable model (Member, GroupShare, ...) is a one-line
+// addition here instead of another endsWith() branch.
+const ICON_BY_SUBJECT: Record<string, typeof History> = {
+    Cycle: HandCoins,
+    Contribution: Coins,
+}
+
 function iconFor(activity: GroupActivity) {
-    return activity.subject_type?.endsWith('Cycle') ? HandCoins : History
+    const shortName = activity.subject_type?.split('\\').pop()
+    return (shortName && ICON_BY_SUBJECT[shortName]) ?? History
 }
 </script>
 
 <template>
     <Card>
-        <CardHeader>
+        <CardHeader class="flex items-center justify-between">
             <CardTitle class="font-heading text-lg">Recent activity</CardTitle>
+            <RouterLink :to="{ name: 'groups.detail.activities.index' }">
+                <Button variant="link">
+                    <ArrowRight class="size-4" />
+                    View all
+                </Button>
+            </RouterLink>
         </CardHeader>
 
         <CardContent class="flex flex-col gap-4">

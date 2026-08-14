@@ -4,6 +4,7 @@ import { authRoutes } from "./auth";
 import { useUserStore } from "@/stores/user";
 import { storeToRefs } from "pinia";
 import { useBootstrapStore } from "@/stores/bootstrap";
+import { activityRoute } from "./activity";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -24,14 +25,29 @@ const router = createRouter({
         },
         {
           path: "groups/:id",
-          name: "group-detail",
+          name: "groups.detail",
           component: () => import("@/pages/groups/show/Index.vue"),
           props: (route) => ({ groupId: Number(route.params.id) }),
+          children: [
+            {
+              path: "activities",
+              name: "groups.detail.activities.index",
+              component: () => import("@/pages/groups/show/activity/Index.vue"),
+              props: (route) => ({ groupId: Number(route.params.id) }),
+            },
+          ],
         },
+        activityRoute,
       ],
     },
     authRoutes,
   ],
+  scrollBehavior: () => {
+    return {
+      top: 0,
+      behavior: "smooth",
+    };
+  },
 });
 
 router.beforeEach(async (to) => {

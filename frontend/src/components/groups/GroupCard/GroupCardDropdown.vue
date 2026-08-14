@@ -22,7 +22,7 @@ const router = useRouter()
         </DropdownMenuTrigger>
 
         <DropdownMenuContent align="end">
-            <DropdownMenuItem @select="router.push({ name: 'group-detail', params: { id: groupId } })">
+            <DropdownMenuItem @select="router.push({ name: 'groups.detail', params: { id: groupId } })">
                 <EyeIcon /> View Group
             </DropdownMenuItem>
             <DropdownMenuItem>

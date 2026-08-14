@@ -25,7 +25,7 @@ withDefaults(
 
 const navItems = [
   { label: 'Dashboard', to: '/' },
-  { label: 'Activity', to: '/activity' },
+  { label: 'Activity', to: '/activities' },
   { label: 'Settings', to: '/settings' },
 ]
 </script>
@@ -43,7 +43,7 @@ const navItems = [
         <nav class="hidden items-center gap-6 md:flex">
           <RouterLink v-for="item in navItems" :key="item.to" :to="item.to"
             class="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-            active-class="text-foreground font-bold!">
+            exact-active-class="text-foreground font-bold!">
             {{ item.label }}
           </RouterLink>
         </nav>

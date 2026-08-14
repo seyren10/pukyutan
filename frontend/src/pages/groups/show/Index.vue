@@ -2,7 +2,7 @@
 import { computed, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import { ArrowLeft, Rocket, UserPlus2, FolderX, Wallet, HandCoins, CheckCircle2, Users, Hexagon } from '@lucide/vue'
+import { ArrowLeft, Rocket, UserPlus2, FolderX, Wallet, HandCoins, CheckCircle2, Users, Hexagon, Component } from '@lucide/vue'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription, EmptyContent } from '@/components/ui/empty'
@@ -102,122 +102,131 @@ const cycleDialogOpen = computed({
 </script>
 
 <template>
-    <GroupDetailSkeleton v-if="isPending" />
+    <RouterView #="{ Component }">
+        <component :is="Component" v-if="Component" />
+        
+        <template v-else>
+            <GroupDetailSkeleton v-if="isPending" />
 
-    <Empty v-else-if="isError || !group">
-        <EmptyHeader>
-            <EmptyMedia variant="icon">
-                <FolderX />
-            </EmptyMedia>
-            <EmptyTitle>Group not found</EmptyTitle>
-            <EmptyDescription>
-                This group doesn't exist, or you don't have access to it.
-            </EmptyDescription>
-        </EmptyHeader>
-        <EmptyContent>
-            <Button as-child variant="outline" size="sm">
-                <RouterLink :to="{ name: 'dashboard' }">
-                    <ArrowLeft data-icon="inline-start" />
+            <Empty v-else-if="isError || !group">
+                <EmptyHeader>
+                    <EmptyMedia variant="icon">
+                        <FolderX />
+                    </EmptyMedia>
+                    <EmptyTitle>Group not found</EmptyTitle>
+                    <EmptyDescription>
+                        This group doesn't exist, or you don't have access to it.
+                    </EmptyDescription>
+                </EmptyHeader>
+                <EmptyContent>
+                    <Button as-child variant="outline" size="sm">
+                        <RouterLink :to="{ name: 'dashboard' }">
+                            <ArrowLeft data-icon="inline-start" />
+                            Back to your groups
+                        </RouterLink>
+                    </Button>
+                </EmptyContent>
+            </Empty>
+
+            <div v-else class="flex flex-col gap-6">
+                <RouterLink :to="{ name: 'dashboard' }"
+                    class="flex w-fit items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground">
+                    <ArrowLeft class="size-3.5" />
                     Back to your groups
                 </RouterLink>
-            </Button>
-        </EmptyContent>
-    </Empty>
 
-    <div v-else class="flex flex-col gap-6">
-        <RouterLink :to="{ name: 'dashboard' }"
-            class="flex w-fit items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground">
-            <ArrowLeft class="size-3.5" />
-            Back to your groups
-        </RouterLink>
+                <GroupDetailHeader :group="group" :is-owner="isOwner" />
 
-        <GroupDetailHeader :group="group" :is-owner="isOwner" />
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                    <Card v-for="stat in stats" :key="stat.label">
+                        <CardContent class="flex items-center gap-3 py-4">
+                            <div
+                                class="flex size-9 shrink-0 items-center justify-center rounded-md bg-accent text-accent-foreground">
+                                <component :is="stat.icon" class="size-4" />
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="font-mono text-lg font-medium text-foreground">{{ stat.value }}</span>
+                                <span class="text-xs text-muted-foreground">{{ stat.label }}</span>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
 
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <Card v-for="stat in stats" :key="stat.label">
-                <CardContent class="flex items-center gap-3 py-4">
-                    <div
-                        class="flex size-9 shrink-0 items-center justify-center rounded-md bg-accent text-accent-foreground">
-                        <component :is="stat.icon" class="size-4" />
+                <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+                    <div class="flex flex-col gap-6 lg:col-span-2">
+                        <GroupCycleSummaryCard v-if="group.status !== 'draft'" :group="group" />
+
+                        <Card v-else>
+                            <CardContent class="flex flex-col items-center gap-3 py-10 text-center">
+                                <div
+                                    class="flex size-10 items-center justify-center rounded-full bg-accent text-accent-foreground">
+                                    <Rocket class="size-5" />
+                                </div>
+                                <div class="flex flex-col gap-1">
+                                    <p class="font-heading text-base font-semibold text-foreground">
+                                        This group hasn't started yet
+                                    </p>
+                                    <p class="max-w-sm text-sm text-muted-foreground">
+                                        {{ membersCount > 0
+                                            ? "Add more members or activate the group to generate its first round."
+                                            : "Add members to build the payout order, then activate to get started." }}
+                                    </p>
+                                </div>
+                                <div v-if="isOwner" class="flex flex-wrap items-center justify-center gap-2">
+                                    <AddMemberDialog :group="group">
+                                        <Button variant="outline" size="sm">
+                                            <UserPlus2 data-icon="inline-start" />
+                                            Add members
+                                        </Button>
+                                    </AddMemberDialog>
+                                    <ActivateGroupDialog v-if="membersCount > 0" :group="group"
+                                        :members-count="membersCount" :loading="isActivatePending"
+                                        @confirm="handleActivate" />
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        <Card v-if="group.cycles.length > 0">
+                            <CardContent class="flex flex-col gap-4">
+                                <div class="flex items-center justify-between">
+                                    <h2 class="font-heading text-lg font-semibold text-foreground">Cycle timeline</h2>
+                                    <span class="text-xs text-muted-foreground flex items-center gap-2">
+                                        <span class="flex">
+                                            <Hexagon class="size-4 fill-primary stroke-none" /> = disbursed
+                                        </span>
+                                        <span class="flex">
+                                            <Hexagon class="size-4 stroke-4 stroke-accent-foreground" /> = due next
+                                        </span>
+                                    </span>
+                                </div>
+                                <GroupHoneyCombTimeline :cycles="group.cycles" :members="group.members"
+                                    :next-cycle-id="group.next_cycle?.id" :expected-per-cycle="expectedPerCycle"
+                                    @select="cycle => selectedCycle = cycle" />
+                                <p class="text-xs text-muted-foreground">Click any cycle to see who's paid.</p>
+                            </CardContent>
+                        </Card>
                     </div>
-                    <div class="flex flex-col">
-                        <span class="font-mono text-lg font-medium text-foreground">{{ stat.value }}</span>
-                        <span class="text-xs text-muted-foreground">{{ stat.label }}</span>
+
+                    <div class="flex flex-col gap-6">
+                        <Card>
+                            <CardContent class="flex flex-col gap-4">
+                                <div class="flex flex-col gap-0.5">
+                                    <h2 class="font-heading text-lg font-semibold text-foreground">Members</h2>
+                                    <p class="text-sm text-muted-foreground">Payout order and current balances.</p>
+                                </div>
+                                <GroupMemberLedgerList :members="group.members"
+                                    :ledger-by-member-id="ledgerByMemberId" />
+                            </CardContent>
+                        </Card>
+
+                        <GroupActivityFeed :group-id="group.id" />
                     </div>
-                </CardContent>
-            </Card>
-        </div>
+                </div>
 
-        <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
-            <div class="flex flex-col gap-6 lg:col-span-2">
-                <GroupCycleSummaryCard v-if="group.status !== 'draft'" :group="group" />
-
-                <Card v-else>
-                    <CardContent class="flex flex-col items-center gap-3 py-10 text-center">
-                        <div
-                            class="flex size-10 items-center justify-center rounded-full bg-accent text-accent-foreground">
-                            <Rocket class="size-5" />
-                        </div>
-                        <div class="flex flex-col gap-1">
-                            <p class="font-heading text-base font-semibold text-foreground">
-                                This group hasn't started yet
-                            </p>
-                            <p class="max-w-sm text-sm text-muted-foreground">
-                                {{ membersCount > 0
-                                    ? "Add more members or activate the group to generate its first round."
-                                    : "Add members to build the payout order, then activate to get started." }}
-                            </p>
-                        </div>
-                        <div v-if="isOwner" class="flex flex-wrap items-center justify-center gap-2">
-                            <AddMemberDialog :group="group">
-                                <Button variant="outline" size="sm">
-                                    <UserPlus2 data-icon="inline-start" />
-                                    Add members
-                                </Button>
-                            </AddMemberDialog>
-                            <ActivateGroupDialog v-if="membersCount > 0" :group="group" :members-count="membersCount"
-                                :loading="isActivatePending" @confirm="handleActivate" />
-                        </div>
-                    </CardContent>
-                </Card>
-
-                <Card v-if="group.cycles.length > 0">
-                    <CardContent class="flex flex-col gap-4">
-                        <div class="flex items-center justify-between">
-                            <h2 class="font-heading text-lg font-semibold text-foreground">Cycle timeline</h2>
-                            <span class="text-xs text-muted-foreground flex items-center gap-2">
-                                <span class="flex">
-                                    <Hexagon class="size-4 fill-primary stroke-none" /> = disbursed
-                                </span>
-                                <span class="flex">
-                                    <Hexagon class="size-4 stroke-4 stroke-accent-foreground" /> = due next
-                                </span>
-                            </span>
-                        </div>
-                        <GroupHoneyCombTimeline :cycles="group.cycles" :members="group.members"
-                            :next-cycle-id="group.next_cycle?.id" :expected-per-cycle="expectedPerCycle"
-                            @select="cycle => selectedCycle = cycle" />
-                        <p class="text-xs text-muted-foreground">Click any cycle to see who's paid.</p>
-                    </CardContent>
-                </Card>
+                <CycleContributionsDialog v-if="selectedCycle" v-model:open="cycleDialogOpen" :cycle="selectedCycle"
+                    :members="group.members" :expected-total="expectedPerCycle" />
             </div>
+        </template>
 
-            <div class="flex flex-col gap-6">
-                <Card>
-                    <CardContent class="flex flex-col gap-4">
-                        <div class="flex flex-col gap-0.5">
-                            <h2 class="font-heading text-lg font-semibold text-foreground">Members</h2>
-                            <p class="text-sm text-muted-foreground">Payout order and current balances.</p>
-                        </div>
-                        <GroupMemberLedgerList :members="group.members" :ledger-by-member-id="ledgerByMemberId" />
-                    </CardContent>
-                </Card>
-
-                <GroupActivityFeed :group-id="group.id" />
-            </div>
-        </div>
-
-        <CycleContributionsDialog v-if="selectedCycle" v-model:open="cycleDialogOpen" :cycle="selectedCycle"
-            :members="group.members" :expected-total="expectedPerCycle" />
-    </div>
+    </RouterView>
 </template>
