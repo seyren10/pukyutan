@@ -9,17 +9,12 @@ import {
 } from "./api";
 import { toValue, type MaybeRefOrGetter } from "vue";
 
-export const getGroupsInfiniteQueryOptions = (
+export const getGroupsQueryOptions = (
   params?: MaybeRefOrGetter<GroupQueryParams>,
 ) =>
-  infiniteQueryOptions({
-    queryKey: ["groups", "infinite-list", params],
-    queryFn: ({ pageParam }) =>
-      getGroups({ ...toValue(params), page: pageParam }),
-    initialPageParam: 1,
-    getNextPageParam: (page) => {
-      return page.links.next !== null ? page.meta.current_page + 1 : undefined;
-    },
+  queryOptions({
+    queryKey: ["groups", "list", params],
+    queryFn: () => getGroups(toValue(params)),
   });
 
 export const getSharedGroupsInfiniteQueryOptions = (
@@ -31,7 +26,9 @@ export const getSharedGroupsInfiniteQueryOptions = (
       getSharedGroups({ ...toValue(params), page: pageParam }),
     initialPageParam: 1,
     getNextPageParam: (page) => {
-      return page.links.next !== null ? page.meta.current_page + 1 : undefined;
+      return page.meta.current_page > page.meta.last_page
+        ? page.meta.current_page + 1
+        : undefined;
     },
   });
 

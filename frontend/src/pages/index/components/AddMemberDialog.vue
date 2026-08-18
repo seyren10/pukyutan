@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import AddMemberForm from '@/components/groups/AddMemberForm.vue';
 import { Dialog, DialogDescription, DialogHeader, DialogScrollContent, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { getGroupDetailQueryOptions, getGroupsInfiniteQueryOptions } from '@/features/group/query';
+import { getGroupDetailQueryOptions, getGroupsQueryOptions } from '@/features/group/query';
 import type { GroupLike } from '@/features/group/type';
 import { useQueryClient } from '@tanstack/vue-query';
 import { ref, watch } from 'vue';
@@ -44,7 +44,7 @@ watch(dialog, () => {
         updateGroupsWhenUpdated.value = false;
 
     if (updateGroupsWhenUpdated.value && !dialog.value) {
-        const queryKey = getGroupsInfiniteQueryOptions().queryKey
+        const queryKey = getGroupsQueryOptions().queryKey
         queryClient.invalidateQueries({ queryKey })
 
         queryClient.invalidateQueries({ queryKey: ['groups', 'detail', group.id] })

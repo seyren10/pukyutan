@@ -6,16 +6,20 @@ import { Layers, Wallet, Users, Inbox, Plus } from '@lucide/vue'
 import { useUserStore } from '@/stores/user'
 import { storeToRefs } from 'pinia'
 import UnverifiedAlert from './components/UnverifiedAlert.vue'
-import { useInfiniteQuery } from '@tanstack/vue-query'
-import { getGroupsInfiniteQueryOptions, getSharedGroupsInfiniteQueryOptions } from '@/features/group/query.ts'
+import { useInfiniteQuery, useQuery } from '@tanstack/vue-query'
+import { getGroupsQueryOptions, getSharedGroupsInfiniteQueryOptions } from '@/features/group/query.ts'
 import { computed, ref } from 'vue'
 import { GroupCard, GroupCardEmpty, GroupCardSkeleton } from '@/components/groups/GroupCard'
 import CreateGroupDialog from './components/CreateGroupDialog.vue'
 import AddMemberDialog from './components/AddMemberDialog.vue'
+import AppPaginationBar from '@/components/app/AppPaginationBar.vue'
+import { useRouteQuery } from '@vueuse/router'
 
-
-const { data, isPending } = useInfiniteQuery(getGroupsInfiniteQueryOptions())
-const groups = computed(() => data.value?.pages?.flatMap((g) => g.data));
+const page = useRouteQuery('page', null, {
+    transform: Number
+})
+const { data, isPending } = useQuery(getGroupsQueryOptions(() => ({ page: page.value })))
+const groups = computed(() => data.value?.data);
 
 const { data: sharedGroupsData, isPending: isSharedGroupsPending } = useInfiniteQuery(getSharedGroupsInfiniteQueryOptions())
 const sharedGroups = computed(() => sharedGroupsData.value?.pages?.flatMap(g => g.data))
@@ -87,9 +91,11 @@ const { isEmailVerified } = storeToRefs(userStore)
             <GroupCardEmpty v-else-if="!groups?.length" />
             <div v-else class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
                 <GroupCard v-for="group in groups" :key="group.id" :group="group" />
+
+                <div class="col-span-full">
+                    <AppPaginationBar :meta="data?.meta" v-if="data" v-model="page" />
+                </div>
             </div>
-
-
         </div>
 
         <!-- SHARED GROUPS -->

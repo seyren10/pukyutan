@@ -76,14 +76,14 @@ const { mutate } = useMutation({
                 </Avatar>
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" class="w-48">
-              <div class="flex gap-2 items-center">
+            <DropdownMenuContent align="end" class="w-56">
+              <div class="flex gap-3 items-center p-2">
                 <Avatar class="size-8 shrink-0">
                   <AvatarFallback class="bg-accent text-accent-foreground">
                     {{ userInitials }}
                   </AvatarFallback>
                 </Avatar>
-                <div class="flex flex-col text-sm text-muted-foreground max-w-30 ">
+                <div class="flex flex-col text-sm text-muted-foreground w-40">
                   <span class="truncate">
                     {{ user?.name }}
                   </span>

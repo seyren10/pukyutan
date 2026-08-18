@@ -17,7 +17,6 @@ export const httpClient = axios.create({
 httpClient.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
-    console.log(location.pathname)
     const isAuthRoute = location.pathname.startsWith(authRoutes.path);
 
     if (error.response?.status === 401 && !isAuthRoute) {
@@ -26,7 +25,6 @@ httpClient.interceptors.response.use(
       useUserStore().setUser(null);
       queryClient.clear();
       router.replace({ name: "login" });
-
     }
 
     return Promise.reject(error);

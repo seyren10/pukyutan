@@ -1,7 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/vue-query";
 import { activateGroup } from "../api";
 import { toast } from "vue-sonner";
-import { getGroupsInfiniteQueryOptions } from "../query";
 import type { LaravelError } from "@/types/common";
 
 export const useGroupActivateMutation = () => {
@@ -18,8 +17,7 @@ export const useGroupActivateMutation = () => {
       );
     },
     onSettled: () => {
-      const queryKey = getGroupsInfiniteQueryOptions().queryKey;
-      queryClient.invalidateQueries({ queryKey });
+      queryClient.invalidateQueries({ queryKey: ["groups"] });
     },
   });
 

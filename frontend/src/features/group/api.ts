@@ -1,11 +1,11 @@
 import { httpClient } from "@/services/axios/axios";
 import type {
+  PaginatedResponse,
   SimplePaginatedResponse,
 } from "@/types/paginate";
 import type {
   CreateGroupSchema,
   Group,
-  GroupActivity,
   GroupDetail,
   GroupQueryParams,
   GroupRoundSummary,
@@ -13,7 +13,7 @@ import type {
 import type { UserActivity } from "../activity/type";
 
 export const getGroups = async (params?: GroupQueryParams) => {
-  const res = await httpClient.get<SimplePaginatedResponse<Group>>(
+  const res = await httpClient.get<PaginatedResponse<Group>>(
     "/api/v1/groups",
     { params },
   );
@@ -28,7 +28,7 @@ export const getGroupDetail = async (groupId: number) => {
 };
 
 export const getSharedGroups = async (params?: GroupQueryParams) => {
-  const res = await httpClient.get<SimplePaginatedResponse<Group>>(
+  const res = await httpClient.get<PaginatedResponse<Group>>(
     "/api/v1/groups/shared",
     { params },
   );
