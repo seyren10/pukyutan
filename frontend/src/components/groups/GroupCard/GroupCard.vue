@@ -3,11 +3,11 @@ import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
-import { Eye, Wallet, CalendarClock, UserPlus2Icon, ChevronDown, HandCoins } from '@lucide/vue'
+import { Eye, Wallet, CalendarClock, UserPlus2Icon, ChevronDown, HandCoins, MoreHorizontal, UserRound } from '@lucide/vue'
 import type { Group } from '@/features/group/type'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { formatFrequencyLabel, getInitials } from '@/lib/helpers'
-import { GroupCycleVisual } from '.'
+import { GroupCycleVisual, type GroupCardDropdownEvent } from '.'
 import { format } from 'date-fns'
 import AddMemberDialog from '@/pages/index/components/AddMemberDialog.vue'
 import GroupCardDropdown from './GroupCardDropdown.vue'
@@ -16,6 +16,8 @@ import { ContributionDialog } from '@/components/contributions/ContributionDialo
 import ActivateGroupDialog from '@/pages/index/components/ActivateGroupDialog.vue'
 import { useGroupActivateMutation } from '@/features/group/composables/use-group-activate-mutation.ts'
 import StartNewRoundDialog from '../dialogs/StartNewRoundDialog.vue'
+import EditGroupDialog from '@/pages/index/components/EditGroupDialog.vue'
+import RenameGroupDialog from '@/pages/index/components/RenameGroupDialog.vue'
 
 const { group } = defineProps<{
     group: Group
@@ -32,10 +34,25 @@ const { contributionAmount,
     status,
     user } = useGroup(() => group)
 
+const showEditGroupDialog = ref(false)
+const showRenameGroupDialog = ref(false)
+
 const isShared = computed(() => user.value?.name)
 
 const { isPending: isGroupActivePending, mutate: groupActivateMutate } = useGroupActivateMutation()
 
+const handleGroupDropdownEvent = (e: GroupCardDropdownEvent) => {
+    switch (e) {
+        case 'edit-group': {
+            showEditGroupDialog.value = true
+            return;
+        }
+        case 'rename-group': {
+            showRenameGroupDialog.value = true
+            return;
+        }
+    }
+}
 </script>
 
 <template>
@@ -98,19 +115,21 @@ const { isPending: isGroupActivePending, mutate: groupActivateMutate } = useGrou
             </ContributionDialog>
             <AddMemberDialog :group="group" v-else-if="status === 'draft' && group.members_count <= 0">
                 <Button variant="outline" size="sm">
-                    <UserPlus2Icon data-icon="inline-end" />
-                    Add Members
+                    <UserRound data-icon="inline-end" />
+                    Manage Members
                 </Button>
             </AddMemberDialog>
             <StartNewRoundDialog v-else-if="group.is_round_completed" :group="group" />
             <ActivateGroupDialog :group="group" :members-count="group.members_count" v-else
                 @confirm="groupActivateMutate(group.id)" :loading="isGroupActivePending" />
-            <GroupCardDropdown :group-id="group.id">
-                <Button variant="ghost" class="ml-auto">
-                    More
-                    <ChevronDown />
+            <GroupCardDropdown :group="group" @select="handleGroupDropdownEvent">
+                <Button variant="ghost" class="ml-auto" size="icon-sm">
+                    <MoreHorizontal />
                 </Button>
             </GroupCardDropdown>
         </CardFooter>
+
+        <EditGroupDialog :group="group" v-model="showEditGroupDialog" v-if="showEditGroupDialog" />
+        <RenameGroupDialog :group="group" v-model="showRenameGroupDialog" v-if="showRenameGroupDialog" />
     </Card>
 </template>

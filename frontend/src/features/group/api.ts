@@ -5,6 +5,7 @@ import type {
 } from "@/types/paginate";
 import type {
   CreateGroupSchema,
+  EditGroupSchema,
   Group,
   GroupDetail,
   GroupQueryParams,
@@ -13,10 +14,9 @@ import type {
 import type { UserActivity } from "../activity/type";
 
 export const getGroups = async (params?: GroupQueryParams) => {
-  const res = await httpClient.get<PaginatedResponse<Group>>(
-    "/api/v1/groups",
-    { params },
-  );
+  const res = await httpClient.get<PaginatedResponse<Group>>("/api/v1/groups", {
+    params,
+  });
   return res.data;
 };
 
@@ -37,6 +37,13 @@ export const getSharedGroups = async (params?: GroupQueryParams) => {
 
 export const createGroup = async (payload: CreateGroupSchema) => {
   const res = await httpClient.post<{ data: Group }>("/api/v1/groups", payload);
+  return res.data;
+};
+export const editGroup = async (groupId: number, payload: EditGroupSchema) => {
+  const res = await httpClient.put<{ data: Group }>(
+    `/api/v1/groups/${groupId}`,
+    payload,
+  );
   return res.data;
 };
 

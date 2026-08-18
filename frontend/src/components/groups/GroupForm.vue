@@ -207,7 +207,7 @@ const handleCreateGroupOnly = async () => {
                     {{ initialValues ? 'Update' : 'Create and add Members' }}
                 </span>
             </Button>
-            <template v-if="true">
+            <template v-if="!initialValues">
                 <ButtonGroupSeparator />
                 <DropdownMenu>
                     <DropdownMenuTrigger as-child>

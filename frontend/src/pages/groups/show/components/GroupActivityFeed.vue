@@ -39,7 +39,7 @@ function iconFor(activity: GroupActivity) {
     <Card>
         <CardHeader class="flex items-center justify-between">
             <CardTitle class="font-heading text-lg">Recent activity</CardTitle>
-            <RouterLink :to="{ name: 'groups.detail.activities.index' }">
+            <RouterLink :to="{ name: 'groups.detail.activities.index' }" v-if="activities.length">
                 <Button variant="link">
                     <ArrowRight class="size-4" />
                     View all

@@ -40,6 +40,10 @@ const rules = [
     },
     {
         icon: Ban,
+        text: 'Once activated, the group cannot be edited beyond changing the group name.',
+    },
+    {
+        icon: Ban,
         text: "This can't be undone — the group can't be sent back to draft once activated.",
     },
 ]
@@ -48,7 +52,7 @@ const rules = [
 <template>
     <AlertDialog>
         <AlertDialogTrigger as-child>
-            <Button>
+            <Button size="sm">
                 <Rocket data-icon="inline-start" />
                 Activate group
             </Button>

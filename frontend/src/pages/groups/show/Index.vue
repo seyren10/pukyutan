@@ -2,7 +2,7 @@
 import { computed, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import { ArrowLeft, Rocket, UserPlus2, FolderX, Wallet, HandCoins, CheckCircle2, Users, Hexagon, Component } from '@lucide/vue'
+import { ArrowLeft, Rocket, UserPlus2, FolderX, Wallet, HandCoins, CheckCircle2, Users, Hexagon, Component, UserRound } from '@lucide/vue'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription, EmptyContent } from '@/components/ui/empty'
@@ -129,11 +129,9 @@ const cycleDialogOpen = computed({
             </Empty>
 
             <div v-else class="flex flex-col gap-6">
-                <Button as-child variant="link" class="w-min" size="sm">
-                    <RouterLink :to="{ name: 'dashboard' }">
-                        <ArrowLeft class="size-3.5" />
-                        Back to your groups
-                    </RouterLink>
+                <Button variant="link" class="w-min" size="sm" @click="$router.back()">
+                    <ArrowLeft class="size-3.5" />
+                    Back to your groups
                 </Button>
 
 
@@ -177,8 +175,8 @@ const cycleDialogOpen = computed({
                                 <div v-if="isOwner" class="flex flex-wrap items-center justify-center gap-2">
                                     <AddMemberDialog :group="group">
                                         <Button variant="outline" size="sm">
-                                            <UserPlus2 data-icon="inline-start" />
-                                            Add members
+                                            <UserRound data-icon="inline-start" />
+                                            Manage members
                                         </Button>
                                     </AddMemberDialog>
                                     <ActivateGroupDialog v-if="membersCount > 0" :group="group"

@@ -23,3 +23,7 @@ export const createGroupSchema = z.object({
       "Start date can't be in the past",
     ),
 });
+
+export const renameGroupSchema = z.object({
+  name: createGroupSchema.shape.name,
+});
