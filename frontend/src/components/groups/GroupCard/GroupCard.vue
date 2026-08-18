@@ -14,7 +14,7 @@ import GroupCardDropdown from './GroupCardDropdown.vue'
 import { useGroup } from '@/features/group/composables/use-group.ts'
 import { ContributionDialog } from '@/components/contributions/ContributionDialog/index.ts'
 import ActivateGroupDialog from '@/pages/index/components/ActivateGroupDialog.vue'
-import { useGroupActivateMutation } from '@/features/group/composables/use-group-active-mutation.ts'
+import { useGroupActivateMutation } from '@/features/group/composables/use-group-activate-mutation.ts'
 import StartNewRoundDialog from '../dialogs/StartNewRoundDialog.vue'
 
 const { group } = defineProps<{

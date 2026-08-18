@@ -12,22 +12,29 @@ import {
 import { Search, Bell, User, LogOut } from '@lucide/vue'
 import AppModeToggler from '@/components/app/AppModeToggler.vue'
 import Logo from '@/assets/logo.svg'
-withDefaults(
-  defineProps<{
-    userName?: string
-    userInitials?: string
-  }>(),
-  {
-    userName: 'Roy',
-    userInitials: 'RG',
-  },
-)
+import { useUserStore } from '@/stores/user'
+import { storeToRefs } from 'pinia'
+import { useMutation } from '@tanstack/vue-query'
+import { logout } from '@/features/auth/api'
+import { useLogout } from '@/composables/use-logout'
+
+const userStore = useUserStore()
+const { userInitials, user, isLoggedIn } = storeToRefs(userStore)
 
 const navItems = [
   { label: 'Dashboard', to: '/' },
   { label: 'Activity', to: '/activities' },
   { label: 'Settings', to: '/settings' },
 ]
+
+
+const { execute } = useLogout()
+const { mutate } = useMutation({
+  mutationFn: () => logout(),
+  onSuccess: () => {
+    execute()
+  }
+})
 </script>
 
 <template>
@@ -59,7 +66,7 @@ const navItems = [
           </Button>
           <AppModeToggler />
 
-          <DropdownMenu>
+          <DropdownMenu v-if="isLoggedIn">
             <DropdownMenuTrigger as-child>
               <button class="rounded-full">
                 <Avatar class="size-8">
@@ -70,12 +77,28 @@ const navItems = [
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" class="w-48">
+              <div class="flex gap-2 items-center">
+                <Avatar class="size-8 shrink-0">
+                  <AvatarFallback class="bg-accent text-accent-foreground">
+                    {{ userInitials }}
+                  </AvatarFallback>
+                </Avatar>
+                <div class="flex flex-col text-sm text-muted-foreground max-w-30 ">
+                  <span class="truncate">
+                    {{ user?.name }}
+                  </span>
+                  <span class="truncate font-medium">
+                    {{ user?.email }}
+                  </span>
+                </div>
+              </div>
+              <DropdownMenuSeparator />
               <DropdownMenuItem>
                 <User data-icon="inline-start" />
                 Profile
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem variant="destructive">
+              <DropdownMenuItem variant="destructive" @select="mutate">
                 <LogOut data-icon="inline-start" />
                 Log out
               </DropdownMenuItem>

@@ -23,7 +23,8 @@ export const logout = async () => {
 };
 
 export const register = async (payload: RegistrationPayload) => {
-  await httpClient.post("/register", payload);
+  const res = await httpClient.post<User>("/register", payload);
+  return res.data;
 };
 
 export const getCsrfCookie = async () => {

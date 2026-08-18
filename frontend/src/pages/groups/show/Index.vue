@@ -14,7 +14,7 @@ import GroupMemberLedgerList from '@/components/groups/GroupMemberLedgerList.vue
 import CycleContributionsDialog from '@/components/contributions/CycleContributionsDialog.vue'
 import AddMemberDialog from '@/pages/index/components/AddMemberDialog.vue'
 import ActivateGroupDialog from '@/pages/index/components/ActivateGroupDialog.vue'
-import { useGroupActivateMutation } from '@/features/group/composables/use-group-active-mutation'
+import { useGroupActivateMutation } from '@/features/group/composables/use-group-activate-mutation.ts'
 import GroupDetailHeader from './components/GroupDetailHeader.vue'
 import GroupDetailSkeleton from './components/GroupDetailSkeleton.vue'
 import GroupActivityFeed from './components/GroupActivityFeed.vue'

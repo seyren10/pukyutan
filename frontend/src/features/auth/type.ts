@@ -1,16 +1,9 @@
 import type z from "zod";
-import type { loginCredentialSchema, resetPasswordSchema } from "./schema";
+import type { loginCredentialSchema, registrationSchema, resetPasswordSchema } from "./schema";
 
 export type LoginCredentials = {
   email: string;
   password: string;
-};
-
-export type RegistrationPayload = {
-  name: string;
-  email: string;
-  password: string;
-  password_confirmation: string;
 };
 
 export type User = {
@@ -24,3 +17,4 @@ export type User = {
 
 export type LoginCredential = z.infer<typeof loginCredentialSchema>;
 export type ResetPasswordSchema = z.infer<typeof resetPasswordSchema>;
+export type RegistrationPayload = z.infer<typeof registrationSchema>;

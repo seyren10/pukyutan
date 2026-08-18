@@ -6,7 +6,7 @@ import type { GroupLike } from '@/features/group/type';
 import { useQueryClient } from '@tanstack/vue-query';
 import { ref, watch } from 'vue';
 import ActivateGroupDialog from './ActivateGroupDialog.vue';
-import { useGroupActivateMutation } from '@/features/group/composables/use-group-active-mutation.ts';
+import { useGroupActivateMutation } from '@/features/group/composables/use-group-activate-mutation.ts';
 
 const { group } = defineProps<{
     group: GroupLike
@@ -47,7 +47,7 @@ watch(dialog, () => {
         const queryKey = getGroupsInfiniteQueryOptions().queryKey
         queryClient.invalidateQueries({ queryKey })
 
-        queryClient.invalidateQueries({ queryKey: ['groups', 'details', group.id] })
+        queryClient.invalidateQueries({ queryKey: ['groups', 'detail', group.id] })
     }
 })
 </script>

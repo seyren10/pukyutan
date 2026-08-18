@@ -1,8 +1,9 @@
 import { useMutation } from "@tanstack/vue-query";
-import type { LoginCredentials } from "./type";
+import type { LoginCredentials, RegistrationPayload } from "./type";
 import {
   forgotPassword,
   login,
+  register,
   resetPassword,
   sendEmailVerification,
 } from "./api";
@@ -27,6 +28,19 @@ export const useAuthMutations = () => {
       toast.info("Successfully logged in", {
         position: "top-center",
       });
+      userStore.setUser(user);
+      router.replace((route.query.redirect as string) || { name: "dashboard" });
+    },
+  });
+
+  const registerMutation = useMutation({
+    mutationFn: (payload: RegistrationPayload) => register(payload),
+    onSuccess: (user) => {
+      toast.info("Registration Successful", {
+        position: "top-center",
+        description: "Check your email to verify your account.",
+      });
+
       userStore.setUser(user);
       router.replace((route.query.redirect as string) || { name: "dashboard" });
     },
@@ -66,5 +80,6 @@ export const useAuthMutations = () => {
     verifyEmailMutation,
     forgotPasswordMutation,
     passwordResetMutation,
+    registerMutation,
   };
 };

@@ -8,8 +8,6 @@ export const useLogout = () => {
   const userStore = useUserStore();
 
   const execute = () => {
-    console.log("boom");
-
     userStore.setUser(null);
     queryClient.clear();
     router.replace({ name: "login" });
