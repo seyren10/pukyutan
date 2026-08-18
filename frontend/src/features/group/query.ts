@@ -68,12 +68,18 @@ export const getGroupActivitiesInfiniteQueryOptions = (
   groupId: MaybeRefOrGetter<number>,
 ) =>
   infiniteQueryOptions({
-    queryKey: ["groups", toValue(groupId), "activities", "infinite-list"],
+    queryKey: [
+      "groups",
+      "detail",
+      toValue(groupId),
+      "activities",
+      "infinite-list",
+    ],
     queryFn: ({ pageParam }) =>
       getGroupActivities(toValue(groupId), { page: pageParam }),
     initialPageParam: 1,
     getNextPageParam: (page) =>
-      page.next_page_url !== null ? page.current_page + 1 : undefined,
+      page.links.next !== null ? page.meta.current_page + 1 : undefined,
   });
 
 // A small, single-shot fetch for the group-detail page's "recent activity"
@@ -85,7 +91,14 @@ export const getRecentGroupActivitiesQueryOptions = (
   limit: MaybeRefOrGetter<number> = 5,
 ) =>
   queryOptions({
-    queryKey: ["groups","detail", toValue(groupId), "activities", "recent", toValue(limit)],
+    queryKey: [
+      "groups",
+      "detail",
+      toValue(groupId),
+      "activities",
+      "recent",
+      toValue(limit),
+    ],
     queryFn: () =>
       getGroupActivities(toValue(groupId), { per_page: toValue(limit) }),
   });

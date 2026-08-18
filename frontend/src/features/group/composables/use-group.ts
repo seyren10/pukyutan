@@ -21,8 +21,8 @@ export const useGroup = <T extends GroupBase | undefined>(
 ) => {
   const groupValue = computed(() => toValue(group));
 
-  const name = computed(() => groupValue.value?.name ?? "");
-  const user = computed(() => groupValue.value?.user);
+  const name = computed(() => groupValue.value?.name ?? "No group");
+  const user = computed(() => groupValue.value?.user ?? "No user");
   const status = computed(() => groupValue.value?.status);
   const recentMembers = computed(() => groupValue.value?.recent_members ?? []);
   const membersCount = computed(() => groupValue.value?.members_count ?? 0);

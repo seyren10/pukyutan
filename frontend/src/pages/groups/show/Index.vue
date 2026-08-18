@@ -104,7 +104,7 @@ const cycleDialogOpen = computed({
 <template>
     <RouterView #="{ Component }">
         <component :is="Component" v-if="Component" />
-        
+
         <template v-else>
             <GroupDetailSkeleton v-if="isPending" />
 
@@ -129,11 +129,13 @@ const cycleDialogOpen = computed({
             </Empty>
 
             <div v-else class="flex flex-col gap-6">
-                <RouterLink :to="{ name: 'dashboard' }"
-                    class="flex w-fit items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground">
-                    <ArrowLeft class="size-3.5" />
-                    Back to your groups
-                </RouterLink>
+                <Button as-child variant="link" class="w-min" size="sm">
+                    <RouterLink :to="{ name: 'dashboard' }">
+                        <ArrowLeft class="size-3.5" />
+                        Back to your groups
+                    </RouterLink>
+                </Button>
+
 
                 <GroupDetailHeader :group="group" :is-owner="isOwner" />
 

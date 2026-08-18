@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, useTemplateRef } from 'vue'
+import { computed, useTemplateRef } from 'vue'
 import { useInfiniteQuery } from '@tanstack/vue-query'
 import { History } from '@lucide/vue'
 import { Card, CardContent } from '@/components/ui/card'
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription } from '@/components/ui/empty'
 import { getUserActivitiesInfiniteQueryOptions } from '@/features/activity/query'
 import { useGroupedActivities } from '@/features/activity/composables/use-grouped-activities.ts'
-import ActivityRow from './components/ActivityRow.vue'
-import ActivityRowSkeleton from './components/ActivityRowSkeleton.vue'
+import ActivityRow from '@/components/activity/ActivityRow.vue'
+import ActivityRowSkeleton from '@/components/activity/ActivityRowSkeleton.vue'
 import { useIntersectionObserver } from '@vueuse/core'
 
 const { data, isPending, isFetchingNextPage, hasNextPage, fetchNextPage } =

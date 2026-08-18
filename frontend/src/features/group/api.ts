@@ -1,5 +1,7 @@
 import { httpClient } from "@/services/axios/axios";
-import type { SimplePaginatedResponse, LaravelPaginatedResponse } from "@/types/paginate";
+import type {
+  SimplePaginatedResponse,
+} from "@/types/paginate";
 import type {
   CreateGroupSchema,
   Group,
@@ -8,6 +10,7 @@ import type {
   GroupQueryParams,
   GroupRoundSummary,
 } from "./type";
+import type { UserActivity } from "../activity/type";
 
 export const getGroups = async (params?: GroupQueryParams) => {
   const res = await httpClient.get<SimplePaginatedResponse<Group>>(
@@ -73,7 +76,7 @@ export const getGroupActivities = async (
   groupId: number,
   params?: GroupQueryParams,
 ) => {
-  const res = await httpClient.get<LaravelPaginatedResponse<GroupActivity>>(
+  const res = await httpClient.get<SimplePaginatedResponse<UserActivity>>(
     `/api/v1/groups/${groupId}/activities`,
     { params },
   );

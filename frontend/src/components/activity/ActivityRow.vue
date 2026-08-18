@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import { format } from 'date-fns'
 import { Badge } from '@/components/ui/badge'
-import { visualForEvent } from '../event-visuals'
+import { visualForEvent } from '../../pages/activity/event-visuals'
 import type { UserActivity } from '@/features/activity/type'
 
 const { activity } = defineProps<{
