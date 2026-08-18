@@ -21,12 +21,12 @@ class GroupController extends Controller
     {
         $user = Auth::user();
 
-        $perPage = $request->query("per_page", 15);
+        $perPage = min($request->query("per_page", 15), 99);
         $userGroups = $user->groups()
             ->with(["recentMembers", 'nextCycle', 'nextCycle.recipient:id,name', 'cycles'])
             ->withCount(['members', 'cycles'])
             ->latest()
-            ->simplePaginate($perPage);
+            ->paginate($perPage);
 
         return GroupResource::collection($userGroups);
     }
@@ -37,7 +37,7 @@ class GroupController extends Controller
     public function shared(Request $request)
     {
         $user = Auth::user();
-        $perPage = $request->query("per_page", 15);
+        $perPage = min($request->query("per_page", 15), 99);
 
         $groups = Group::query()->
             whereHas("groupShares", fn($query) =>
@@ -46,7 +46,7 @@ class GroupController extends Controller
             ->with(["user:id,name", 'recentMembers', 'nextCycle'])
             ->withCount(["members"])
             ->latest()
-            ->simplePaginate($perPage);
+            ->paginate($perPage);
 
         return GroupResource::collection($groups);
     }
