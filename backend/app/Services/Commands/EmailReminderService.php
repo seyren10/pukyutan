@@ -64,7 +64,7 @@ class EmailReminderService
         }
 
         $exists = $owner->notifications()
-            ->where('type', NotificationType::CycleReminder->value)
+            ->where('type', NotificationType::CycleReminder)
             ->where('data->cycle_id', $cycle->id)
             ->exists();
 
