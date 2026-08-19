@@ -1,9 +1,23 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { Hexagon, Wallet, CalendarClock, Users, Eye, Ticket, Copy, Check } from '@lucide/vue'
+import { useRouter } from 'vue-router'
+import { Hexagon, Wallet, CalendarClock, Users, Eye, Ticket, Copy, Check, ShieldUser, LogOut } from '@lucide/vue'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import {
+    AlertDialog,
+    AlertDialogTrigger,
+    AlertDialogContent,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogCancel,
+    AlertDialogAction,
+} from '@/components/ui/alert-dialog'
 import { getInitials } from '@/lib/helpers'
 import { useGroupDetail } from '@/features/group/composables/use-group'
+import { useLeaveGroupMutation } from '@/features/share/composables/use-leave-group-mutation'
 import type { GroupDetail } from '@/features/group/type'
 import { toast } from 'vue-sonner'
 
@@ -11,6 +25,8 @@ const { group, isOwner } = defineProps<{
     group: GroupDetail
     isOwner: boolean
 }>()
+
+const router = useRouter()
 
 const {
     name,
@@ -39,6 +55,17 @@ const copyInviteCode = async () => {
     toast.success('Invite code copied')
 
     setTimeout(() => (justCopied.value = false), 1500)
+}
+
+const { mutate: leaveGroupMutate, isPending: isLeaving } = useLeaveGroupMutation()
+
+const handleLeave = () => {
+    leaveGroupMutate(group.id, {
+        onSuccess: () => {
+            toast.success(`You've left "${name.value}"`)
+            router.push({ name: 'dashboard' })
+        },
+    })
 }
 </script>
 
@@ -92,14 +119,48 @@ const copyInviteCode = async () => {
             </div>
         </div>
 
-        <div v-if="isOwner && group.invite_code" class="shrink-0">
-            <button type="button" @click="copyInviteCode"
-                class="inline-flex items-center gap-1.5 rounded-full border border-dashed border-border bg-muted/40 px-3 py-1.5 font-mono text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
-                <Ticket class="size-3.5" />
-                {{ group.invite_code }}
-                <Check v-if="justCopied" class="size-3 text-success" />
-                <Copy v-else class="size-3" />
-            </button>
+        <div class="flex shrink-0 flex-col items-end gap-2">
+            <div v-if="isOwner && group.invite_code" class="flex items-center gap-2">
+                <Button as-child variant="outline" size="sm">
+                    <RouterLink :to="{ name: 'groups.detail.access.index' }">
+                        <ShieldUser data-icon="inline-start" />
+                        Manage access
+                    </RouterLink>
+                </Button>
+
+                <button type="button" @click="copyInviteCode"
+                    class="inline-flex items-center gap-1.5 rounded-full border border-dashed border-border bg-muted/40 px-3 py-1.5 font-mono text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
+                    <Ticket class="size-3.5" />
+                    {{ group.invite_code }}
+                    <Check v-if="justCopied" class="size-3 text-success" />
+                    <Copy v-else class="size-3" />
+                </button>
+            </div>
+
+            <AlertDialog v-else-if="!isOwner">
+                <AlertDialogTrigger as-child>
+                    <Button variant="outline" size="sm" class="text-muted-foreground hover:text-destructive">
+                        <LogOut data-icon="inline-start" />
+                        Leave group
+                    </Button>
+                </AlertDialogTrigger>
+
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle class="font-heading">Leave "{{ name }}"?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            You'll lose access to this group right away. You can ask the owner for a new invite
+                            code if you want back in later.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Stay</AlertDialogCancel>
+                        <AlertDialogAction :disabled="isLeaving" @click="handleLeave">
+                            {{ isLeaving ? 'Leaving...' : 'Leave group' }}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     </div>
 </template>

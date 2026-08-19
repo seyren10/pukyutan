@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
   DropdownMenu,
@@ -9,8 +8,9 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
-import { Search, Bell, User, LogOut } from '@lucide/vue'
+import { Search, User, LogOut } from '@lucide/vue'
 import AppModeToggler from '@/components/app/AppModeToggler.vue'
+import AppNotificationBell from '@/components/app/AppNotificationBell.vue'
 import Logo from '@/assets/logo.svg'
 import { useUserStore } from '@/stores/user'
 import { storeToRefs } from 'pinia'
@@ -61,9 +61,7 @@ const { mutate } = useMutation({
             <Input placeholder="Search groups..." class="w-56 pl-8" />
           </div>
 
-          <Button variant="ghost" size="icon" class="rounded-full">
-            <Bell />
-          </Button>
+          <AppNotificationBell />
           <AppModeToggler />
 
           <DropdownMenu v-if="isLoggedIn">

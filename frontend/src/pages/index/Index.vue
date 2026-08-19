@@ -2,16 +2,18 @@
 import { Card, CardContent } from '@/components/ui/card'
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
-import { Layers, Wallet, Users, Inbox, Plus } from '@lucide/vue'
+import { Layers, Wallet, Users, Inbox, Plus, Ticket } from '@lucide/vue'
 import { useUserStore } from '@/stores/user'
 import { storeToRefs } from 'pinia'
 import UnverifiedAlert from './components/UnverifiedAlert.vue'
 import { useInfiniteQuery, useQuery } from '@tanstack/vue-query'
 import { getGroupsQueryOptions, getSharedGroupsInfiniteQueryOptions } from '@/features/group/query.ts'
+import { getPendingShareRequestsQueryOptions } from '@/features/share/query'
 import { computed, ref } from 'vue'
 import { GroupCard, GroupCardEmpty, GroupCardSkeleton } from '@/components/groups/GroupCard'
 import CreateGroupDialog from './components/CreateGroupDialog.vue'
 import AddMemberDialog from './components/AddMemberDialog.vue'
+import JoinGroupDialog from './components/JoinGroupDialog.vue'
 import AppPaginationBar from '@/components/app/AppPaginationBar.vue'
 import { useRouteQuery } from '@vueuse/router'
 
@@ -25,6 +27,7 @@ const { data: sharedGroupsData, isPending: isSharedGroupsPending } = useInfinite
 const sharedGroups = computed(() => sharedGroupsData.value?.pages?.flatMap(g => g.data))
 
 const showAddMemberDialog = ref(false)
+const showJoinGroupDialog = ref(false)
 
 
 const stats = [
@@ -33,7 +36,10 @@ const stats = [
     { label: 'Members across groups', value: '11', icon: Users },
 ]
 
-const pendingRequestCount = 2
+// per_page: 1 — this call only ever reads meta.total, the same endpoint the
+// full inbox page (/requests) later fetches for real.
+const { data: pendingRequestsData } = useQuery(getPendingShareRequestsQueryOptions(1, 1))
+const pendingRequestCount = computed(() => pendingRequestsData.value?.meta.total ?? 0)
 
 const userStore = useUserStore()
 const { isEmailVerified } = storeToRefs(userStore)
@@ -46,10 +52,12 @@ const { isEmailVerified } = storeToRefs(userStore)
 
         <Alert v-if="pendingRequestCount > 0" variant="accent">
             <Inbox />
-            <AlertTitle>{{ pendingRequestCount }} pending join requests</AlertTitle>
+            <AlertTitle>{{ pendingRequestCount }} pending join {{ pendingRequestCount === 1 ? 'request' : 'requests' }}</AlertTitle>
             <AlertDescription class="flex items-center justify-between gap-4">
                 <span>Someone wants to view one of your groups. Review before they get access.</span>
-                <Button size="sm" variant="outline">Review requests</Button>
+                <Button as-child size="sm" variant="outline">
+                    <RouterLink :to="{ name: 'share-requests.index' }">Review requests</RouterLink>
+                </Button>
             </AlertDescription>
         </Alert>
 
@@ -100,14 +108,22 @@ const { isEmailVerified } = storeToRefs(userStore)
 
         <!-- SHARED GROUPS -->
         <div class="flex flex-col gap-3">
-            <h2 class="font-heading text-lg font-semibold text-foreground">Shared with you</h2>
+            <div class="flex items-center justify-between">
+                <h2 class="font-heading text-lg font-semibold text-foreground">Shared with you</h2>
+                <JoinGroupDialog v-model="showJoinGroupDialog">
+                    <Button size="sm" variant="outline">
+                        <Ticket data-icon="inline-start" />
+                        Join a group
+                    </Button>
+                </JoinGroupDialog>
+            </div>
 
             <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3" v-if="isSharedGroupsPending">
                 <GroupCardSkeleton />
                 <GroupCardSkeleton />
                 <GroupCardSkeleton />
             </div>
-            <GroupCardEmpty v-else-if="!groups?.length" />
+            <GroupCardEmpty v-else-if="!sharedGroups?.length" />
             <div v-else class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
                 <GroupCard v-for="group in sharedGroups" :key="group.id" :group="group" />
             </div>

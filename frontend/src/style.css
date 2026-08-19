@@ -48,7 +48,8 @@
 }
 
 :root {
-  --radius: 0.625rem;
+  --radius: 0.925rem;
+  /*default : 0.625rem;*/
 
   --font-sans: 'Public Sans', ui-sans-serif, system-ui, sans-serif;
   --font-display: 'Fraunces', ui-serif, serif;

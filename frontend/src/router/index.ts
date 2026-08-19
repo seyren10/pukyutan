@@ -5,6 +5,7 @@ import { useUserStore } from "@/stores/user";
 import { storeToRefs } from "pinia";
 import { useBootstrapStore } from "@/stores/bootstrap";
 import { activityRoute } from "./activity";
+import { shareRequestsRoute } from "./share-requests";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -35,9 +36,16 @@ const router = createRouter({
               component: () => import("@/pages/groups/show/activity/Index.vue"),
               props: (route) => ({ groupId: Number(route.params.id) }),
             },
+            {
+              path: "access",
+              name: "groups.detail.access.index",
+              component: () => import("@/pages/groups/show/access/Index.vue"),
+              props: (route) => ({ groupId: Number(route.params.id) }),
+            },
           ],
         },
         activityRoute,
+        shareRequestsRoute,
       ],
     },
     authRoutes,
