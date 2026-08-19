@@ -10,5 +10,7 @@ enum GroupActivityEvent: string
     case CycleDisbursed = 'cycle.disbursed';
     case ShareAccepted = 'share.accepted';
     case ShareRejected = 'share.rejected';
+    case ShareRevoked = 'share.revoked';
+    case ShareLeft = 'share.left';
     case ContributionRecorded = 'contribution.recorded';
 }

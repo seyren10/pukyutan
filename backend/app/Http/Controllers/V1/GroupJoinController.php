@@ -4,8 +4,9 @@ namespace App\Http\Controllers\V1;
 
 use App\Enums\GroupShareStatus;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\V1\GroupShareResource;
 use App\Models\Group;
-use App\Models\GroupShare;
+use App\Notifications\GroupShareRequested;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -23,8 +24,7 @@ class GroupJoinController extends Controller
         abort_if($group === null, 404, "No group found with that invitation code");
         abort_if(Auth::id() === $group->user_id, 400, "You cannot invite yourself");
 
-
-        auth()->user()->groupShares()->updateOrCreate(
+        $share = $request->user()->groupShares()->updateOrCreate(
             [
                 "group_id" => $group->id
             ],
@@ -35,6 +35,12 @@ class GroupJoinController extends Controller
             ]
         );
 
-        return response()->json(["message" => "Request has been made. Wait for the owner to confirm"]);
+        $group->user->notify(new GroupShareRequested($share));
+
+        // Avoids an extra query — we already have the requesting user in
+        // memory, and it's the same user the share belongs to.
+        $share->setRelation("user", $request->user());
+
+        return (new GroupShareResource($share))->response();
     }
 }

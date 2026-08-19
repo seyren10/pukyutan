@@ -31,8 +31,9 @@ class ContributionController extends Controller
      */
     public function store(StoreContributionRequest $request, Cycle $cycle)
     {
+        Gate::authorize('update', $cycle->group);
         abort_if($cycle->group->status !== GroupStatus::ACTIVE, 400, "Cannot add contribution to a group that is not active.");
-
+        
         //member should be part of the group before proceeding
         $memberId = $request->safe()->member_id;
         Gate::authorize('addContribution', [$cycle, $memberId]);
