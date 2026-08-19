@@ -1,21 +1,23 @@
 <script setup lang="ts">
 import { Button } from '@/components/ui/button';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Edit3Icon, EyeIcon, MoreVertical, UserRound } from '@lucide/vue';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Edit3Icon, EyeIcon, MoreVertical, Ticket, Trash2Icon, UserRound } from '@lucide/vue';
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import type { GroupCardDropdownEvent } from '.';
 import type { GroupLike } from '@/features/group/type';
+import { useCopyInviteCode } from '@/features/group/composables/use-copy-invite-code';
 
 const { group, isOwner = true } = defineProps<{
     group: GroupLike
-    /** Owner-only actions (manage members, edit/rename) are hidden for view-only collaborators. */
+    /** Owner-only actions (manage members, edit/rename, delete) are hidden for view-only collaborators. */
     isOwner?: boolean
 }>()
 const emit = defineEmits<{
     (e: 'select', type: GroupCardDropdownEvent): void
 }>()
 const router = useRouter()
+const { copyInviteCode } = useCopyInviteCode()
 
 // Membership can only be managed while the group is still a draft — once
 // active the member list locks, so the owner-only action set is trimmed
@@ -46,6 +48,14 @@ const isDraft = computed(() => group.status === 'draft')
                 </DropdownMenuItem>
                 <DropdownMenuItem @select="emit('select', 'rename-group')" v-else>
                     <Edit3Icon /> Rename Group
+                </DropdownMenuItem>
+                <DropdownMenuItem @select="copyInviteCode(group.invite_code)" v-if="group.invite_code">
+                    <Ticket /> Copy Invitation Code
+                </DropdownMenuItem>
+
+                <DropdownMenuSeparator />
+                <DropdownMenuItem variant="destructive" @select="emit('select', 'delete-group')">
+                    <Trash2Icon /> Delete Group
                 </DropdownMenuItem>
             </template>
         </DropdownMenuContent>

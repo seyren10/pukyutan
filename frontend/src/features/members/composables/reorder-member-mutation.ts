@@ -17,6 +17,9 @@ export const useReorderMembersMutation = (
       // success or failure — the component handles the failure-case
       // rollback itself since it owns the pre-drag snapshot.
       queryClient.invalidateQueries({ queryKey });
+      // Reordering changes recent_members' displayed order on the group
+      // list/detail cards — keep them in sync too.
+      queryClient.invalidateQueries({ queryKey: ["groups"] });
     },
   });
 

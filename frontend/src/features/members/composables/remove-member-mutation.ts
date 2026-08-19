@@ -36,6 +36,9 @@ export const useRemoveMemberMutation = (groupId: MaybeRefOrGetter<number>) => {
 
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey });
+      // Removing a member changes the group's members_count/recent_members,
+      // which the group list/detail cards render — keep them in sync too.
+      queryClient.invalidateQueries({ queryKey: ["groups"] });
     },
   });
 

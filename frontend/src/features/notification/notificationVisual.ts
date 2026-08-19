@@ -1,4 +1,10 @@
-import { UserPlus, CheckCircle2, XCircle, UserMinus } from "@lucide/vue";
+import {
+  UserPlus,
+  CheckCircle2,
+  XCircle,
+  UserMinus,
+  AlarmClock,
+} from "@lucide/vue";
 import type { RouteLocationRaw } from "vue-router";
 import type { AppNotification } from "./type";
 
@@ -35,6 +41,17 @@ export function describeNotification(notification: AppNotification) {
         icon: UserMinus,
         text: `Your access to "${data.group_name}" was removed`,
         to: null,
+      };
+    case "cycle.reminder":
+      return {
+        icon: AlarmClock,
+        text: data.message ?? "Cycle due",
+        to: {
+          name: "groups.detail",
+          params: {
+            id: data.group_id,
+          },
+        } satisfies RouteLocationRaw,
       };
   }
 }

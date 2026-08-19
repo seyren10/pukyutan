@@ -24,9 +24,6 @@ import { useDebounceFn } from '@vueuse/core'
 const props = defineProps<{
     groupId: number
 }>()
-const emit = defineEmits<{
-    (e: 'updated'): void
-}>()
 
 const groupId = computed(() => props.groupId)
 
@@ -72,7 +69,6 @@ const onSubmit = handleSubmit((payload) => {
         },
         onSuccess: () => {
             resetForm()
-            emit('updated');
         }
     })
 })
@@ -88,9 +84,6 @@ const commitReorder = useDebounceFn(() => {
 
     const snapshot = dragSnapshot
     reorderMembersMutate(memberIds, {
-        onSuccess: () => {
-            emit('updated')
-        },
         onError: () => {
             members.value = snapshot.value
         },
@@ -98,11 +91,7 @@ const commitReorder = useDebounceFn(() => {
 }, 1000)
 
 const handleRemovemember = (memberId: number) => {
-    removeMemberMutate(memberId, {
-        onSuccess: () => {
-            emit('updated')
-        }
-    })
+    removeMemberMutate(memberId)
 }
 
 watchEffect(() => {

@@ -33,7 +33,7 @@ export const getGroupDetailQueryOptions = (
   enabled: MaybeRefOrGetter<boolean> = true,
 ) =>
   queryOptions({
-    queryKey: ["groups", "detail", toValue(groupId)],
+    queryKey: () => ["groups", "detail", toValue(groupId)],
     queryFn: () => getGroupDetail(toValue(groupId)),
     enabled: () => toValue(enabled),
   });

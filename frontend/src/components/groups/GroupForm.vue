@@ -29,8 +29,12 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { ButtonGroup, ButtonGroupSeparator } from '../ui/button-group/index.ts'
 
 const emit = defineEmits<{
-    (e: 'submit', payload: GroupSchema): void
-    (e: 'addMembers'): void
+    // `addMembers` tells the consumer whether to continue into the add-members
+    // flow once the group is actually created — kept as part of the same
+    // `submit` event (rather than a separate `addMembers` event fired right
+    // after) so the consumer only acts on it once the create mutation
+    // resolves, instead of racing ahead of it.
+    (e: 'submit', payload: GroupSchema, options: { addMembers: boolean }): void
 }>()
 const { initialValues, loading } = defineProps<{
     loading?: boolean,
@@ -100,13 +104,12 @@ const startDate = computed<DateValue | undefined>({
 
 
 const onSubmit = handleSubmit((values) => {
-    emit('submit', values)
-    emit('addMembers')
+    emit('submit', values, { addMembers: true })
 })
 
 const handleCreateGroupOnly = async () => {
     handleSubmit((values) => {
-        emit('submit', values)
+        emit('submit', values, { addMembers: false })
     })()
 }
 </script>

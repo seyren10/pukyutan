@@ -18,6 +18,7 @@ import { useGroupActivateMutation } from '@/features/group/composables/use-group
 import StartNewRoundDialog from '../dialogs/StartNewRoundDialog.vue'
 import EditGroupDialog from '@/pages/index/components/EditGroupDialog.vue'
 import RenameGroupDialog from '@/pages/index/components/RenameGroupDialog.vue'
+import DeleteGroupDialog from '../dialogs/DeleteGroupDialog.vue'
 
 const { group } = defineProps<{
     group: Group
@@ -37,6 +38,7 @@ const { contributionAmount,
 const showEditGroupDialog = ref(false)
 const showRenameGroupDialog = ref(false)
 const showAddMemberDialog = ref(false)
+const showDeleteGroupDialog = ref(false)
 
 const isShared = computed(() => user.value?.name)
 // Mirrors GroupDetailHeader's isOwner check — a shared/view-only collaborator
@@ -58,6 +60,10 @@ const handleGroupDropdownEvent = (e: GroupCardDropdownEvent) => {
         }
         case 'rename-group': {
             showRenameGroupDialog.value = true
+            return;
+        }
+        case 'delete-group': {
+            showDeleteGroupDialog.value = true
             return;
         }
     }
@@ -142,7 +148,7 @@ const handleGroupDropdownEvent = (e: GroupCardDropdownEvent) => {
                     View Group
                 </RouterLink>
             </Button>
-            <GroupCardDropdown :group="group" :is-owner="isOwner" @select="handleGroupDropdownEvent">
+            <GroupCardDropdown :group="group" :is-owner="isOwner" @select="handleGroupDropdownEvent" v-if="isOwner">
                 <Button variant="ghost" class="ml-auto" size="icon-sm">
                     <MoreHorizontal />
                 </Button>
@@ -155,5 +161,6 @@ const handleGroupDropdownEvent = (e: GroupCardDropdownEvent) => {
         <AddMemberDialog :group="group" v-model="showAddMemberDialog" v-if="isOwner && showAddMemberDialog" />
         <EditGroupDialog :group="group" v-model="showEditGroupDialog" v-if="showEditGroupDialog" />
         <RenameGroupDialog :group="group" v-model="showRenameGroupDialog" v-if="showRenameGroupDialog" />
+        <DeleteGroupDialog :group="group" v-model="showDeleteGroupDialog" v-if="showDeleteGroupDialog" />
     </Card>
 </template>

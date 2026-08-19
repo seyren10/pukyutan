@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useQuery } from '@tanstack/vue-query'
 import { formatDistanceToNow } from 'date-fns'
 import {
@@ -22,6 +22,7 @@ import { describeNotification } from '@/features/notification/notificationVisual
 import type { AppNotification } from '@/features/notification/type'
 
 const router = useRouter()
+const route = useRoute()
 
 const { data } = useQuery(getNotificationsQueryOptions())
 const notifications = computed(() => data.value?.data ?? [])
@@ -34,7 +35,12 @@ const handleSelect = (notification: AppNotification) => {
     if (!notification.read_at) markReadMutate(notification.id)
 
     const { to } = describeNotification(notification)
-    if (to) router.push(to)
+    if (to) {
+        if (route.matched.some(m => m.name === to.name)) {
+            router.replace(to)
+        } else
+            router.push(to)
+    }
 }
 </script>
 
@@ -51,7 +57,7 @@ const handleSelect = (notification: AppNotification) => {
         </DropdownMenuTrigger>
 
         <DropdownMenuContent align="end" class="w-80 p-0">
-            <div class="flex items-center justify-between px-3 py-2.5">
+            <div class="flex items-center justify-between px-3 py-2.5 sticky top-0 bg-background z-10">
                 <DropdownMenuLabel class="p-0 font-heading">Notifications</DropdownMenuLabel>
                 <Button v-if="unreadCount > 0" variant="link" size="sm" class="h-auto p-0 text-xs"
                     :disabled="isMarkingAll" @click="markAllReadMutate()">
@@ -70,23 +76,26 @@ const handleSelect = (notification: AppNotification) => {
                 </EmptyHeader>
             </Empty>
 
-            <ScrollArea v-else class="max-h-80">
-                <DropdownMenuItem v-for="notification in notifications" :key="notification.id"
-                    class="items-start gap-2.5 whitespace-normal py-2.5"
-                    :class="{ 'bg-accent/25': !notification.read_at }" @select="handleSelect(notification)">
-                    <div
-                        class="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full bg-accent text-accent-foreground">
-                        <component :is="describeNotification(notification).icon" class="size-3.5" />
-                    </div>
-                    <div class="flex min-w-0 flex-1 flex-col gap-0.5">
-                        <p class="text-sm leading-snug text-foreground">{{ describeNotification(notification).text }}</p>
-                        <span class="font-mono text-xs text-muted-foreground">
-                            {{ formatDistanceToNow(new Date(notification.created_at), { addSuffix: true }) }}
-                        </span>
-                    </div>
-                    <span v-if="!notification.read_at"
-                        class="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
-                </DropdownMenuItem>
+            <ScrollArea v-else>
+                <ul class="max-h-80">
+                    <DropdownMenuItem v-for="notification in notifications" :key="notification.id"
+                        class="items-start gap-2.5 whitespace-normal py-2.5"
+                        :class="{ 'bg-accent/25': !notification.read_at }" @select="handleSelect(notification)">
+                        <div
+                            class="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full bg-accent text-accent-foreground">
+                            <component :is="describeNotification(notification).icon" class="size-3.5" />
+                        </div>
+                        <div class="flex min-w-0 flex-1 flex-col gap-0.5">
+                            <p class="text-sm leading-snug text-foreground">{{ describeNotification(notification).text
+                                }}
+                            </p>
+                            <span class="font-mono text-xs text-muted-foreground">
+                                {{ formatDistanceToNow(new Date(notification.created_at), { addSuffix: true }) }}
+                            </span>
+                        </div>
+                        <span v-if="!notification.read_at" class="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
+                    </DropdownMenuItem>
+                </ul>
             </ScrollArea>
         </DropdownMenuContent>
     </DropdownMenu>

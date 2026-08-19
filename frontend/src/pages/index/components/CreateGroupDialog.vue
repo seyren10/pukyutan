@@ -4,32 +4,31 @@ import { Dialog, DialogDescription, DialogHeader, DialogScrollContent, DialogTit
 import { createGroup } from '@/features/group/api';
 import type { Group, GroupSchema } from '@/features/group/type';
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
-import { ref } from 'vue';
 
 const dialog = defineModel({
     default: false
 })
 const emit = defineEmits<{
-    (e: 'addMembers'): void
+    (e: 'addMembers', group: Group): void
 }>()
 const queryClient = useQueryClient()
-const addMembers = ref(false)
-const selectedGroup = ref<Group | null>(null)
 
-const { mutate: createGroupMutate, isPending: isCrateGroupPending } = useMutation({
+const { mutate: createGroupMutate, isPending: isCreateGroupPending } = useMutation({
     mutationFn: createGroup,
 })
 
-const handleSubmit = (payload: GroupSchema) => {
+const handleSubmit = (payload: GroupSchema, { addMembers }: { addMembers: boolean }) => {
     createGroupMutate(payload, {
+        // Only close the dialog and (optionally) hand the new group off once the
+        // create request actually resolves — emitting eagerly here raced ahead
+        // of the mutation and left the add-members dialog with no group to show.
         onSuccess: (group) => {
-            selectedGroup.value = group.data;
             dialog.value = false;
 
+            if (addMembers) emit('addMembers', group.data)
         },
         onSettled: () => queryClient.invalidateQueries({ queryKey: ['groups'] })
     })
-
 }
 
 </script>
@@ -38,7 +37,7 @@ const handleSubmit = (payload: GroupSchema) => {
 <template>
     <Dialog v-model:open="dialog" unmount-on-hide>
         <DialogTrigger as-child>
-            <slot :add-members="addMembers" :group="selectedGroup" />
+            <slot />
         </DialogTrigger>
 
         <DialogScrollContent>
@@ -47,7 +46,7 @@ const handleSubmit = (payload: GroupSchema) => {
                 <DialogDescription>Fill out the form to create a new group</DialogDescription>
             </DialogHeader>
 
-            <GroupForm @submit="handleSubmit" @add-members="emit('addMembers')" :loading="isCrateGroupPending" />
+            <GroupForm @submit="handleSubmit" :loading="isCreateGroupPending" />
         </DialogScrollContent>
     </Dialog>
 </template>

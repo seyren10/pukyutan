@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
-import { UserRoundCheck, Hourglass, Users2 } from '@lucide/vue'
+import { UserRoundCheck, Hourglass, Users2, ArrowLeft } from '@lucide/vue'
 import { Card, CardContent } from '@/components/ui/card'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { Badge } from '@/components/ui/badge'
@@ -11,6 +11,7 @@ import PendingRequestRow from '@/components/share/PendingRequestRow.vue'
 import CollaboratorRow from '@/components/share/CollaboratorRow.vue'
 import { getGroupShareRequestsQueryOptions } from '@/features/share/query'
 import type { GroupShareStatus } from '@/features/share/type'
+import { Button } from '@/components/ui/button'
 
 const { groupId } = defineProps<{
     groupId: number
@@ -35,6 +36,12 @@ const shares = computed(() => data.value?.data)
 
 <template>
     <div class="flex flex-col gap-4">
+        <Button variant="link" size="sm" as-child class="w-fit">
+            <RouterLink :to="{ name: 'groups.detail', params: { id: groupId } }" replace>
+                <ArrowLeft />
+                Back
+            </RouterLink>
+        </Button>
         <div class="flex items-center justify-between gap-3">
             <div class="flex flex-col gap-0.5">
                 <h2 class="font-heading text-lg font-semibold text-foreground">Access</h2>

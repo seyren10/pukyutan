@@ -15,15 +15,26 @@ import CreateGroupDialog from './components/CreateGroupDialog.vue'
 import AddMemberDialog from './components/AddMemberDialog.vue'
 import AppPaginationBar from '@/components/app/AppPaginationBar.vue'
 import { useRouteQuery } from '@vueuse/router'
+import type { Group } from '@/features/group/type'
 
 const page = useRouteQuery('page', null, {
-    transform: Number
+    transform: Number,
 })
 const { data, isPending } = useQuery(getGroupsQueryOptions(() => ({ page: page.value })))
 const groups = computed(() => data.value?.data);
 
-
+// Owns the post-create "add members" hand-off for both the header's "New
+// group" trigger and the empty-state's "Create a group" trigger below.
+// Deliberately rendered outside the isPending/empty/grid branches further
+// down, since the freshly-created group flips that branch (empty -> grid)
+// as soon as the list refetches — nesting this dialog inside either branch
+// would unmount it mid-flow before the user ever sees it.
 const showAddMemberDialog = ref(false)
+const createdGroup = ref<Group | null>(null)
+const handleGroupCreated = (group: Group) => {
+    createdGroup.value = group
+    showAddMemberDialog.value = true
+}
 
 
 const stats = [
@@ -78,13 +89,11 @@ const { isEmailVerified } = storeToRefs(userStore)
         <div class="flex flex-col gap-3">
             <div class="flex items-center justify-between">
                 <h2 class="font-heading text-lg font-semibold text-foreground">Your groups</h2>
-                <CreateGroupDialog #="{ group }" @add-members="showAddMemberDialog = true" v-if="isEmailVerified">
+                <CreateGroupDialog @add-members="handleGroupCreated" v-if="isEmailVerified">
                     <Button size="sm">
                         <Plus data-icon="inline-start" />
                         New group
                     </Button>
-
-                    <AddMemberDialog v-model="showAddMemberDialog" :group="group" v-if="group" />
                 </CreateGroupDialog>
             </div>
 
@@ -95,13 +104,11 @@ const { isEmailVerified } = storeToRefs(userStore)
             </div>
             <GroupCardEmpty v-else-if="!groups?.length">
                 <template #action>
-                    <CreateGroupDialog #="{ group }" @add-members="showAddMemberDialog = true" v-if="isEmailVerified">
+                    <CreateGroupDialog @add-members="handleGroupCreated" v-if="isEmailVerified">
                         <Button>
                             <Plus data-icon="inline-start" />
                             Create a group
                         </Button>
-
-                        <AddMemberDialog v-model="showAddMemberDialog" :group="group" v-if="group" />
                     </CreateGroupDialog>
                 </template>
             </GroupCardEmpty>
@@ -112,6 +119,8 @@ const { isEmailVerified } = storeToRefs(userStore)
                     <AppPaginationBar :meta="data?.meta" v-if="data" v-model="page" />
                 </div>
             </div>
+
+            <AddMemberDialog v-model="showAddMemberDialog" :group="createdGroup" v-if="createdGroup" />
         </div>
 
         <!-- SHARED GROUPS

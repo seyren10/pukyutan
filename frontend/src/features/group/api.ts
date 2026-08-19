@@ -47,6 +47,10 @@ export const editGroup = async (groupId: number, payload: EditGroupSchema) => {
   return res.data;
 };
 
+export const deleteGroup = async (groupId: number) => {
+  await httpClient.delete(`/api/v1/groups/${groupId}`);
+};
+
 export const activateGroup = async (groupId: number) => {
   const res = await httpClient.post<{ data: Group }>(
     `/api/v1/groups/${groupId}/activate`,
