@@ -36,11 +36,9 @@ const shares = computed(() => data.value?.data)
 
 <template>
     <div class="flex flex-col gap-4">
-        <Button variant="link" size="sm" as-child class="w-fit">
-            <RouterLink :to="{ name: 'groups.detail', params: { id: groupId } }" replace>
-                <ArrowLeft />
-                Back
-            </RouterLink>
+        <Button variant="link" size="sm" class="w-fit" @click="$router.back()">
+            <ArrowLeft />
+            Back
         </Button>
         <div class="flex items-center justify-between gap-3">
             <div class="flex flex-col gap-0.5">

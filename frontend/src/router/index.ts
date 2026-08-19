@@ -51,6 +51,11 @@ const router = createRouter({
       ],
     },
     authRoutes,
+    {
+      path: "/:pathMatch(.*)*",
+      name: "not-found",
+      component: () => import("@/components/app/AppNotFound.vue"),
+    },
   ],
   scrollBehavior: () => {
     return {
