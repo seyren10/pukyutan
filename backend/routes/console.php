@@ -9,5 +9,5 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::command("app:send-reminder")
-    ->everyFiveMinutes()
+    ->everyThirtySeconds()
     ->withoutOverlapping();

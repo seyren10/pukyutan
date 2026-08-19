@@ -40,8 +40,7 @@ class CycleDueReminder extends Notification
         return (new MailMessage)
             ->subject("Upcoming contribution due — {$group->name}")
             ->line("Your contribution of ₱{$group->contribution_amount} for \"{$group->name}\" is due on {$this->cycle->due_date->format('F j, Y')}.")
-            ->line("This is cycle #{$this->cycle->cycle_number}.")
-            ->line("Thank you for choosing " . config("app.name"));
+            ->line("This is cycle #{$this->cycle->cycle_number}.");
     }
 
     /**

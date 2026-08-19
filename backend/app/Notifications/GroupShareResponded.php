@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Enums\GroupShareStatus;
+use App\Enums\NotificationType;
 use App\Models\GroupShare;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -20,6 +21,15 @@ class GroupShareResponded extends Notification
     {
         //
     }
+
+    /**
+     * Get the notification's database type.
+     */
+    public function databaseType(object $notifiable): string
+    {
+        return NotificationType::ShareResponded->value;
+    }
+
 
     /**
      * Get the notification's delivery channels.
@@ -58,7 +68,7 @@ class GroupShareResponded extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            'type' => 'share.responded',
+            'type' => NotificationType::ShareResponded->value,
             'share_id' => $this->share->id,
             'group_id' => $this->share->group_id,
             'group_name' => $this->share->group->name,

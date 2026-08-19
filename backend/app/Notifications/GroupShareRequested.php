@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Enums\NotificationType;
 use App\Models\GroupShare;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -18,6 +19,14 @@ class GroupShareRequested extends Notification
     public function __construct(protected GroupShare $share)
     {
         //
+    }
+
+    /**
+     * Get the notification's database type.
+     */
+    public function databaseType(object $notifiable): string
+    {
+        return NotificationType::ShareRequested->value;
     }
 
     /**
@@ -52,7 +61,7 @@ class GroupShareRequested extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            'type' => 'share.requested',
+            'type' => NotificationType::ShareRequested->value,
             'share_id' => $this->share->id,
             'group_id' => $this->share->group_id,
             'group_name' => $this->share->group->name,

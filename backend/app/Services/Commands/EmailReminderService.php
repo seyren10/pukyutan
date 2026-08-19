@@ -2,9 +2,11 @@
 
 namespace App\Services\Commands;
 
+use App\Enums\NotificationType;
 use App\Models\Cycle;
 use App\Models\CycleReminder;
 use App\Notifications\CycleDueReminder;
+use App\Notifications\CycleDueReminderOwner;
 use Notification;
 
 class EmailReminderService
@@ -26,6 +28,10 @@ class EmailReminderService
                     $sentCount++;
                 }
             }
+            // Notify the group owner via database notification (once per cycle)
+            if ($this->notifyOwner($cycle)) {
+                $sentCount++;
+            }
         }
 
         return $sentCount;
@@ -41,8 +47,34 @@ class EmailReminderService
         return Cycle::query()
             ->whereBetween('due_date', [now()->startOfDay(), now()->addDays($daysAhead)->endOfDay()])
             ->whereNull('disbursed_at')
-            ->with('group.members')
+            ->with('group.members', 'group.user')
             ->get();
+    }
+
+    /**
+     * Notify the group owner via the database channel about an upcoming cycle.
+     * Returns true if a notification was created, false if skipped (no owner or already notified).
+     */
+    public function notifyOwner(Cycle $cycle): bool
+    {
+        $owner = $cycle->group->user ?? null;
+
+        if (!$owner) {
+            return false;
+        }
+
+        $exists = $owner->notifications()
+            ->where('type', NotificationType::CycleReminder->value)
+            ->where('data->cycle_id', $cycle->id)
+            ->exists();
+
+        if ($exists) {
+            return false;
+        }
+
+        $owner->notify(new CycleDueReminderOwner($cycle));
+
+        return true;
     }
 
     /**
@@ -67,7 +99,6 @@ class EmailReminderService
 
         Notification::route('mail', $member->email)
             ->notify(new CycleDueReminder($cycle));
-
         return true;
     }
 }
