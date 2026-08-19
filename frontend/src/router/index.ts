@@ -6,6 +6,7 @@ import { storeToRefs } from "pinia";
 import { useBootstrapStore } from "@/stores/bootstrap";
 import { activityRoute } from "./activity";
 import { shareRequestsRoute } from "./share-requests";
+import { sharedGroupsRoute } from "./shared-groups";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -46,6 +47,7 @@ const router = createRouter({
         },
         activityRoute,
         shareRequestsRoute,
+        sharedGroupsRoute,
       ],
     },
     authRoutes,

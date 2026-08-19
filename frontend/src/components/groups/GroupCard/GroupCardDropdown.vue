@@ -1,18 +1,26 @@
 <script setup lang="ts">
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Edit3Icon, EyeIcon, MoreVertical, UserRound, Users2Icon } from '@lucide/vue';
+import { Edit3Icon, EyeIcon, MoreVertical, UserRound } from '@lucide/vue';
+import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import type { GroupCardDropdownEvent } from '.';
 import type { GroupLike } from '@/features/group/type';
 
-const { group } = defineProps<{
+const { group, isOwner = true } = defineProps<{
     group: GroupLike
+    /** Owner-only actions (manage members, edit/rename) are hidden for view-only collaborators. */
+    isOwner?: boolean
 }>()
 const emit = defineEmits<{
     (e: 'select', type: GroupCardDropdownEvent): void
 }>()
 const router = useRouter()
+
+// Membership can only be managed while the group is still a draft — once
+// active the member list locks, so the owner-only action set is trimmed
+// down to just renaming from that point on.
+const isDraft = computed(() => group.status === 'draft')
 </script>
 
 <template>
@@ -29,15 +37,17 @@ const router = useRouter()
             <DropdownMenuItem @select="router.push({ name: 'groups.detail', params: { id: group.id } })">
                 <EyeIcon /> View Group
             </DropdownMenuItem>
-            <DropdownMenuItem @select="emit('select', 'add-member')">
-                <UserRound /> Manage Members
-            </DropdownMenuItem>
-            <DropdownMenuItem @select="emit('select', 'edit-group')" v-if="group.status === 'draft'">
-                <Edit3Icon /> Edit Group
-            </DropdownMenuItem>
-            <DropdownMenuItem @select="emit('select', 'rename-group')" v-else>
-                <Edit3Icon /> Rename Group
-            </DropdownMenuItem>
+            <template v-if="isOwner">
+                <DropdownMenuItem @select="emit('select', 'add-member')" v-if="isDraft">
+                    <UserRound /> Manage Members
+                </DropdownMenuItem>
+                <DropdownMenuItem @select="emit('select', 'edit-group')" v-if="group.status === 'draft'">
+                    <Edit3Icon /> Edit Group
+                </DropdownMenuItem>
+                <DropdownMenuItem @select="emit('select', 'rename-group')" v-else>
+                    <Edit3Icon /> Rename Group
+                </DropdownMenuItem>
+            </template>
         </DropdownMenuContent>
     </DropdownMenu>
 </template>

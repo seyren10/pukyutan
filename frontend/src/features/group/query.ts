@@ -17,19 +17,15 @@ export const getGroupsQueryOptions = (
     queryFn: () => getGroups(toValue(params)),
   });
 
-export const getSharedGroupsInfiniteQueryOptions = (
+// Mirrors getGroupsQueryOptions above — the shared-groups list is a regular
+// page-numbered listing (same PaginatedResponse shape from the API), so it
+// pairs with AppPaginationBar the same way the owned-groups list does.
+export const getSharedGroupsQueryOptions = (
   params?: MaybeRefOrGetter<GroupQueryParams>,
 ) =>
-  infiniteQueryOptions({
-    queryKey: ["groups-shared", "infinite-list", toValue(params)],
-    queryFn: ({ pageParam }) =>
-      getSharedGroups({ ...toValue(params), page: pageParam }),
-    initialPageParam: 1,
-    getNextPageParam: (page) => {
-      return page.meta.current_page > page.meta.last_page
-        ? page.meta.current_page + 1
-        : undefined;
-    },
+  queryOptions({
+    queryKey: ["groups-shared", "list", params],
+    queryFn: () => getSharedGroups(toValue(params)),
   });
 
 export const getGroupDetailQueryOptions = (

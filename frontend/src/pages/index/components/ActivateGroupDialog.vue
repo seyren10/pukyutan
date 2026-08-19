@@ -32,7 +32,7 @@ const finalMembersCount = computed(() => membersCount ?? groupMembersCount.value
 const rules = [
     {
         icon: Lock,
-        text: 'The member list locks — no adding, removing, or reordering members until this round finishes.',
+        text: 'Members will be totally locked — no reordering, removing, or replacing until this round finishes.',
     },
     {
         icon: CalendarCheck,

@@ -1,28 +1,25 @@
 <script setup lang="ts">
-import { Button } from '@/components/ui/button';
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty';
-import { useUserStore } from '@/stores/user';
-import { PackageOpen, Plus } from '@lucide/vue';
-import { storeToRefs } from 'pinia';
+import { PackageOpen } from '@lucide/vue';
 
-
-const userStore = useUserStore()
-const { isEmailVerified } = storeToRefs(userStore)
+const { title = 'No groups yet', description = 'Create your first paluwagan group to get started.' } = defineProps<{
+    title?: string
+    description?: string
+}>()
 </script>
 <template>
     <Empty>
         <EmptyHeader>
             <EmptyMedia variant="icon">
-                <PackageOpen />
+                <slot name="icon">
+                    <PackageOpen />
+                </slot>
             </EmptyMedia>
-            <EmptyTitle>No groups yet</EmptyTitle>
-            <EmptyDescription>Create your first paluwagan group to get started.</EmptyDescription>
+            <EmptyTitle>{{ title }}</EmptyTitle>
+            <EmptyDescription>{{ description }}</EmptyDescription>
         </EmptyHeader>
         <EmptyContent>
-            <Button v-if="isEmailVerified">
-                <Plus data-icon="inline-start" />
-                Create a group
-            </Button>
+            <slot name="action" />
         </EmptyContent>
     </Empty>
 </template>

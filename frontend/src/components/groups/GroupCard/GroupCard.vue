@@ -3,7 +3,7 @@ import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
-import { Eye, Wallet, CalendarClock, UserPlus2Icon, ChevronDown, HandCoins, MoreHorizontal, UserRound } from '@lucide/vue'
+import { Eye, Wallet, CalendarClock, HandCoins, MoreHorizontal, UserRound } from '@lucide/vue'
 import type { Group } from '@/features/group/type'
 import { computed, ref } from 'vue'
 import { formatFrequencyLabel, getInitials } from '@/lib/helpers'
@@ -36,13 +36,22 @@ const { contributionAmount,
 
 const showEditGroupDialog = ref(false)
 const showRenameGroupDialog = ref(false)
+const showAddMemberDialog = ref(false)
 
 const isShared = computed(() => user.value?.name)
+// Mirrors GroupDetailHeader's isOwner check — a shared/view-only collaborator
+// never gets group.user populated the way the "shared" and detail endpoints
+// do, so isShared doubles as the inverse of ownership here.
+const isOwner = computed(() => !isShared.value)
 
 const { isPending: isGroupActivePending, mutate: groupActivateMutate } = useGroupActivateMutation()
 
 const handleGroupDropdownEvent = (e: GroupCardDropdownEvent) => {
     switch (e) {
+        case 'add-member': {
+            showAddMemberDialog.value = true
+            return;
+        }
         case 'edit-group': {
             showEditGroupDialog.value = true
             return;
@@ -107,28 +116,43 @@ const handleGroupDropdownEvent = (e: GroupCardDropdownEvent) => {
         </CardContent>
 
         <CardFooter class="gap-2">
-            <ContributionDialog :group-id="group.id" v-if="status === 'active' && !group.is_round_completed">
-                <Button variant="outline" size="sm">
-                    <HandCoins />
-                    Add Contribution
-                </Button>
-            </ContributionDialog>
-            <AddMemberDialog :group="group" v-else-if="status === 'draft' && group.members_count <= 0">
-                <Button variant="outline" size="sm">
-                    <UserRound data-icon="inline-end" />
-                    Manage Members
-                </Button>
-            </AddMemberDialog>
-            <StartNewRoundDialog v-else-if="group.is_round_completed" :group="group" />
-            <ActivateGroupDialog :group="group" :members-count="group.members_count" v-else
-                @confirm="groupActivateMutate(group.id)" :loading="isGroupActivePending" />
-            <GroupCardDropdown :group="group" @select="handleGroupDropdownEvent">
+            <template v-if="isOwner">
+                <ContributionDialog :group-id="group.id" v-if="status === 'active' && !group.is_round_completed">
+                    <Button variant="outline" size="sm">
+                        <HandCoins />
+                        Add Contribution
+                    </Button>
+                </ContributionDialog>
+                <AddMemberDialog :group="group" v-else-if="status === 'draft' && group.members_count <= 0">
+                    <Button variant="outline" size="sm">
+                        <UserRound data-icon="inline-end" />
+                        Manage Members
+                    </Button>
+                </AddMemberDialog>
+                <StartNewRoundDialog v-else-if="group.is_round_completed" :group="group" />
+                <ActivateGroupDialog :group="group" :members-count="group.members_count" v-else
+                    @confirm="groupActivateMutate(group.id)" :loading="isGroupActivePending" />
+            </template>
+            <!-- View-only collaborators get no mutation actions here — every branch
+                 above ends up owner-gated server-side anyway (Gate::authorize('update', ...)),
+                 so surfacing them would just be a dead end that 403s on click. -->
+            <Button v-else as-child variant="outline" size="sm">
+                <RouterLink :to="{ name: 'groups.detail', params: { id: group.id } }">
+                    <Eye data-icon="inline-start" />
+                    View Group
+                </RouterLink>
+            </Button>
+            <GroupCardDropdown :group="group" :is-owner="isOwner" @select="handleGroupDropdownEvent">
                 <Button variant="ghost" class="ml-auto" size="icon-sm">
                     <MoreHorizontal />
                 </Button>
             </GroupCardDropdown>
         </CardFooter>
 
+        <!-- Controlled-only instance (no trigger slot) so the dropdown's "Manage
+             Members" item can open this even when the footer's own AddMemberDialog
+             above isn't rendered (e.g. the group already has members). -->
+        <AddMemberDialog :group="group" v-model="showAddMemberDialog" v-if="isOwner && showAddMemberDialog" />
         <EditGroupDialog :group="group" v-model="showEditGroupDialog" v-if="showEditGroupDialog" />
         <RenameGroupDialog :group="group" v-model="showRenameGroupDialog" v-if="showRenameGroupDialog" />
     </Card>

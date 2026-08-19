@@ -2,18 +2,17 @@
 import { Card, CardContent } from '@/components/ui/card'
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
-import { Layers, Wallet, Users, Inbox, Plus, Ticket } from '@lucide/vue'
+import { Layers, Wallet, Users, Inbox, Plus } from '@lucide/vue'
 import { useUserStore } from '@/stores/user'
 import { storeToRefs } from 'pinia'
 import UnverifiedAlert from './components/UnverifiedAlert.vue'
-import { useInfiniteQuery, useQuery } from '@tanstack/vue-query'
-import { getGroupsQueryOptions, getSharedGroupsInfiniteQueryOptions } from '@/features/group/query.ts'
+import { useQuery } from '@tanstack/vue-query'
+import { getGroupsQueryOptions, } from '@/features/group/query.ts'
 import { getPendingShareRequestsQueryOptions } from '@/features/share/query'
 import { computed, ref } from 'vue'
 import { GroupCard, GroupCardEmpty, GroupCardSkeleton } from '@/components/groups/GroupCard'
 import CreateGroupDialog from './components/CreateGroupDialog.vue'
 import AddMemberDialog from './components/AddMemberDialog.vue'
-import JoinGroupDialog from './components/JoinGroupDialog.vue'
 import AppPaginationBar from '@/components/app/AppPaginationBar.vue'
 import { useRouteQuery } from '@vueuse/router'
 
@@ -23,11 +22,8 @@ const page = useRouteQuery('page', null, {
 const { data, isPending } = useQuery(getGroupsQueryOptions(() => ({ page: page.value })))
 const groups = computed(() => data.value?.data);
 
-const { data: sharedGroupsData, isPending: isSharedGroupsPending } = useInfiniteQuery(getSharedGroupsInfiniteQueryOptions())
-const sharedGroups = computed(() => sharedGroupsData.value?.pages?.flatMap(g => g.data))
 
 const showAddMemberDialog = ref(false)
-const showJoinGroupDialog = ref(false)
 
 
 const stats = [
@@ -52,7 +48,8 @@ const { isEmailVerified } = storeToRefs(userStore)
 
         <Alert v-if="pendingRequestCount > 0" variant="accent">
             <Inbox />
-            <AlertTitle>{{ pendingRequestCount }} pending join {{ pendingRequestCount === 1 ? 'request' : 'requests' }}</AlertTitle>
+            <AlertTitle>{{ pendingRequestCount }} pending join {{ pendingRequestCount === 1 ? 'request' : 'requests' }}
+            </AlertTitle>
             <AlertDescription class="flex items-center justify-between gap-4">
                 <span>Someone wants to view one of your groups. Review before they get access.</span>
                 <Button as-child size="sm" variant="outline">
@@ -81,8 +78,8 @@ const { isEmailVerified } = storeToRefs(userStore)
         <div class="flex flex-col gap-3">
             <div class="flex items-center justify-between">
                 <h2 class="font-heading text-lg font-semibold text-foreground">Your groups</h2>
-                <CreateGroupDialog #="{ group }" @add-members="showAddMemberDialog = true">
-                    <Button size="sm" v-if="isEmailVerified">
+                <CreateGroupDialog #="{ group }" @add-members="showAddMemberDialog = true" v-if="isEmailVerified">
+                    <Button size="sm">
                         <Plus data-icon="inline-start" />
                         New group
                     </Button>
@@ -96,7 +93,18 @@ const { isEmailVerified } = storeToRefs(userStore)
                 <GroupCardSkeleton />
                 <GroupCardSkeleton />
             </div>
-            <GroupCardEmpty v-else-if="!groups?.length" />
+            <GroupCardEmpty v-else-if="!groups?.length">
+                <template #action>
+                    <CreateGroupDialog #="{ group }" @add-members="showAddMemberDialog = true" v-if="isEmailVerified">
+                        <Button>
+                            <Plus data-icon="inline-start" />
+                            Create a group
+                        </Button>
+
+                        <AddMemberDialog v-model="showAddMemberDialog" :group="group" v-if="group" />
+                    </CreateGroupDialog>
+                </template>
+            </GroupCardEmpty>
             <div v-else class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
                 <GroupCard v-for="group in groups" :key="group.id" :group="group" />
 
@@ -106,11 +114,11 @@ const { isEmailVerified } = storeToRefs(userStore)
             </div>
         </div>
 
-        <!-- SHARED GROUPS -->
+        <!-- SHARED GROUPS
         <div class="flex flex-col gap-3">
             <div class="flex items-center justify-between">
                 <h2 class="font-heading text-lg font-semibold text-foreground">Shared with you</h2>
-                <JoinGroupDialog v-model="showJoinGroupDialog">
+                <JoinGroupDialog>
                     <Button size="sm" variant="outline">
                         <Ticket data-icon="inline-start" />
                         Join a group
@@ -118,15 +126,41 @@ const { isEmailVerified } = storeToRefs(userStore)
                 </JoinGroupDialog>
             </div>
 
-            <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3" v-if="isSharedGroupsPending">
-                <GroupCardSkeleton />
-                <GroupCardSkeleton />
-                <GroupCardSkeleton />
-            </div>
-            <GroupCardEmpty v-else-if="!sharedGroups?.length" />
-            <div v-else class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-                <GroupCard v-for="group in sharedGroups" :key="group.id" :group="group" />
-            </div>
-        </div>
+            <Card v-if="isSharedGroupsPending">
+                <CardContent class="flex items-center gap-3 py-4">
+                    <Skeleton class="size-9 shrink-0 rounded-md" />
+                    <div class="flex flex-1 flex-col gap-1.5">
+                        <Skeleton class="h-3.5 w-1/3" />
+                        <Skeleton class="h-3 w-1/2" />
+                    </div>
+                </CardContent>
+            </Card>
+            <Card v-else>
+                <CardContent class="flex items-center justify-between gap-4 py-4">
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="flex size-9 shrink-0 items-center justify-center rounded-md bg-accent text-accent-foreground">
+                            <Users2 class="size-4" />
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-sm font-medium text-foreground">
+                                {{ sharedGroupsCount > 0
+                                    ? `${sharedGroupsCount} ${sharedGroupsCount === 1 ? 'group' : 'groups'} shared with you`
+                                    : 'No groups shared with you yet' }}
+                            </span>
+                            <span class="text-xs text-muted-foreground">
+                                Groups other people have given you view access to.
+                            </span>
+                        </div>
+                    </div>
+                    <Button as-child size="sm" variant="outline">
+                        <RouterLink :to="{ name: 'shared-groups.index' }">
+                            View all
+                            <ChevronRight data-icon="inline-end" />
+                        </RouterLink>
+                    </Button>
+                </CardContent>
+            </Card>
+        </div> -->
     </div>
 </template>

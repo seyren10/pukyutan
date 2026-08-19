@@ -40,9 +40,15 @@ const onSubmit = handleSubmit((payload) => {
         onError: (error) => {
             if (isAxiosError(error)) {
                 const laravelError = error as LaravelError
-                setErrors({
-                    invite_code: laravelError.response?.data?.message ?? 'Something went wrong.',
-                })
+                if (laravelError.response?.status === 404)
+                    setErrors({
+                        invite_code: 'Invalid invitation code',
+                    })
+                else {
+                    setErrors({
+                        invite_code: laravelError.response?.data?.message ?? 'Something went wrong',
+                    })
+                }
             }
         },
     })
