@@ -1,5 +1,5 @@
 import { httpClient } from "@/services/axios/axios";
-import type { CreateMemberPayload, Member } from "./type";
+import type { CreateMemberPayload, Member, UpdateMemberPayload } from "./type";
 
 export const getGroupMembers = async (groupId: number) => {
   const res = await httpClient.get<{ data: Member[] }>(
@@ -14,6 +14,18 @@ export const addMember = async (
 ) => {
   const res = await httpClient.post(
     `/api/v1/groups/${groupId}/members`,
+    payload,
+  );
+
+  return res.data;
+};
+
+export const updateMember = async (
+  memberId: number,
+  payload: UpdateMemberPayload,
+) => {
+  const res = await httpClient.put<{ data: Member }>(
+    `/api/v1/members/${memberId}`,
     payload,
   );
 

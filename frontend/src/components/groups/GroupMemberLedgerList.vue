@@ -1,18 +1,35 @@
 <script setup lang="ts">
+import { ref, watchEffect } from 'vue'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { Star, Mail, CheckCircle2, CirclePlus } from '@lucide/vue'
+import { Mail, CheckCircle2, CirclePlus, Pencil } from '@lucide/vue'
 import { getInitials } from '@/lib/helpers'
 import type { Member, MemberWithLedger } from '@/features/members/type'
+import EditMemberDialog from './EditMemberDialog.vue'
 
 type LedgerEntry = Pick<MemberWithLedger, 'expected_total' | 'paid_total' | 'balance'>
 
-const { members, ledgerByMemberId } = defineProps<{
+const { members, ledgerByMemberId, isOwner = false } = defineProps<{
     members: Member[]
     /** Cycle-scoped status, keyed by member id — omitted while the group is still a draft (no cycle to be scoped to yet). */
     ledgerByMemberId?: Record<number, LedgerEntry>
+    /** Contact-info editing is owner-only — view-only collaborators just see the list. */
+    isOwner?: boolean
 }>()
+
+// Editing a member's name/email doesn't touch payout order or ledger data,
+// so it's allowed here regardless of group status — unlike adding/removing/
+// reordering, which are locked to draft groups.
+const editingMember = ref<Member | null>(null)
+
+const showEditMemberDialog = ref(false)
+const handleEditMember = (member: Member) => {
+    editingMember.value = member
+    showEditMemberDialog.value = true
+}
+
+watchEffect(() => { if (!showEditMemberDialog.value) editingMember.value = null })
 </script>
 
 <template>
@@ -33,7 +50,7 @@ const { members, ledgerByMemberId } = defineProps<{
             <div class="flex min-w-0 flex-1 flex-col">
                 <div class="flex items-center gap-2">
                     <span class="truncate text-sm font-medium text-foreground">{{ member.name }}</span>
-                   
+
                 </div>
                 <span class="flex items-center gap-1 text-xs text-muted-foreground">
                     <Mail class="size-3 shrink-0" />
@@ -64,6 +81,13 @@ const { members, ledgerByMemberId } = defineProps<{
                     Owes ₱{{ ledgerByMemberId[member.id].balance.toLocaleString('en-PH') }}
                 </span>
             </div>
+
+            <Button v-if="isOwner" variant="ghost" size="icon" type="button"
+                class="shrink-0 text-muted-foreground hover:text-foreground" @click="handleEditMember(member)">
+                <Pencil class="size-3.5" />
+            </Button>
         </div>
     </div>
+
+    <EditMemberDialog :member="editingMember" v-model="showEditMemberDialog" v-if="editingMember" />
 </template>

@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription } from '@/components/ui/empty'
-import { GripVertical, X, Star, Mail, UserPlus, Users } from '@lucide/vue'
+import { GripVertical, X, Star, Mail, UserPlus, Users, Pencil } from '@lucide/vue'
 import { toTypedSchema } from '@vee-validate/zod'
 import { memberSchema } from '@/features/members/schema'
 import { useQuery } from '@tanstack/vue-query'
@@ -20,6 +20,7 @@ import type { Member, MemberSchema } from '@/features/members/type'
 import { useRemoveMemberMutation } from '@/features/members/composables/remove-member-mutation'
 import { useReorderMembersMutation } from '@/features/members/composables/reorder-member-mutation'
 import { useDebounceFn } from '@vueuse/core'
+import EditMemberDialog from './EditMemberDialog.vue'
 
 const props = defineProps<{
     groupId: number
@@ -93,6 +94,18 @@ const commitReorder = useDebounceFn(() => {
 const handleRemovemember = (memberId: number) => {
     removeMemberMutate(memberId)
 }
+
+const editingMember = ref<Member | null>(null)
+const showEditMemberDialog = ref(false)
+const handleEditMember = (member: Member) => {
+    editingMember.value = member
+    showEditMemberDialog.value = true
+}
+
+watchEffect(() => {
+    if (!showEditMemberDialog.value)
+        editingMember.value = null
+})
 
 watchEffect(() => {
     if (!membersData.value) return;
@@ -190,6 +203,12 @@ watchEffect(() => {
                         </div>
 
                         <Button variant="ghost" size="icon" type="button"
+                            class="shrink-0 text-muted-foreground hover:text-foreground"
+                            @click="handleEditMember(member)">
+                            <Pencil />
+                        </Button>
+
+                        <Button variant="ghost" size="icon" type="button"
                             class="shrink-0 text-muted-foreground hover:text-destructive"
                             @click="handleRemovemember(member.id)">
                             <X />
@@ -198,6 +217,8 @@ watchEffect(() => {
                 </VueDraggable>
             </CardContent>
         </Card>
+
+        <EditMemberDialog :member="editingMember" v-model="showEditMemberDialog" v-if="editingMember" />
 
         <slot :members-count="membersCount" />
     </div>

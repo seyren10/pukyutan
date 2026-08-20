@@ -31,7 +31,7 @@ useIntersectionObserver(sentinel, ([entry]) => {
 <template>
     <div class="flex flex-col gap-6">
         <div class="flex flex-col gap-1">
-            <h1 class="font-heading text-xl font-semibold text-foreground">Activity</h1>
+            <h1 class="font-heading text-xl font-semibold text-foreground">Activities</h1>
             <p class="text-sm text-muted-foreground">
                 Everything that's happened across your groups — owned and shared.
             </p>

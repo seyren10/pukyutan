@@ -58,7 +58,7 @@ const handleLeave = () => {
     leaveGroupMutate(group.id, {
         onSuccess: () => {
             toast.success(`You've left "${name.value}"`)
-            router.push({ name: 'dashboard' })
+            router.push({ name: 'shared-groups.index' })
         },
     })
 }

@@ -27,3 +27,4 @@ export type MemberWithLedger = Member & {
 
 export type MemberSchema = z.infer<typeof memberSchema>;
 export type CreateMemberPayload = MemberSchema;
+export type UpdateMemberPayload = MemberSchema;

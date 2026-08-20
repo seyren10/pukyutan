@@ -28,7 +28,7 @@ const { userInitials, user, isLoggedIn } = storeToRefs(userStore)
 const navItems = [
   { label: 'Dashboard', to: '/' },
   { label: 'Shared Groups', to: { name: 'shared-groups.index' } },
-  { label: 'Activity', to: '/activities' },
+  { label: 'Activities', to: '/activities' },
 ]
 
 

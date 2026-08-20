@@ -9,8 +9,8 @@ export const useLeaveGroupMutation = () => {
   return useMutation({
     mutationFn: leaveGroup,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["groups"] });
-      queryClient.invalidateQueries({ queryKey: ["share-requests"] });
+      // queryClient.invalidateQueries({ queryKey: ["groups"] });
+      queryClient.invalidateQueries({ queryKey: ["groups-shared"] });
     },
     onError: (err: LaravelError) => {
       toast.error("Couldn't leave the group", {

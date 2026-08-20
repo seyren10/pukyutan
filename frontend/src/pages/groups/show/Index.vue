@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watchEffect } from 'vue'
+import { computed, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { ArrowLeft, Rocket, UserPlus2, FolderX, Wallet, HandCoins, CheckCircle2, Users, Hexagon, Component, UserRound } from '@lucide/vue'
@@ -215,7 +215,7 @@ const cycleDialogOpen = computed({
                                     <p class="text-sm text-muted-foreground">Payout order and current balances.</p>
                                 </div>
                                 <GroupMemberLedgerList :members="group.members"
-                                    :ledger-by-member-id="ledgerByMemberId" />
+                                    :ledger-by-member-id="ledgerByMemberId" :is-owner="isOwner" />
                             </CardContent>
                         </Card>
 
