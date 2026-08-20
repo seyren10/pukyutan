@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\V1;
 
 use App\Enums\GroupShareStatus;
+use App\Enums\GroupStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\V1\StoreGroupRequest;
 use App\Http\Requests\V1\UpdateGroupRequest;
 use App\Http\Resources\V1\GroupResource;
 use App\Models\Group;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
@@ -22,7 +24,17 @@ class GroupController extends Controller
         $user = Auth::user();
 
         $perPage = min($request->query("per_page", 15), 99);
+        $search = $request->query('search', null);
+        $status = GroupStatus::tryFrom($request->query('status'));
+        $sortBy = $request->query('sort_by');
+        $sortDir = $request->query('sort_dir');
+        if (!in_array($sortDir, ['asc', 'desc']))
+            $sortDir = 'desc';
+
         $userGroups = $user->groups()
+            ->when($search, fn(Builder $query) => $query->whereLike('name', "%{$search}%"))
+            ->when($status, fn(Builder $query) => $query->where('status', $status))
+            ->when($sortBy, fn(Builder $query) => $query->orderBy($sortBy, $sortDir))
             ->with(["recentMembers", 'nextCycle', 'nextCycle.recipient:id,name', 'cycles'])
             ->withCount(['members', 'cycles'])
             ->latest()
