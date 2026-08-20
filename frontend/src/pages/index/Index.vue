@@ -2,37 +2,61 @@
 import { Card, CardContent } from '@/components/ui/card'
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
-import { Layers, Wallet, Users, Inbox, Plus } from '@lucide/vue'
+import { Layers, Wallet, Users, Inbox, Plus, ListFilter, X } from '@lucide/vue'
 import { useUserStore } from '@/stores/user'
 import { storeToRefs } from 'pinia'
 import UnverifiedAlert from './components/UnverifiedAlert.vue'
 import { useQuery } from '@tanstack/vue-query'
 import { getGroupsQueryOptions, } from '@/features/group/query.ts'
 import { getPendingShareRequestsQueryOptions } from '@/features/share/query'
-import { computed, ref } from 'vue'
+import { GROUP_SORT_OPTIONS } from '@/features/group/constant'
+import { computed, ref, watch } from 'vue'
 import { GroupCard, GroupCardEmpty, GroupCardSkeleton } from '@/components/groups/GroupCard'
 import CreateGroupDialog from './components/CreateGroupDialog.vue'
 import AddMemberDialog from './components/AddMemberDialog.vue'
+import GroupListFilters from './components/GroupListFilters.vue'
 import AppPaginationBar from '@/components/app/AppPaginationBar.vue'
 import { useRouteQuery } from '@vueuse/router'
-import type { Group } from '@/features/group/type'
+import type { Group, GroupStatus } from '@/features/group/type'
 
-const page = useRouteQuery('page', null, {
-    transform: Number,
+const page = useRouteQuery('page', 1, {
+    transform: Number
 })
-const { data, isPending } = useQuery(getGroupsQueryOptions(() => ({ page: page.value })))
+const status = useRouteQuery<string>('status', 'all')
+const sort = useRouteQuery<string>('sort', GROUP_SORT_OPTIONS[0].value)
+
+// Reset back to page 1 whenever the filter/sort criteria change — staying
+// on, say, page 3 after narrowing the list down would likely land on a
+// page that no longer exists.
+watch([status, sort], () => {
+    page.value = 1
+})
+
+const sortParams = computed(() => {
+    const match = GROUP_SORT_OPTIONS.find((option) => option.value === sort.value) ?? GROUP_SORT_OPTIONS[0]
+    return { sort_by: match.sort_by, sort_dir: match.sort_dir }
+})
+const hasActiveFilters = computed(() => status.value !== 'all')
+
+const { data, isPending } = useQuery(getGroupsQueryOptions(() => ({
+    page: page.value,
+    status: status.value !== 'all' ? (status.value as GroupStatus) : undefined,
+    sort_by: sortParams.value.sort_by,
+    sort_dir: sortParams.value.sort_dir,
+})))
 const groups = computed(() => data.value?.data);
 
-// Owns the post-create "add members" hand-off for both the header's "New
-// group" trigger and the empty-state's "Create a group" trigger below.
-// Deliberately rendered outside the isPending/empty/grid branches further
-// down, since the freshly-created group flips that branch (empty -> grid)
-// as soon as the list refetches — nesting this dialog inside either branch
-// would unmount it mid-flow before the user ever sees it.
+const clearFilters = () => {
+    status.value = 'all'
+    sort.value = GROUP_SORT_OPTIONS[0].value
+}
+
 const showAddMemberDialog = ref(false)
-const createdGroup = ref<Group | null>(null)
-const handleGroupCreated = (group: Group) => {
-    createdGroup.value = group
+const pendingNewGroup = ref<Group | null>(null)
+
+const handleGroupCreated = (group: Group, { addMembers }: { addMembers: boolean }) => {
+    if (!addMembers) return
+    pendingNewGroup.value = group
     showAddMemberDialog.value = true
 }
 
@@ -89,7 +113,7 @@ const { isEmailVerified } = storeToRefs(userStore)
         <div class="flex flex-col gap-3">
             <div class="flex items-center justify-between">
                 <h2 class="font-heading text-lg font-semibold text-foreground">Your groups</h2>
-                <CreateGroupDialog @add-members="handleGroupCreated" v-if="isEmailVerified">
+                <CreateGroupDialog @created="handleGroupCreated" v-if="isEmailVerified">
                     <Button size="sm">
                         <Plus data-icon="inline-start" />
                         New group
@@ -97,14 +121,35 @@ const { isEmailVerified } = storeToRefs(userStore)
                 </CreateGroupDialog>
             </div>
 
+            <!-- Stays visible even when the current filter matches zero groups
+                 (as long as some groups exist at all) so the person can switch
+                 straight to a different status instead of hitting a dead end. -->
+            <GroupListFilters v-model:status="status" v-model:sort="sort"
+                v-if="!isPending && (groups?.length || hasActiveFilters)" />
+
             <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3" v-if="isPending">
                 <GroupCardSkeleton />
                 <GroupCardSkeleton />
                 <GroupCardSkeleton />
             </div>
+            <!-- Filters narrowed a real, non-empty group list down to nothing —
+                 distinct from having no groups at all, so this points at
+                 clearing the filter instead of creating a group. -->
+            <GroupCardEmpty v-else-if="!groups?.length && hasActiveFilters" title="No groups match this filter"
+                description="Try a different status, or clear the filter to see all your groups.">
+                <template #icon>
+                    <ListFilter />
+                </template>
+                <template #action>
+                    <Button variant="outline" @click="clearFilters">
+                        <X data-icon="inline-start" />
+                        Clear filter
+                    </Button>
+                </template>
+            </GroupCardEmpty>
             <GroupCardEmpty v-else-if="!groups?.length">
                 <template #action>
-                    <CreateGroupDialog @add-members="handleGroupCreated" v-if="isEmailVerified">
+                    <CreateGroupDialog @created="handleGroupCreated" v-if="isEmailVerified">
                         <Button>
                             <Plus data-icon="inline-start" />
                             Create a group
@@ -120,56 +165,11 @@ const { isEmailVerified } = storeToRefs(userStore)
                 </div>
             </div>
 
-            <AddMemberDialog v-model="showAddMemberDialog" :group="createdGroup" v-if="createdGroup" />
+            <!-- Lives at this root level (a sibling of the empty/populated
+                 branches above), not nested inside either — so it survives
+                 the empty state being swapped out for the populated grid the
+                 instant the groups list refetches after creation. -->
+            <AddMemberDialog v-model="showAddMemberDialog" :group="pendingNewGroup" v-if="pendingNewGroup" />
         </div>
-
-        <!-- SHARED GROUPS
-        <div class="flex flex-col gap-3">
-            <div class="flex items-center justify-between">
-                <h2 class="font-heading text-lg font-semibold text-foreground">Shared with you</h2>
-                <JoinGroupDialog>
-                    <Button size="sm" variant="outline">
-                        <Ticket data-icon="inline-start" />
-                        Join a group
-                    </Button>
-                </JoinGroupDialog>
-            </div>
-
-            <Card v-if="isSharedGroupsPending">
-                <CardContent class="flex items-center gap-3 py-4">
-                    <Skeleton class="size-9 shrink-0 rounded-md" />
-                    <div class="flex flex-1 flex-col gap-1.5">
-                        <Skeleton class="h-3.5 w-1/3" />
-                        <Skeleton class="h-3 w-1/2" />
-                    </div>
-                </CardContent>
-            </Card>
-            <Card v-else>
-                <CardContent class="flex items-center justify-between gap-4 py-4">
-                    <div class="flex items-center gap-3">
-                        <div
-                            class="flex size-9 shrink-0 items-center justify-center rounded-md bg-accent text-accent-foreground">
-                            <Users2 class="size-4" />
-                        </div>
-                        <div class="flex flex-col">
-                            <span class="text-sm font-medium text-foreground">
-                                {{ sharedGroupsCount > 0
-                                    ? `${sharedGroupsCount} ${sharedGroupsCount === 1 ? 'group' : 'groups'} shared with you`
-                                    : 'No groups shared with you yet' }}
-                            </span>
-                            <span class="text-xs text-muted-foreground">
-                                Groups other people have given you view access to.
-                            </span>
-                        </div>
-                    </div>
-                    <Button as-child size="sm" variant="outline">
-                        <RouterLink :to="{ name: 'shared-groups.index' }">
-                            View all
-                            <ChevronRight data-icon="inline-end" />
-                        </RouterLink>
-                    </Button>
-                </CardContent>
-            </Card>
-        </div> -->
     </div>
 </template>

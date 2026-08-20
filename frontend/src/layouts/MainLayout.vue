@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { Input } from '@/components/ui/input'
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -11,12 +10,17 @@ import {
 import { Search, User, LogOut } from '@lucide/vue'
 import AppModeToggler from '@/components/app/AppModeToggler.vue'
 import AppNotificationBell from '@/components/app/AppNotificationBell.vue'
+import GroupSearchDialog from '@/components/groups/dialogs/GroupSearchDialog.vue'
 import Logo from '@/assets/logo.svg'
 import { useUserStore } from '@/stores/user'
 import { storeToRefs } from 'pinia'
 import { useMutation } from '@tanstack/vue-query'
 import { logout } from '@/features/auth/api'
 import { useLogout } from '@/composables/use-logout'
+import { ref } from 'vue'
+import { Kbd } from '@/components/ui/kbd'
+
+const showSearchDialog = ref(false)
 
 const userStore = useUserStore()
 const { userInitials, user, isLoggedIn } = storeToRefs(userStore)
@@ -56,10 +60,18 @@ const { mutate } = useMutation({
         </nav>
 
         <div class="flex items-center gap-3">
-          <div class="relative hidden lg:block">
-            <Search class="absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input placeholder="Search groups..." class="w-56 pl-8" />
-          </div>
+          <button type="button" @click="showSearchDialog = true"
+            class="hidden items-center gap-2 rounded-md border border-input bg-background px-3 py-1.5 text-sm text-muted-foreground shadow-xs transition-colors hover:bg-accent/40 hover:text-foreground lg:flex lg:w-56">
+            <Search class="size-4 shrink-0" />
+            <span class="flex-1 text-left">Search groups...</span>
+            <Kbd class="hidden xl:flex">
+              ⌘K
+            </Kbd>
+          </button>
+          <button type="button" @click="showSearchDialog = true" aria-label="Search groups"
+            class="flex size-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent/40 hover:text-foreground lg:hidden">
+            <Search class="size-4.5" />
+          </button>
 
           <AppNotificationBell />
           <AppModeToggler />
@@ -109,5 +121,7 @@ const { mutate } = useMutation({
         <RouterView />
       </main>
     </div>
+
+    <GroupSearchDialog v-model="showSearchDialog" />
   </div>
 </template>

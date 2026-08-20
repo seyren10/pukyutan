@@ -45,7 +45,19 @@ export type GroupDetail = Omit<Group, "recent_members" | "members_count"> & {
 
 export type GroupLike = Group | GroupDetail;
 
-export type GroupQueryParams = QueryParams;
+export type GroupSortBy =
+  | "created_at"
+  | "name"
+  | "start_date"
+  | "contribution_amount";
+export type GroupSortDir = "asc" | "desc";
+
+export type GroupQueryParams = QueryParams & {
+  search?: string;
+  status?: GroupStatus;
+  sort_by?: GroupSortBy;
+  sort_dir?: GroupSortDir;
+};
 
 export type GroupActivity = TimeStamp & {
   id: number;

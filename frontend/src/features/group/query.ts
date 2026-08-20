@@ -17,6 +17,18 @@ export const getGroupsQueryOptions = (
     queryFn: () => getGroups(toValue(params)),
   });
 
+// Backs the spotlight-style search dialog in the main layout header. This is
+// deliberately a separate branch of the query cache (["groups","search",...]
+// vs. the dashboard's ["groups","list",...]) — typing in the search dialog
+// must never refetch or otherwise disturb the dashboard's own paginated,
+// filtered/sorted groups list underneath it.
+export const getGroupSearchQueryOptions = (search: MaybeRefOrGetter<string>) =>
+  queryOptions({
+    queryKey: ["groups", "search", search],
+    queryFn: () => getGroups({ search: toValue(search), per_page: 8 }),
+    enabled: () => toValue(search).trim().length > 0,
+  });
+
 // Mirrors getGroupsQueryOptions above — the shared-groups list is a regular
 // page-numbered listing (same PaginatedResponse shape from the API), so it
 // pairs with AppPaginationBar the same way the owned-groups list does.
@@ -33,7 +45,7 @@ export const getGroupDetailQueryOptions = (
   enabled: MaybeRefOrGetter<boolean> = true,
 ) =>
   queryOptions({
-    queryKey: () => ["groups", "detail", toValue(groupId)],
+    queryKey: ["groups", "detail", groupId],
     queryFn: () => getGroupDetail(toValue(groupId)),
     enabled: () => toValue(enabled),
   });
