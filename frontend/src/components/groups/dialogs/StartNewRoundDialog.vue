@@ -63,10 +63,12 @@ const rules = computed(() => [
 <template>
     <AlertDialog v-model:open="dialog">
         <AlertDialogTrigger as-child>
-            <Button size="sm">
-                <RefreshCw data-icon="inline-start" />
-                Start round {{ nextRoundNumber }}
-            </Button>
+            <slot :props="{ nextRoundNumber }">
+                <Button size="sm">
+                    <RefreshCw data-icon="inline-start" />
+                    Start round {{ nextRoundNumber }}
+                </Button>
+            </slot>
         </AlertDialogTrigger>
 
         <AlertDialogContent>

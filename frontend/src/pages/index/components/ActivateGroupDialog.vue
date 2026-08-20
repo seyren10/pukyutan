@@ -52,10 +52,12 @@ const rules = [
 <template>
     <AlertDialog>
         <AlertDialogTrigger as-child>
-            <Button size="sm">
-                <Rocket data-icon="inline-start" />
-                Activate group
-            </Button>
+            <slot>
+                <Button size="sm">
+                    <Rocket data-icon="inline-start" />
+                    Activate group
+                </Button>
+            </slot>
         </AlertDialogTrigger>
 
         <AlertDialogContent>

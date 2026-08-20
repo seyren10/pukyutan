@@ -3,7 +3,7 @@ import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
-import { Eye, Wallet, CalendarClock, HandCoins, MoreHorizontal, UserRound } from '@lucide/vue'
+import { Eye, Wallet, CalendarClock, HandCoins, MoreHorizontal, UserRound, Rocket } from '@lucide/vue'
 import type { Group } from '@/features/group/type'
 import { computed, ref } from 'vue'
 import { formatFrequencyLabel, getInitials } from '@/lib/helpers'
@@ -124,20 +124,30 @@ const handleGroupDropdownEvent = (e: GroupCardDropdownEvent) => {
         <CardFooter class="gap-2">
             <template v-if="isOwner">
                 <ContributionDialog :group-id="group.id" v-if="status === 'active' && !group.is_round_completed">
-                    <Button variant="outline" size="sm">
+                    <Button variant="outline" size="xs">
                         <HandCoins />
                         Add Contribution
                     </Button>
                 </ContributionDialog>
-                <AddMemberDialog :group="group" v-else-if="status === 'draft' && group.members_count <= 0">
-                    <Button variant="outline" size="sm">
+                <AddMemberDialog :group="group" v-else-if="status === 'draft'">
+                    <Button variant="outline" size="xs">
                         <UserRound data-icon="inline-end" />
                         Manage Members
                     </Button>
                 </AddMemberDialog>
-                <StartNewRoundDialog v-else-if="group.is_round_completed" :group="group" />
-                <ActivateGroupDialog :group="group" :members-count="group.members_count" v-else
-                    @confirm="groupActivateMutate(group.id)" :loading="isGroupActivePending" />
+                <StartNewRoundDialog v-else-if="group.is_round_completed" :group="group"
+                    #="{ props: { nextRoundNumber } }">
+                    <Button size="xs">
+                        <Rocket /> Start Round {{ nextRoundNumber }}
+                    </Button>
+                </StartNewRoundDialog>
+                <ActivateGroupDialog :group="group" :members-count="group.members_count"
+                    v-if="group.members_count && group.status === 'draft'" @confirm="groupActivateMutate(group.id)"
+                    :loading="isGroupActivePending">
+                    <Button size="xs">
+                        <Rocket /> Activate Group
+                    </Button>
+                </ActivateGroupDialog>
             </template>
             <!-- View-only collaborators get no mutation actions here — every branch
                  above ends up owner-gated server-side anyway (Gate::authorize('update', ...)),

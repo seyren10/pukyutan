@@ -54,8 +54,7 @@ const clearFilters = () => {
 const showAddMemberDialog = ref(false)
 const pendingNewGroup = ref<Group | null>(null)
 
-const handleGroupCreated = (group: Group, { addMembers }: { addMembers: boolean }) => {
-    if (!addMembers) return
+const handleGroupCreated = (group: Group) => {
     pendingNewGroup.value = group
     showAddMemberDialog.value = true
 }
@@ -113,7 +112,7 @@ const { isEmailVerified } = storeToRefs(userStore)
         <div class="flex flex-col gap-3">
             <div class="flex items-center justify-between">
                 <h2 class="font-heading text-lg font-semibold text-foreground">Your groups</h2>
-                <CreateGroupDialog @created="handleGroupCreated" v-if="isEmailVerified">
+                <CreateGroupDialog @add-members="handleGroupCreated" v-if="isEmailVerified">
                     <Button size="sm">
                         <Plus data-icon="inline-start" />
                         New group
@@ -149,7 +148,7 @@ const { isEmailVerified } = storeToRefs(userStore)
             </GroupCardEmpty>
             <GroupCardEmpty v-else-if="!groups?.length">
                 <template #action>
-                    <CreateGroupDialog @created="handleGroupCreated" v-if="isEmailVerified">
+                    <CreateGroupDialog @add-members="handleGroupCreated" v-if="isEmailVerified">
                         <Button>
                             <Plus data-icon="inline-start" />
                             Create a group

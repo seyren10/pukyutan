@@ -84,11 +84,6 @@ export const useAddMemberMutation = () => {
 
       onSettled: (_data, _error, _variables, context) => {
         if (!context) return;
-        // Safety net: reconcile with the server's actual current state,
-        // in case anything else changed the roster concurrently.
-        queryClient.invalidateQueries({ queryKey: context.queryKey });
-        // Adding a member changes the group's members_count/recent_members,
-        // which the group list/detail cards render — keep them in sync too.
         queryClient.invalidateQueries({ queryKey: ["groups"] });
       },
     });
