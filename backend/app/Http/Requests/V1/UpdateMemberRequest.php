@@ -23,15 +23,16 @@ class UpdateMemberRequest extends FormRequest
      */
     public function rules(): array
     {
+        $member = $this->route('member');
         return [
             "name" => ["sometimes", "string", "max:255"],
             "email" => [
                 "sometimes",
                 "email",
                 "max:255",
-                Rule::unique("members")->where(
-                    fn($query) => $query->where("group_id", $this->route("group")->id)
-                )
+                Rule::when($this->email !== $member->email, Rule::unique("members")->where(
+                    fn($query) => $query->where("group_id", $member->group->id)
+                ))
             ],
         ];
     }

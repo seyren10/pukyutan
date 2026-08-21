@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\V1\ContributionController;
 use App\Http\Controllers\V1\CycleDisburseController;
+use App\Http\Controllers\V1\DashboardController;
 use App\Http\Controllers\V1\GroupActivateController;
 use App\Http\Controllers\V1\GroupActivityController;
 use App\Http\Controllers\V1\GroupCompleteController;
@@ -48,5 +49,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 
     Route::post("cycles/{cycle}/disburse", CycleDisburseController::class);
     Route::apiResource('cycles.contributions', ContributionController::class)->shallow()->only(['index', 'store'])->withoutMiddlewareFor(['index'], 'verified');
+
+    Route::get('dashboard/stats', DashboardController::class)->withoutMiddleware('verified');
 
 });
