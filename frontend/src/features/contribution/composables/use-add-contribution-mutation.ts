@@ -24,6 +24,11 @@ export const useAddContributionMutation = ({
       queryClient.invalidateQueries({
         queryKey: ["cycles", "detail", toValue(cycleId)],
       });
+      // The two invalidations above are scoped to this specific group/cycle,
+      // so they don't reach ["groups", "stats"] (a sibling key, not a
+      // descendant of either) — recording a payment changes the dashboard's
+      // "collected this cycle" figure, so it needs its own invalidation.
+      queryClient.invalidateQueries({ queryKey: ["groups", "stats"] });
     },
   });
 

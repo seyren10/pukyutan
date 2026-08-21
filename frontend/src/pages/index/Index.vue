@@ -2,69 +2,58 @@
 import { Card, CardContent } from '@/components/ui/card'
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
-import { Layers, Wallet, Users, Inbox, Plus, ListFilter, X } from '@lucide/vue'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Progress } from '@/components/ui/progress'
+import { Layers, Wallet, Users, Inbox, Plus, Trophy, CalendarClock } from '@lucide/vue'
 import { useUserStore } from '@/stores/user'
 import { storeToRefs } from 'pinia'
 import UnverifiedAlert from './components/UnverifiedAlert.vue'
 import { useQuery } from '@tanstack/vue-query'
 import { getGroupsQueryOptions, } from '@/features/group/query.ts'
 import { getPendingShareRequestsQueryOptions } from '@/features/share/query'
-import { GROUP_SORT_OPTIONS } from '@/features/group/constant'
-import { computed, ref, watch } from 'vue'
+import { getDashboardStatsQueryOptions } from '@/features/dashboard/query'
+import { computed, ref } from 'vue'
+import { formatDate } from 'date-fns'
 import { GroupCard, GroupCardEmpty, GroupCardSkeleton } from '@/components/groups/GroupCard'
 import CreateGroupDialog from './components/CreateGroupDialog.vue'
 import AddMemberDialog from './components/AddMemberDialog.vue'
-import GroupListFilters from './components/GroupListFilters.vue'
 import AppPaginationBar from '@/components/app/AppPaginationBar.vue'
 import { useRouteQuery } from '@vueuse/router'
-import type { Group, GroupStatus } from '@/features/group/type'
+import type { Group } from '@/features/group/type'
 
-const page = useRouteQuery('page', 1, {
+const page = useRouteQuery('page', null, {
     transform: Number
 })
-const status = useRouteQuery<string>('status', 'all')
-const sort = useRouteQuery<string>('sort', GROUP_SORT_OPTIONS[0].value)
-
-// Reset back to page 1 whenever the filter/sort criteria change — staying
-// on, say, page 3 after narrowing the list down would likely land on a
-// page that no longer exists.
-watch([status, sort], () => {
-    page.value = 1
-})
-
-const sortParams = computed(() => {
-    const match = GROUP_SORT_OPTIONS.find((option) => option.value === sort.value) ?? GROUP_SORT_OPTIONS[0]
-    return { sort_by: match.sort_by, sort_dir: match.sort_dir }
-})
-const hasActiveFilters = computed(() => status.value !== 'all')
-
-const { data, isPending } = useQuery(getGroupsQueryOptions(() => ({
-    page: page.value,
-    status: status.value !== 'all' ? (status.value as GroupStatus) : undefined,
-    sort_by: sortParams.value.sort_by,
-    sort_dir: sortParams.value.sort_dir,
-})))
+const { data, isPending } = useQuery(getGroupsQueryOptions(() => ({ page: page.value })))
 const groups = computed(() => data.value?.data);
 
-const clearFilters = () => {
-    status.value = 'all'
-    sort.value = GROUP_SORT_OPTIONS[0].value
-}
-
+// Owns the post-create "add members" hand-off for both the header's "New
+// group" trigger and the empty-state's "Create a group" trigger below.
+// Deliberately rendered outside the isPending/empty/grid branches further
+// down, since the freshly-created group flips that branch (empty -> grid)
+// as soon as the list refetches — nesting this dialog inside either branch
+// would unmount it mid-flow before the user ever sees it.
 const showAddMemberDialog = ref(false)
-const pendingNewGroup = ref<Group | null>(null)
-
+const createdGroup = ref<Group | null>(null)
 const handleGroupCreated = (group: Group) => {
-    pendingNewGroup.value = group
+    createdGroup.value = group
     showAddMemberDialog.value = true
 }
 
+const { data: statsData, isPending: isStatsPending } = useQuery(getDashboardStatsQueryOptions())
+const stats = computed(() => statsData.value?.data)
 
-const stats = [
-    { label: 'Active groups', value: '2', icon: Layers },
-    { label: 'Collected this cycle', value: '₱3,200', icon: Wallet },
-    { label: 'Members across groups', value: '11', icon: Users },
-]
+const collectedPercent = computed(() => {
+    const cycle = stats.value?.current_cycle
+    if (!cycle || cycle.expected_total <= 0) return 0
+    return Math.min((cycle.collected_total / cycle.expected_total) * 100, 100)
+})
+
+const nextPayoutDueLabel = computed(() => {
+    const dueDate = stats.value?.next_payout?.due_date
+    return dueDate ? formatDate(new Date(dueDate), 'MMMM dd, yyyy') : ''
+})
+
 
 // per_page: 1 — this call only ever reads meta.total, the same endpoint the
 // full inbox page (/requests) later fetches for real.
@@ -93,20 +82,95 @@ const { isEmailVerified } = storeToRefs(userStore)
         </Alert>
 
         <!-- STATS -->
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <Card v-for="stat in stats" :key="stat.label">
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-3" v-if="isStatsPending">
+            <Card v-for="n in 3" :key="n">
                 <CardContent class="flex items-center gap-3 py-4">
-                    <div
-                        class="flex size-9 shrink-0 items-center justify-center rounded-md bg-accent text-accent-foreground">
-                        <component :is="stat.icon" class="size-4" />
-                    </div>
-                    <div class="flex flex-col">
-                        <span class="font-mono text-lg font-medium text-foreground">{{ stat.value }}</span>
-                        <span class="text-xs text-muted-foreground">{{ stat.label }}</span>
+                    <Skeleton class="size-9 shrink-0 rounded-md" />
+                    <div class="flex flex-1 flex-col gap-1.5">
+                        <Skeleton class="h-5 w-1/3" />
+                        <Skeleton class="h-3 w-2/3" />
                     </div>
                 </CardContent>
             </Card>
         </div>
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-3" v-else-if="stats">
+            <Card>
+                <CardContent class="flex items-center gap-3 py-4">
+                    <div
+                        class="flex size-9 shrink-0 items-center justify-center rounded-md bg-accent text-accent-foreground">
+                        <Layers class="size-4" />
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="font-mono text-lg font-medium text-foreground">{{ stats.groups.active }}</span>
+                        <span class="text-xs text-muted-foreground">
+                            Active {{ stats.groups.active === 1 ? 'group' : 'groups' }}
+                            <template v-if="stats.groups.draft > 0"> · {{ stats.groups.draft }} in draft</template>
+                        </span>
+                    </div>
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardContent class="flex flex-col gap-2.5 py-4">
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="flex size-9 shrink-0 items-center justify-center rounded-md bg-accent text-accent-foreground">
+                            <Wallet class="size-4" />
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="font-mono text-lg font-medium text-foreground" v-if="stats.current_cycle">
+                                ₱{{ stats.current_cycle.collected_total.toLocaleString('en-PH') }}
+                                <span class="text-sm font-normal text-muted-foreground">/ ₱{{
+                                    stats.current_cycle.expected_total.toLocaleString('en-PH') }}</span>
+                            </span>
+                            <span class="font-mono text-lg font-medium text-foreground" v-else>—</span>
+                            <span class="text-xs text-muted-foreground">Collected this cycle</span>
+                        </div>
+                    </div>
+                    <Progress v-if="stats.current_cycle" :model-value="collectedPercent" class="h-1.5" />
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardContent class="flex items-center gap-3 py-4">
+                    <div
+                        class="flex size-9 shrink-0 items-center justify-center rounded-md bg-accent text-accent-foreground">
+                        <Users class="size-4" />
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="font-mono text-lg font-medium text-foreground">{{ stats.members_total }}</span>
+                        <span class="text-xs text-muted-foreground">Members across groups</span>
+                    </div>
+                </CardContent>
+            </Card>
+        </div>
+
+        <!-- NEXT PAYOUT — the one thing most worth surfacing above everything else:
+             who gets paid next, and when, across every active group. -->
+        <Card v-if="stats?.next_payout" class="border-accent bg-accent/30">
+            <CardContent class="flex flex-wrap items-center justify-between gap-4 py-4">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="flex size-9 shrink-0 items-center justify-center rounded-md bg-accent-foreground/10 text-accent-foreground">
+                        <Trophy class="size-4" />
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-sm font-medium text-foreground">
+                            {{ stats.next_payout.recipient_name }} is next up in "{{ stats.next_payout.group_name }}"
+                        </span>
+                        <span class="flex items-center gap-1.5 text-xs text-muted-foreground">
+                            <CalendarClock class="size-3" />
+                            ₱{{ stats.next_payout.amount.toLocaleString('en-PH') }} due {{ nextPayoutDueLabel }}
+                        </span>
+                    </div>
+                </div>
+                <Button as-child size="sm" variant="outline">
+                    <RouterLink :to="{ name: 'groups.detail', params: { id: stats.next_payout.group_id } }">
+                        View group
+                    </RouterLink>
+                </Button>
+            </CardContent>
+        </Card>
 
         <!-- YOUR GROUPS -->
         <div class="flex flex-col gap-3">
@@ -120,32 +184,11 @@ const { isEmailVerified } = storeToRefs(userStore)
                 </CreateGroupDialog>
             </div>
 
-            <!-- Stays visible even when the current filter matches zero groups
-                 (as long as some groups exist at all) so the person can switch
-                 straight to a different status instead of hitting a dead end. -->
-            <GroupListFilters v-model:status="status" v-model:sort="sort"
-                v-if="!isPending && (groups?.length || hasActiveFilters)" />
-
             <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3" v-if="isPending">
                 <GroupCardSkeleton />
                 <GroupCardSkeleton />
                 <GroupCardSkeleton />
             </div>
-            <!-- Filters narrowed a real, non-empty group list down to nothing —
-                 distinct from having no groups at all, so this points at
-                 clearing the filter instead of creating a group. -->
-            <GroupCardEmpty v-else-if="!groups?.length && hasActiveFilters" title="No groups match this filter"
-                description="Try a different status, or clear the filter to see all your groups.">
-                <template #icon>
-                    <ListFilter />
-                </template>
-                <template #action>
-                    <Button variant="outline" @click="clearFilters">
-                        <X data-icon="inline-start" />
-                        Clear filter
-                    </Button>
-                </template>
-            </GroupCardEmpty>
             <GroupCardEmpty v-else-if="!groups?.length">
                 <template #action>
                     <CreateGroupDialog @add-members="handleGroupCreated" v-if="isEmailVerified">
@@ -164,11 +207,56 @@ const { isEmailVerified } = storeToRefs(userStore)
                 </div>
             </div>
 
-            <!-- Lives at this root level (a sibling of the empty/populated
-                 branches above), not nested inside either — so it survives
-                 the empty state being swapped out for the populated grid the
-                 instant the groups list refetches after creation. -->
-            <AddMemberDialog v-model="showAddMemberDialog" :group="pendingNewGroup" v-if="pendingNewGroup" />
+            <AddMemberDialog v-model="showAddMemberDialog" :group="createdGroup" v-if="createdGroup" />
         </div>
+
+        <!-- SHARED GROUPS
+        <div class="flex flex-col gap-3">
+            <div class="flex items-center justify-between">
+                <h2 class="font-heading text-lg font-semibold text-foreground">Shared with you</h2>
+                <JoinGroupDialog>
+                    <Button size="sm" variant="outline">
+                        <Ticket data-icon="inline-start" />
+                        Join a group
+                    </Button>
+                </JoinGroupDialog>
+            </div>
+
+            <Card v-if="isSharedGroupsPending">
+                <CardContent class="flex items-center gap-3 py-4">
+                    <Skeleton class="size-9 shrink-0 rounded-md" />
+                    <div class="flex flex-1 flex-col gap-1.5">
+                        <Skeleton class="h-3.5 w-1/3" />
+                        <Skeleton class="h-3 w-1/2" />
+                    </div>
+                </CardContent>
+            </Card>
+            <Card v-else>
+                <CardContent class="flex items-center justify-between gap-4 py-4">
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="flex size-9 shrink-0 items-center justify-center rounded-md bg-accent text-accent-foreground">
+                            <Users2 class="size-4" />
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-sm font-medium text-foreground">
+                                {{ sharedGroupsCount > 0
+                                    ? `${sharedGroupsCount} ${sharedGroupsCount === 1 ? 'group' : 'groups'} shared with you`
+                                    : 'No groups shared with you yet' }}
+                            </span>
+                            <span class="text-xs text-muted-foreground">
+                                Groups other people have given you view access to.
+                            </span>
+                        </div>
+                    </div>
+                    <Button as-child size="sm" variant="outline">
+                        <RouterLink :to="{ name: 'shared-groups.index' }">
+                            View all
+                            <ChevronRight data-icon="inline-end" />
+                        </RouterLink>
+                    </Button>
+                </CardContent>
+            </Card>
+        </div> -->
     </div>
 </template>
