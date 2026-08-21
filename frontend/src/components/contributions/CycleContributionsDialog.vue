@@ -21,14 +21,16 @@ import type { Member } from '@/features/members/type'
 import { getCycleContributionsInfiniteQueryOptions } from '@/features/contribution/query'
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
 import { ScrollArea } from '../ui/scroll-area'
+import ContributionUndoDialog from './ContributionUndoDialog.vue'
 
 const open = defineModel<boolean>('open', { default: false })
 
-const { cycle, members, expectedTotal } = defineProps<{
+const { cycle, members, expectedTotal, disableUndo = true } = defineProps<{
     cycle: CycleSummary
     members: Member[]
     /** contribution_amount × member count — passed down so the progress bar matches the timeline tooltip. */
-    expectedTotal: number
+    expectedTotal: number,
+    disableUndo: boolean
 }>()
 
 const memberById = computed(() => new Map(members.map((member) => [member.id, member])))
@@ -133,6 +135,7 @@ const contributions = computed(() => data.value?.pages.flatMap((page) => page.da
                             <span class="shrink-0 font-mono text-sm font-medium text-foreground">
                                 ₱{{ Number(contribution.amount).toLocaleString('en-PH') }}
                             </span>
+                            <ContributionUndoDialog :contribution="contribution" v-if="!disableUndo" />
                         </div>
                     </div>
                 </ScrollArea>

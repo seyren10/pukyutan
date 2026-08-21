@@ -4,7 +4,7 @@ import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Progress } from '@/components/ui/progress'
-import { Layers, Wallet, Users, Inbox, Plus, Trophy, CalendarClock } from '@lucide/vue'
+import { Layers, Wallet, Users, Inbox, Plus, Trophy, CalendarClock, ListFilter, X } from '@lucide/vue'
 import { useUserStore } from '@/stores/user'
 import { storeToRefs } from 'pinia'
 import UnverifiedAlert from './components/UnverifiedAlert.vue'
@@ -12,19 +12,44 @@ import { useQuery } from '@tanstack/vue-query'
 import { getGroupsQueryOptions, } from '@/features/group/query.ts'
 import { getPendingShareRequestsQueryOptions } from '@/features/share/query'
 import { getDashboardStatsQueryOptions } from '@/features/dashboard/query'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { formatDate } from 'date-fns'
 import { GroupCard, GroupCardEmpty, GroupCardSkeleton } from '@/components/groups/GroupCard'
 import CreateGroupDialog from './components/CreateGroupDialog.vue'
 import AddMemberDialog from './components/AddMemberDialog.vue'
 import AppPaginationBar from '@/components/app/AppPaginationBar.vue'
 import { useRouteQuery } from '@vueuse/router'
-import type { Group } from '@/features/group/type'
+import type { Group, GroupStatus } from '@/features/group/type'
+import GroupListFilters from './components/GroupListFilters.vue'
+import { GROUP_SORT_OPTIONS } from '@/features/group/constant.ts'
 
 const page = useRouteQuery('page', null, {
     transform: Number
 })
-const { data, isPending } = useQuery(getGroupsQueryOptions(() => ({ page: page.value })))
+
+const status = useRouteQuery<string>('status', 'all')
+const sort = useRouteQuery<string>('sort', GROUP_SORT_OPTIONS[0].value)
+
+// Reset back to page 1 whenever the filter/sort criteria change — staying
+// on, say, page 3 after narrowing the list down would likely land on a
+// page that no longer exists.
+watch([status, sort], () => {
+    page.value = 1
+})
+
+const sortParams = computed(() => {
+    const match = GROUP_SORT_OPTIONS.find((option) => option.value === sort.value) ?? GROUP_SORT_OPTIONS[0]
+    return { sort_by: match.sort_by, sort_dir: match.sort_dir }
+})
+const hasActiveFilters = computed(() => status.value !== 'all' || page.value > 1)
+
+const { data, isPending } = useQuery(getGroupsQueryOptions(() => ({
+    page: page.value,
+    status: status.value !== 'all' ? (status.value as GroupStatus) : undefined,
+    sort_by: sortParams.value.sort_by,
+    sort_dir: sortParams.value.sort_dir,
+})))
+
 const groups = computed(() => data.value?.data);
 
 // Owns the post-create "add members" hand-off for both the header's "New
@@ -38,6 +63,12 @@ const createdGroup = ref<Group | null>(null)
 const handleGroupCreated = (group: Group) => {
     createdGroup.value = group
     showAddMemberDialog.value = true
+}
+
+const clearFilters = () => {
+    status.value = 'all'
+    sort.value = GROUP_SORT_OPTIONS[0].value
+    page.value = 1;
 }
 
 const { data: statsData, isPending: isStatsPending } = useQuery(getDashboardStatsQueryOptions())
@@ -184,11 +215,27 @@ const { isEmailVerified } = storeToRefs(userStore)
                 </CreateGroupDialog>
             </div>
 
+            <GroupListFilters v-model:status="status" v-model:sort="sort"
+                v-if="!isPending && (groups?.length || hasActiveFilters)" />
+
+
             <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3" v-if="isPending">
                 <GroupCardSkeleton />
                 <GroupCardSkeleton />
                 <GroupCardSkeleton />
             </div>
+            <GroupCardEmpty v-else-if="!groups?.length && hasActiveFilters" title="No groups match this filter"
+                description="Try a different status, or clear the filter to see all your groups.">
+                <template #icon>
+                    <ListFilter />
+                </template>
+                <template #action>
+                    <Button variant="outline" @click="clearFilters">
+                        <X data-icon="inline-start" />
+                        Clear filter
+                    </Button>
+                </template>
+            </GroupCardEmpty>
             <GroupCardEmpty v-else-if="!groups?.length">
                 <template #action>
                     <CreateGroupDialog @add-members="handleGroupCreated" v-if="isEmailVerified">

@@ -29,7 +29,7 @@ export const useAuthMutations = () => {
         position: "top-center",
       });
       userStore.setUser(user);
-      router.replace((route.query.redirect as string) || { name: "dashboard" });
+      router.replace((route.query.redirect as string) || { name: "groups.index" });
     },
   });
 
@@ -42,7 +42,7 @@ export const useAuthMutations = () => {
       });
 
       userStore.setUser(user);
-      router.replace((route.query.redirect as string) || { name: "dashboard" });
+      router.replace((route.query.redirect as string) || { name: "groups.index" });
     },
   });
 

@@ -22,3 +22,7 @@ export const getCycleContributions = async (cycleId: number, page?: number) => {
 
   return res.data;
 };
+
+export const deleteContribution = async (contributionId: number) => {
+  await httpClient.delete(`/api/v1/contributions/${contributionId}`);
+};

@@ -65,7 +65,10 @@ const onSubmit = handleSubmit((payload) => {
             if (isAxiosError(error)) {
                 const formError = error as LaravelError<MemberSchema>
                 if (formError.response?.data?.errors)
-                    setErrors(formError.response?.data?.errors)
+                    setErrors({
+                        ...formError.response?.data?.errors,
+                        email: formError.response?.data?.errors?.email || 'invalid email'
+                    })
             }
         },
         onSuccess: () => {

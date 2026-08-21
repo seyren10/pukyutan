@@ -18,7 +18,7 @@ import { Home } from "@lucide/vue";
             </div>
 
             <Button class="w-fit mx-auto" as-child>
-                <RouterLink :to="{ name: 'dashboard' }" replace>
+                <RouterLink :to="{ name: 'groups.index' }" replace>
                     <Home />
                     Back to home page
                 </RouterLink>

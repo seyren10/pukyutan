@@ -22,8 +22,8 @@ import { useCopyInviteCode } from '@/features/group/composables/use-copy-invite-
 import { useLeaveGroupMutation } from '@/features/share/composables/use-leave-group-mutation'
 import type { GroupDetail } from '@/features/group/type'
 import { toast } from 'vue-sonner'
-import EditGroupDialog from '@/pages/index/components/EditGroupDialog.vue'
-import RenameGroupDialog from '@/pages/index/components/RenameGroupDialog.vue'
+import EditGroupDialog from '@/pages/groups/index/components/EditGroupDialog.vue'
+import RenameGroupDialog from '@/pages/groups/index/components/RenameGroupDialog.vue'
 import DeleteGroupDialog from '@/components/groups/dialogs/DeleteGroupDialog.vue'
 
 const { group, isOwner } = defineProps<{
@@ -71,7 +71,7 @@ const showDeleteGroupDialog = ref(false)
 // dashboard's group cards, which just disappear from the refetched list —
 // this page has to navigate away itself.
 const handleDeleted = () => {
-    router.push({ name: 'dashboard' })
+    router.push({ name: 'groups.index' })
 }
 </script>
 
@@ -183,7 +183,7 @@ const handleDeleted = () => {
                     <DropdownMenuItem @select="showRenameGroupDialog = true" v-else>
                         <Edit3Icon /> Rename Group
                     </DropdownMenuItem>
-                    
+
                     <DropdownMenuSeparator />
                     <DropdownMenuItem variant="destructive" @select="showDeleteGroupDialog = true">
                         <Trash2Icon /> Delete Group

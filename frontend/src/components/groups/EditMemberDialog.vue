@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button'
 import AppButtonLoaderSwap from '@/components/app/AppButtonLoaderSwap.vue'
 import { Check } from '@lucide/vue'
 import { memberSchema } from '@/features/members/schema'
-import type { Member, MemberSchema } from '@/features/members/type'
+import type { Member } from '@/features/members/type'
 import { useEditMemberMutation } from '@/features/members/composables/edit-member-mutation'
 import type { LaravelError } from '@/types/common'
 
@@ -20,7 +20,7 @@ const { member } = defineProps<{
 
 const dialog = defineModel<boolean>({ default: false })
 
-const { handleSubmit, setErrors, resetField, values } = useForm({
+const { handleSubmit, setErrors, setFieldValue, values } = useForm({
     validationSchema: toTypedSchema(memberSchema),
     initialValues: {
         name: member.name,
@@ -38,7 +38,7 @@ const onSubmit = handleSubmit((payload) => {
     }, {
         onError: (error) => {
             if (isAxiosError(error)) {
-                const formError = error as LaravelError<MemberSchema>
+                const formError = error as LaravelError
                 if (formError.response?.data?.errors)
                     setErrors(formError.response?.data?.errors)
             }
@@ -53,7 +53,7 @@ const onSubmit = handleSubmit((payload) => {
 // as the add-member form.
 watchEffect(() => {
     if (values.email === '') {
-        resetField('email')
+        setFieldValue('email', null)
     }
 })
 

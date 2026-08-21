@@ -5,7 +5,7 @@ import type { TimeStamp } from "@/types/common";
 export type Member = TimeStamp & {
   id: number;
   name: string;
-  email?: string;
+  email?: string | null;
   payout_order: number;
   deleted_at: null | string;
   group_id: number;

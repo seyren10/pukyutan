@@ -1,4 +1,5 @@
 import MainLayout from "@/layouts/MainLayout.vue";
+import PublicLayout from "@/layouts/PublicLayout.vue";
 import { createRouter, createWebHistory } from "vue-router";
 import { authRoutes } from "./auth";
 import { useUserStore } from "@/stores/user";
@@ -7,44 +8,37 @@ import { useBootstrapStore } from "@/stores/bootstrap";
 import { activityRoute } from "./activity";
 import { shareRequestsRoute } from "./share-requests";
 import { sharedGroupsRoute } from "./shared-groups";
+import { groupRoutes } from "./group";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
+      // The public marketing site owns the root path — logged-in visitors
+      // are bounced straight to /dashboard by the requiresGuest guard below.
       path: "/",
-      name: "home",
+      component: PublicLayout,
+      children: [
+        {
+          path: "",
+          name: "landing",
+          component: () => import("@/pages/landing/Index.vue"),
+          meta: {
+            requiresGuest: true,
+          },
+        },
+      ],
+    },
+    {
+      path: "/app",
+      name: "app",
       component: MainLayout,
+      redirect: { name: "groups.index" },
       meta: {
         requiresAuth: true,
       },
       children: [
-        {
-          path: "",
-          name: "dashboard",
-          alias: "dashboard",
-          component: () => import("@/pages/index/Index.vue"),
-        },
-        {
-          path: "groups/:id",
-          name: "groups.detail",
-          component: () => import("@/pages/groups/show/Index.vue"),
-          props: (route) => ({ groupId: Number(route.params.id) }),
-          children: [
-            {
-              path: "activities",
-              name: "groups.detail.activities.index",
-              component: () => import("@/pages/groups/show/activity/Index.vue"),
-              props: (route) => ({ groupId: Number(route.params.id) }),
-            },
-            {
-              path: "access",
-              name: "groups.detail.access.index",
-              component: () => import("@/pages/groups/show/access/Index.vue"),
-              props: (route) => ({ groupId: Number(route.params.id) }),
-            },
-          ],
-        },
+        groupRoutes,
         activityRoute,
         shareRequestsRoute,
         sharedGroupsRoute,
@@ -77,7 +71,7 @@ router.beforeEach(async (to) => {
   }
 
   if (to.meta.requiresGuest && isLoggedIn.value) {
-    return { name: "dashboard" };
+    return { name: "groups.index" };
   }
 });
 

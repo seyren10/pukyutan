@@ -8,6 +8,7 @@ export const GROUP_ACTIVITY_EVENT = [
   "share.accepted",
   "share.rejected",
   "contribution.recorded",
+  'contribution.undo'
 ] as const;
 
 export type GroupActivityEvent = (typeof GROUP_ACTIVITY_EVENT)[number];

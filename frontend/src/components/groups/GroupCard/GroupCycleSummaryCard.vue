@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
-import { Trophy, PiggyBank, Wallet, HandCoins, PartyPopper, CheckCircle2 } from '@lucide/vue'
+import { Trophy, PiggyBank, Wallet, HandCoins, PartyPopper, CheckCircle2, CalendarClock } from '@lucide/vue'
 import { Card, CardContent } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { Progress } from '@/components/ui/progress'
@@ -11,6 +11,7 @@ import DisburseCycleDialog from '@/components/cycles/DisburseCycleDialog.vue'
 import StartNewRoundDialog from '../dialogs/StartNewRoundDialog.vue'
 import { useUserStore } from '@/stores/user'
 import type { GroupDetail } from '@/features/group/type'
+import { formatDate } from 'date-fns'
 
 const { group } = defineProps<{
     group: GroupDetail
@@ -44,6 +45,17 @@ const collectedPercent = computed(() => {
                         This cycle's pot goes to
                     </span>
                     <span class="font-medium text-foreground">{{ nextCycle.recipient.name }}</span>
+                </div>
+
+                <Separator />
+
+                <div class="flex items-center justify-between text-sm">
+                    <span class="flex items-center gap-1.5 text-muted-foreground">
+                        <CalendarClock class="size-3.5" />
+                        This cycle due
+                    </span>
+                    <span class="font-medium text-foreground">{{ formatDate(new Date(nextCycle.due_date), 'MMMM d, y')
+                        }}</span>
                 </div>
 
                 <Separator />

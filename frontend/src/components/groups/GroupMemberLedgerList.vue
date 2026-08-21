@@ -3,19 +3,20 @@ import { ref, watchEffect } from 'vue'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { Mail, CheckCircle2, CirclePlus, Pencil } from '@lucide/vue'
+import { Mail, CheckCircle2, CirclePlus, Pencil, Trophy } from '@lucide/vue'
 import { getInitials } from '@/lib/helpers'
 import type { Member, MemberWithLedger } from '@/features/members/type'
 import EditMemberDialog from './EditMemberDialog.vue'
 
 type LedgerEntry = Pick<MemberWithLedger, 'expected_total' | 'paid_total' | 'balance'>
 
-const { members, ledgerByMemberId, isOwner = false } = defineProps<{
+const { members, ledgerByMemberId, isOwner = false, nextPayoutMemberId } = defineProps<{
     members: Member[]
     /** Cycle-scoped status, keyed by member id — omitted while the group is still a draft (no cycle to be scoped to yet). */
     ledgerByMemberId?: Record<number, LedgerEntry>
     /** Contact-info editing is owner-only — view-only collaborators just see the list. */
-    isOwner?: boolean
+    isOwner?: boolean,
+    nextPayoutMemberId?: number
 }>()
 
 // Editing a member's name/email doesn't touch payout order or ledger data,
@@ -36,9 +37,16 @@ watchEffect(() => { if (!showEditMemberDialog.value) editingMember.value = null 
     <div class="flex flex-col divide-y divide-border">
         <div v-for="(member, index) in members" :key="member.id"
             class="flex items-center gap-3 py-3 first:pt-0 last:pb-0">
-            <div class="flex size-7 shrink-0 items-center justify-center rounded-full font-mono text-xs"
-                :class="index === 0 ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'">
-                {{ index + 1 }}
+            <div class="flex size-7 shrink-0 items-center justify-center rounded-full font-mono text-xs relative isolate"
+                :class="nextPayoutMemberId === member.id ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'">
+                <template v-if="nextPayoutMemberId === member.id">
+                    <Trophy class="size-4 stroke-foreground" />
+                </template>
+                <template v-else>
+                    {{ index + 1 }}
+                </template>
+                <span class="absolute inset-1 -z-10 bg-primary rounded-full animate-ping"
+                    v-if="nextPayoutMemberId === member.id"></span>
             </div>
 
             <Avatar class="size-8 shrink-0">

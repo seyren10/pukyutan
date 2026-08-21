@@ -15,9 +15,11 @@ const time = computed(() => format(new Date(activity.created_at), 'h:mm a'))
 
 <template>
     <li class="flex items-start gap-3 py-3 last:pb-0">
-        <div class="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full" :class="visual.class">
-            <component :is="visual.icon" class="size-4" />
-        </div>
+        <slot name="icon" :visual="visual">
+            <div class="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full" :class="visual.class">
+                <component :is="visual.icon" class="size-4" />
+            </div>
+        </slot>
 
         <div class="flex flex-1 flex-col gap-1">
             <p class="text-sm text-foreground">{{ activity.description }}</p>
@@ -25,7 +27,9 @@ const time = computed(() => format(new Date(activity.created_at), 'h:mm a'))
                 <Badge v-if="activity.group_name" variant="outline" class="font-normal">
                     {{ activity.group_name }}
                 </Badge>
-                <span class="font-mono text-xs text-muted-foreground">{{ time }}</span>
+                <slot name="time" :time="activity.created_at">
+                    <span class="font-mono text-xs text-muted-foreground">{{ time }}</span>
+                </slot>
             </div>
         </div>
     </li>

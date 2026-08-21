@@ -13,7 +13,7 @@ export const useGroupDeleteMutation = () => {
     mutationFn: (groupId: number) => deleteGroup(groupId),
     onSuccess: () => {
       toast.success("Group deleted");
-      if (route.name !== "dashboard") router.back();
+      if (route.name !== "groups.index") router.back();
     },
     onError: (error: LaravelError) => {
       toast.error(

@@ -26,9 +26,9 @@ const userStore = useUserStore()
 const { userInitials, user, isLoggedIn } = storeToRefs(userStore)
 
 const navItems = [
-  { label: 'Dashboard', to: '/' },
+  { label: 'Dashboard', to: { name: 'groups.index' } },
   { label: 'Shared Groups', to: { name: 'shared-groups.index' } },
-  { label: 'Activities', to: '/activities' },
+  { label: 'Activities', to: { name: 'activities.index' } },
 ]
 
 
@@ -54,7 +54,7 @@ const { mutate } = useMutation({
         <nav class="hidden items-center gap-6 md:flex">
           <RouterLink v-for="(item, idx) in navItems" :key="idx" :to="item.to"
             class="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-            exact-active-class="text-foreground font-bold! text-foreground!">
+            active-class="text-foreground font-bold! text-foreground!">
             {{ item.label }}
           </RouterLink>
         </nav>

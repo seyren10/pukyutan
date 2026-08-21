@@ -8,6 +8,7 @@ import {
   UserX,
   History,
   type LucideIcon,
+  Undo,
 } from "@lucide/vue";
 import type { GroupActivityEvent } from "@/features/activity/constants";
 
@@ -25,6 +26,7 @@ const EVENT_VISUAL: Record<
   { icon: LucideIcon; tone: EventTone }
 > = {
   "contribution.recorded": { icon: Coins, tone: "money" },
+  "contribution.undo": { icon: Undo, tone: "default" },
   "cycle.disbursed": { icon: HandCoins, tone: "money" },
   "round.started": { icon: RefreshCw, tone: "lifecycle" },
   "group.activated": { icon: Rocket, tone: "lifecycle" },

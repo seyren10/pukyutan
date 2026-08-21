@@ -11,5 +11,5 @@ export const memberSchema = z.object({
     .string()
     .email("Enter a valid email address.")
     .max(255, "Email must be at most 255 characters.")
-    .optional(),
+    .nullable(),
 });

@@ -2,7 +2,7 @@
 import { computed, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import { ArrowLeft, Rocket, UserPlus2, FolderX, Wallet, HandCoins, CheckCircle2, Users, Hexagon, Component, UserRound } from '@lucide/vue'
+import { ArrowLeft, Rocket, FolderX, Wallet, HandCoins, CheckCircle2, Users, Hexagon, Component, UserRound } from '@lucide/vue'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription, EmptyContent } from '@/components/ui/empty'
@@ -12,8 +12,8 @@ import { GroupCycleSummaryCard } from '@/components/groups/GroupCard'
 import GroupHoneyCombTimeline from '@/components/groups/GroupHoneyCombTimeline.vue'
 import GroupMemberLedgerList from '@/components/groups/GroupMemberLedgerList.vue'
 import CycleContributionsDialog from '@/components/contributions/CycleContributionsDialog.vue'
-import AddMemberDialog from '@/pages/index/components/AddMemberDialog.vue'
-import ActivateGroupDialog from '@/pages/index/components/ActivateGroupDialog.vue'
+import AddMemberDialog from '@/pages/groups/index/components/AddMemberDialog.vue'
+import ActivateGroupDialog from '@/pages/groups/index/components/ActivateGroupDialog.vue'
 import { useGroupActivateMutation } from '@/features/group/composables/use-group-activate-mutation.ts'
 import GroupDetailHeader from './components/GroupDetailHeader.vue'
 import GroupDetailSkeleton from './components/GroupDetailSkeleton.vue'
@@ -92,12 +92,25 @@ const handleActivate = () => {
     })
 }
 
-// A single dialog instance shared by every hexagon in the timeline, rather
-// than one per cycle — `selectedCycle` doubles as its open state.
-const selectedCycle = ref<CycleSummary | null>(null)
+// Keep the selected cycle by id instead of by object reference. After a group
+// refetch or mutation invalidation, Vue re-renders the cycle list with fresh
+// objects, and the dialog continues to point at the current cycle with the
+// same identity rather than the stale instance that was captured earlier.
+const selectedCycleId = ref<number | null>(null)
+const selectedCycle = computed<CycleSummary | null>(() => {
+    if (selectedCycleId.value === null || !group.value) return null
+
+    return group.value.cycles.find((cycle) => cycle.id === selectedCycleId.value) ?? null
+})
+const isCurrentCycle = computed(() => {
+    if (!selectedCycleId.value || !group.value || !group.value.next_cycle) return false;
+
+    return selectedCycleId.value === group.value.next_cycle.id
+})
+
 const cycleDialogOpen = computed({
     get: () => selectedCycle.value !== null,
-    set: (isOpen) => { if (!isOpen) selectedCycle.value = null },
+    set: (isOpen) => { if (!isOpen) selectedCycleId.value = null },
 })
 </script>
 
@@ -120,7 +133,7 @@ const cycleDialogOpen = computed({
                 </EmptyHeader>
                 <EmptyContent>
                     <Button as-child variant="outline" size="sm">
-                        <RouterLink :to="{ name: 'dashboard' }">
+                        <RouterLink :to="{ name: 'groups.index' }">
                             <ArrowLeft data-icon="inline-start" />
                             Back to your groups
                         </RouterLink>
@@ -201,7 +214,7 @@ const cycleDialogOpen = computed({
                                 </div>
                                 <GroupHoneyCombTimeline :cycles="group.cycles" :members="group.members"
                                     :next-cycle-id="group.next_cycle?.id" :expected-per-cycle="expectedPerCycle"
-                                    @select="cycle => selectedCycle = cycle" />
+                                    @select="cycle => selectedCycleId = cycle.id" />
                                 <p class="text-xs text-muted-foreground">Click any cycle to see who's paid.</p>
                             </CardContent>
                         </Card>
@@ -214,8 +227,9 @@ const cycleDialogOpen = computed({
                                     <h2 class="font-heading text-lg font-semibold text-foreground">Members</h2>
                                     <p class="text-sm text-muted-foreground">Payout order and current balances.</p>
                                 </div>
-                                <GroupMemberLedgerList :members="group.members"
-                                    :ledger-by-member-id="ledgerByMemberId" :is-owner="isOwner" />
+                                <GroupMemberLedgerList :members="group.members" :ledger-by-member-id="ledgerByMemberId"
+                                    :is-owner="isOwner"
+                                    :next-payout-member-id="group.next_cycle?.recipient_member_id" />
                             </CardContent>
                         </Card>
 
@@ -224,7 +238,7 @@ const cycleDialogOpen = computed({
                 </div>
 
                 <CycleContributionsDialog v-if="selectedCycle" v-model:open="cycleDialogOpen" :cycle="selectedCycle"
-                    :members="group.members" :expected-total="expectedPerCycle" />
+                    :members="group.members" :expected-total="expectedPerCycle" :disable-undo="!isCurrentCycle" />
             </div>
         </template>
 

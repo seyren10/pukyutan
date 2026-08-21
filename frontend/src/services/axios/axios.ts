@@ -18,13 +18,14 @@ httpClient.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
     const isAuthRoute = location.pathname.startsWith(authRoutes.path);
+    const isLandingPage = location.pathname === "/";
 
-    if (error.response?.status === 401 && !isAuthRoute) {
-      toast.warning("Session Expired. Please login to continue");
-
+    if (error.response?.status === 401 && !isAuthRoute && !isLandingPage) {
       useUserStore().setUser(null);
       queryClient.clear();
       router.replace({ name: "login" });
+
+      toast.warning("Session Expired. Please login to continue");
     }
 
     return Promise.reject(error);

@@ -2,12 +2,12 @@
 import { computed } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
 import { useRouteQuery } from '@vueuse/router'
-import { ArrowLeft, Ticket } from '@lucide/vue'
+import { Ticket } from '@lucide/vue'
 import { Button } from '@/components/ui/button'
 import AppPaginationBar from '@/components/app/AppPaginationBar.vue'
 import { GroupCard, GroupCardEmpty, GroupCardSkeleton } from '@/components/groups/GroupCard'
 import { getSharedGroupsQueryOptions } from '@/features/group/query'
-import JoinGroupDialog from '@/pages/index/components/JoinGroupDialog.vue'
+import JoinGroupDialog from '@/pages/groups/index/components/JoinGroupDialog.vue'
 
 const page = useRouteQuery('page', null, { transform: Number })
 
