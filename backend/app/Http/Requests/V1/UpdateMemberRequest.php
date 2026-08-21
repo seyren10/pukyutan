@@ -30,6 +30,7 @@ class UpdateMemberRequest extends FormRequest
                 "sometimes",
                 "email",
                 "max:255",
+                "nullable",
                 Rule::when($this->email !== $member->email, Rule::unique("members")->where(
                     fn($query) => $query->where("group_id", $member->group->id)
                 ))

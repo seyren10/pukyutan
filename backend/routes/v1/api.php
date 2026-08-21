@@ -48,7 +48,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get("members/{member}/ledger", MemberLedgerController::class)->withoutMiddleware('verified');
 
     Route::post("cycles/{cycle}/disburse", CycleDisburseController::class);
-    Route::apiResource('cycles.contributions', ContributionController::class)->shallow()->only(['index', 'store'])->withoutMiddlewareFor(['index'], 'verified');
+    Route::apiResource('cycles.contributions', ContributionController::class)->shallow()->only(['index', 'store','destroy'])->withoutMiddlewareFor(['index'], 'verified');
 
     Route::get('dashboard/stats', DashboardController::class)->withoutMiddleware('verified');
 

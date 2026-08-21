@@ -13,4 +13,5 @@ enum GroupActivityEvent: string
     case ShareRevoked = 'share.revoked';
     case ShareLeft = 'share.left';
     case ContributionRecorded = 'contribution.recorded';
+    case ContributionUndo = 'contribution.undo';
 }
