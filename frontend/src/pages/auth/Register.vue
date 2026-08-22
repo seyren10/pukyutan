@@ -11,6 +11,8 @@ import type { RegistrationPayload } from '@/features/auth/type'
 import { useAuthMutations } from '@/features/auth/mutations'
 import type { LaravelError } from '@/types/common'
 import { isAxiosError } from 'axios'
+import AppGoogleLoginButton from '@/components/app/AppGoogleLoginButton.vue'
+import { Marker, MarkerContent } from '@/components/ui/marker'
 
 
 const { handleSubmit, setErrors } = useForm({
@@ -38,7 +40,7 @@ const submit = handleSubmit((values) => {
             <CardDescription>Start tracking your paluwagan groups.</CardDescription>
         </CardHeader>
 
-        <CardContent>
+        <CardContent class="space-y-4">
             <form @submit="submit" class="space-y-4">
                 <FormField #="{ componentField }" name="name">
                     <FormItem>
@@ -84,6 +86,12 @@ const submit = handleSubmit((values) => {
                     Create account
                 </Button>
             </form>
+
+            <Marker variant="separator">
+                <MarkerContent>OR</MarkerContent>
+            </Marker>
+
+            <AppGoogleLoginButton class="w-full" />
         </CardContent>
 
         <CardFooter class="justify-center text-sm text-muted-foreground">

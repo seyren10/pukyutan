@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -80,6 +80,7 @@ const { mutate } = useMutation({
             <DropdownMenuTrigger as-child>
               <button class="rounded-full">
                 <Avatar class="size-8">
+                  <AvatarImage :src="user.avatar" v-if="user?.avatar" />
                   <AvatarFallback class="bg-accent text-accent-foreground">
                     {{ userInitials }}
                   </AvatarFallback>
@@ -89,6 +90,7 @@ const { mutate } = useMutation({
             <DropdownMenuContent align="end" class="w-56">
               <div class="flex gap-3 items-center p-2">
                 <Avatar class="size-8 shrink-0">
+                  <AvatarImage :src="user.avatar" v-if="user?.avatar" />
                   <AvatarFallback class="bg-accent text-accent-foreground">
                     {{ userInitials }}
                   </AvatarFallback>

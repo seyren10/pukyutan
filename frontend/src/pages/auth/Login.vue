@@ -11,6 +11,8 @@ import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/comp
 import AppButtonLoaderSwap from '@/components/app/AppButtonLoaderSwap.vue'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import type { LaravelError } from '@/types/common'
+import AppGoogleLoginButton from '@/components/app/AppGoogleLoginButton.vue'
+import { Marker, MarkerContent } from '@/components/ui/marker'
 
 const { loginMutation } = useAuthMutations()
 const { mutate, isPending, isError, error } = loginMutation
@@ -71,8 +73,11 @@ const submit = handleSubmit((v) => mutate(v))
                     Log in
                 </Button>
             </form>
+            <Marker variant="separator">
+                <MarkerContent>OR</MarkerContent>
+            </Marker>
+            <AppGoogleLoginButton class="w-full" />
         </CardContent>
-
         <CardFooter class="justify-center text-sm text-muted-foreground">
             Don't have an account?
             <RouterLink :to="{ name: 'register' }" class="ml-1 text-foreground hover:underline">
