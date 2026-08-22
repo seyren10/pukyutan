@@ -85,14 +85,13 @@ const nextPayoutDueLabel = computed(() => {
     return dueDate ? formatDate(new Date(dueDate), 'MMMM dd, yyyy') : ''
 })
 
-
-// per_page: 1 — this call only ever reads meta.total, the same endpoint the
-// full inbox page (/requests) later fetches for real.
-const { data: pendingRequestsData } = useQuery(getPendingShareRequestsQueryOptions(1, 1))
-const pendingRequestCount = computed(() => pendingRequestsData.value?.meta.total ?? 0)
-
 const userStore = useUserStore()
 const { isEmailVerified } = storeToRefs(userStore)
+
+const { data: pendingRequestsData } = useQuery(getPendingShareRequestsQueryOptions(() => ({ page: 1, per_page: 1 }), isEmailVerified.value))
+const pendingRequestCount = computed(() => pendingRequestsData.value?.meta.total ?? 0)
+
+
 
 </script>
 

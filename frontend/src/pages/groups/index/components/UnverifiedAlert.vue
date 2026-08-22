@@ -6,9 +6,13 @@ import { Button } from '@/components/ui/button'
 import { useAuthMutations } from '@/features/auth/mutations'
 import { FlagIcon } from '@lucide/vue'
 
+defineOptions({
+    inheritAttrs: false
+})
 const { verified } = defineProps<{
     verified: boolean
 }>()
+
 
 const { verifyEmailMutation } = useAuthMutations()
 const { mutate, isPending } = verifyEmailMutation
@@ -34,19 +38,27 @@ function handleResend() {
         },
     })
 }
+
+defineExpose({
+    cooldown,
+    resendAvailableAt,
+    handleResend
+})
 </script>
 
 <template>
-    <Alert v-if="!verified" variant="warning">
-        <FlagIcon />
-        <AlertTitle>Verify your email to create groups</AlertTitle>
-        <AlertDescription class="flex items-center justify-between gap-4">
-            <span>Until then, you can only view groups that have been shared with you.</span>
-            <Button size="sm" variant="outline" :disabled="isPending || cooldown > 0" @click="handleResend">
-                {{ cooldown > 0 ? `Resend email (${cooldown}s)` : 'Resend email' }}
-            </Button>
-        </AlertDescription>
-    </Alert>
+    <slot :cooldown="cooldown" :handleResend="handleResend">
+        <Alert variant="warning" v-if="!verified" v-bind="$attrs">
+            <FlagIcon />
+            <AlertTitle>Verify your email to create groups</AlertTitle>
+            <AlertDescription class="flex items-center justify-between gap-4">
+                <span>Until then, you can only view groups that have been shared with you.</span>
+                <Button size="sm" variant="outline" :disabled="isPending || cooldown > 0" @click="handleResend">
+                    {{ cooldown > 0 ? `Resend email (${cooldown}s)` : 'Resend email' }}
+                </Button>
+            </AlertDescription>
+        </Alert>
+    </slot>
 </template>
 
 <style scoped></style>

@@ -9,6 +9,7 @@ import { activityRoute } from "./activity";
 import { shareRequestsRoute } from "./share-requests";
 import { sharedGroupsRoute } from "./shared-groups";
 import { groupRoutes } from "./group";
+import { profileRoutes } from "./profile";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -32,6 +33,7 @@ const router = createRouter({
     {
       path: "/app",
       name: "app",
+      alias: ["/dashboard"],
       component: MainLayout,
       redirect: { name: "groups.index" },
       meta: {
@@ -42,6 +44,7 @@ const router = createRouter({
         activityRoute,
         shareRequestsRoute,
         sharedGroupsRoute,
+        profileRoutes,
       ],
     },
     authRoutes,

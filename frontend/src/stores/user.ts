@@ -8,6 +8,7 @@ export const useUserStore = defineStore("user", () => {
 
   const isEmailVerified = computed(() => !!user.value?.email_verified_at);
   const isLoggedIn = computed(() => !!user.value);
+  const isGoogleLoggedIn = computed(() => !!user.value?.google_id);
   const userInitials = computed(() =>
     isLoggedIn.value ? getInitials(user.value?.name || "NA") : "NA",
   );
@@ -20,5 +21,6 @@ export const useUserStore = defineStore("user", () => {
     isEmailVerified,
     isLoggedIn,
     userInitials,
+    isGoogleLoggedIn,
   };
 });

@@ -105,9 +105,11 @@ const { mutate } = useMutation({
                 </div>
               </div>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <User data-icon="inline-start" />
-                Profile
+              <DropdownMenuItem as-child>
+                <RouterLink :to="{ name: 'profile' }">
+                  <User data-icon="inline-start" />
+                  Profile
+                </RouterLink>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem variant="destructive" @select="mutate">

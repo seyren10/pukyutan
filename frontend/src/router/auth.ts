@@ -1,4 +1,6 @@
 import AuthLayout from "@/layouts/AuthLayout.vue";
+import { useUserStore } from "@/stores/user";
+import { storeToRefs } from "pinia";
 import type { RouteRecordRaw } from "vue-router";
 
 export const authRoutes: RouteRecordRaw = {
@@ -27,7 +29,16 @@ export const authRoutes: RouteRecordRaw = {
       name: "verify-email",
       component: () => import("@/pages/auth/VerifyEmail.vue"),
       meta: {
-        requiresGuest: true,
+        requiresAuth: true,
+      },
+      beforeEnter: () => {
+        const userStore = useUserStore();
+        const { isEmailVerified } = storeToRefs(userStore);
+
+        if (isEmailVerified.value)
+          return {
+            name: "app",
+          };
       },
     },
     {

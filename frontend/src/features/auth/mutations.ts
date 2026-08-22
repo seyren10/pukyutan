@@ -6,6 +6,7 @@ import {
   register,
   resetPassword,
   sendEmailVerification,
+  updateProfile,
 } from "./api";
 import { toast } from "vue-sonner";
 import { useRoute, useRouter } from "vue-router";
@@ -29,7 +30,9 @@ export const useAuthMutations = () => {
         position: "top-center",
       });
       userStore.setUser(user);
-      router.replace((route.query.redirect as string) || { name: "groups.index" });
+      router.replace(
+        (route.query.redirect as string) || { name: "groups.index" },
+      );
     },
   });
 
@@ -42,7 +45,14 @@ export const useAuthMutations = () => {
       });
 
       userStore.setUser(user);
-      router.replace((route.query.redirect as string) || { name: "groups.index" });
+      router.replace({ name: "verify-email" });
+    },
+  });
+  const updateProfileMutation = useMutation({
+    mutationFn: updateProfile,
+    onSuccess: (user) => {
+      toast.info("Profile updated");
+      userStore.setUser(user);
     },
   });
 
@@ -81,5 +91,6 @@ export const useAuthMutations = () => {
     forgotPasswordMutation,
     passwordResetMutation,
     registerMutation,
+    updateProfileMutation,
   };
 };

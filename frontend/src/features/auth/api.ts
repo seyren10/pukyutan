@@ -4,6 +4,7 @@ import type {
   RegistrationPayload,
   ResetPasswordSchema,
   User,
+  UserInfoPayload,
 } from "./type";
 
 export const login = async (payload: LoginCredentials) => {
@@ -15,6 +16,11 @@ export const login = async (payload: LoginCredentials) => {
 
 export const getUser = async () => {
   const res = await httpClient.get<User>("/api/user");
+  return res.data;
+};
+
+export const updateProfile = async (payload: UserInfoPayload) => {
+  const res = await httpClient.put<User>("/api/user", payload);
   return res.data;
 };
 

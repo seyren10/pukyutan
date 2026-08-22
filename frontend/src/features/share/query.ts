@@ -2,6 +2,7 @@ import { queryOptions } from "@tanstack/vue-query";
 import { toValue, type MaybeRefOrGetter } from "vue";
 import { getGroupShareRequests, getPendingShareRequests } from "./api";
 import type { GroupShareStatus } from "./type";
+import type { QueryParams } from "@/types/common";
 
 export const getGroupShareRequestsQueryOptions = (
   groupId: MaybeRefOrGetter<number>,
@@ -20,19 +21,16 @@ export const getGroupShareRequestsQueryOptions = (
 // Small, single-shot fetch reused for both the dashboard banner's count
 // (via `select`, page 1 only) and the full pending-requests inbox (paged).
 export const getPendingShareRequestsQueryOptions = (
-  page?: MaybeRefOrGetter<number | null>,
-  perPage: MaybeRefOrGetter<number> = 15,
-) =>
-  queryOptions({
-    queryKey: [
-      "share-requests",
-      "pending",
-      toValue(page) ?? 1,
-      toValue(perPage),
-    ],
+  params?: MaybeRefOrGetter<QueryParams>,
+  enabled: boolean = true,
+) => {
+  return queryOptions({
+    queryKey: ["share-requests", "pending", params],
     queryFn: () =>
       getPendingShareRequests({
-        page: toValue(page) ?? 1,
-        per_page: toValue(perPage),
+        page: toValue(params)?.page ?? 1,
+        per_page: toValue(params)?.per_page,
       }),
+    enabled,
   });
+};

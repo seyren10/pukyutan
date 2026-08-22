@@ -2,6 +2,7 @@ import { httpClient } from "@/services/axios/axios";
 import type { PaginatedResponse } from "@/types/paginate";
 import type { GroupShare, GroupShareStatus } from "./type";
 import type { JoinGroupSchema } from "./schema";
+import type { QueryParams } from "@/types/common";
 
 export const joinGroup = async (payload: JoinGroupSchema) => {
   const res = await httpClient.post<{ data: GroupShare }>(
@@ -23,10 +24,7 @@ export const getGroupShareRequests = async (
   return res.data;
 };
 
-export const getPendingShareRequests = async (params?: {
-  page?: number;
-  per_page?: number;
-}) => {
+export const getPendingShareRequests = async (params?: QueryParams) => {
   const res = await httpClient.get<PaginatedResponse<GroupShare>>(
     "/api/v1/share-requests/pending",
     { params },
