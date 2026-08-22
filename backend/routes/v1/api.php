@@ -32,7 +32,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::post("groups/join/{invite_code}", GroupJoinController::class)
         ->whereAlphaNumeric("invite_code")
         ->withoutMiddleware('verified');
-    Route::delete("groups/{group}/leave", GroupLeaveController::class);
+    Route::delete("groups/{group}/leave", GroupLeaveController::class)->withoutMiddleware('verified');
 
     Route::get("share-requests/pending", [GroupShareController::class, "pending"]);
     Route::get("groups/{group}/share-requests", [GroupShareController::class, "index"]);
@@ -48,8 +48,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get("members/{member}/ledger", MemberLedgerController::class)->withoutMiddleware('verified');
 
     Route::post("cycles/{cycle}/disburse", CycleDisburseController::class);
-    Route::apiResource('cycles.contributions', ContributionController::class)->shallow()->only(['index', 'store','destroy'])->withoutMiddlewareFor(['index'], 'verified');
+    Route::apiResource('cycles.contributions', ContributionController::class)->shallow()->only(['index', 'store', 'destroy'])->withoutMiddlewareFor(['index'], 'verified');
 
     Route::get('dashboard/stats', DashboardController::class)->withoutMiddleware('verified');
-
 });
