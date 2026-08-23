@@ -48,3 +48,14 @@ export const forgotPassword = async (
 export const resetPassword = async (payload: ResetPasswordSchema) => {
   await httpClient.post("/reset-password", payload);
 };
+
+/* DICEBEAR */
+export const seedDicebear = async () => {
+  const res = await httpClient.put<User>("/api/v1/dicebear");
+  return res.data;
+};
+
+export const deleteDicebearSeed = async () => {
+  const res = await httpClient.delete<User>("/api/v1/dicebear");
+  return res.data;
+};

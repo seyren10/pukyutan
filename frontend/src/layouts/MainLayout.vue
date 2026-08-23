@@ -19,6 +19,7 @@ import { logout } from '@/features/auth/api'
 import { useLogout } from '@/composables/use-logout'
 import { ref } from 'vue'
 import { Kbd } from '@/components/ui/kbd'
+import AppAvatar from '@/components/app/AppAvatar.vue'
 
 const showSearchDialog = ref(false)
 
@@ -79,22 +80,14 @@ const { mutate } = useMutation({
           <DropdownMenu v-if="isLoggedIn">
             <DropdownMenuTrigger as-child>
               <button class="rounded-full">
-                <Avatar class="size-8">
-                  <AvatarImage :src="user.avatar" v-if="user?.avatar" />
-                  <AvatarFallback class="bg-accent text-accent-foreground">
-                    {{ userInitials }}
-                  </AvatarFallback>
-                </Avatar>
+                <AppAvatar class="size-8" :google-avatar="user!.avatar" :fallback="user!.name"
+                  :seed="user!.dicebear_seed" />
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" class="w-56">
               <div class="flex gap-3 items-center p-2">
-                <Avatar class="size-8 shrink-0">
-                  <AvatarImage :src="user.avatar" v-if="user?.avatar" />
-                  <AvatarFallback class="bg-accent text-accent-foreground">
-                    {{ userInitials }}
-                  </AvatarFallback>
-                </Avatar>
+                <AppAvatar class="size-8 shrink-0" :google-avatar="user!.avatar" :fallback="user!.name"
+                  :seed="user!.dicebear_seed" />
                 <div class="flex flex-col text-sm text-muted-foreground w-40">
                   <span class="truncate">
                     {{ user?.name }}

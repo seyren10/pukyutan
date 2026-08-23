@@ -7,6 +7,7 @@ import { Mail, CheckCircle2, CirclePlus, Pencil, Trophy } from '@lucide/vue'
 import { getInitials } from '@/lib/helpers'
 import type { Member, MemberWithLedger } from '@/features/members/type'
 import EditMemberDialog from './EditMemberDialog.vue'
+import AppAvatar from '../app/AppAvatar.vue'
 
 type LedgerEntry = Pick<MemberWithLedger, 'expected_total' | 'paid_total' | 'balance'>
 
@@ -49,11 +50,7 @@ watchEffect(() => { if (!showEditMemberDialog.value) editingMember.value = null 
                     v-if="nextPayoutMemberId === member.id"></span>
             </div>
 
-            <Avatar class="size-8 shrink-0">
-                <AvatarFallback class="bg-accent text-xs text-accent-foreground">
-                    {{ getInitials(member.name) }}
-                </AvatarFallback>
-            </Avatar>
+            <AppAvatar class="size-8 shrink-0" :fallback="member.name" :seed="member.dicebear_seed" />
 
             <div class="flex min-w-0 flex-1 flex-col">
                 <div class="flex items-center gap-2">

@@ -12,6 +12,7 @@ export const useUserStore = defineStore("user", () => {
   const userInitials = computed(() =>
     isLoggedIn.value ? getInitials(user.value?.name || "NA") : "NA",
   );
+  const hasDicebearSeed = computed(() => user.value?.dicebear_seed !== null);
 
   const setUser = (payload: User | null) => (user.value = payload);
 
@@ -22,5 +23,6 @@ export const useUserStore = defineStore("user", () => {
     isLoggedIn,
     userInitials,
     isGoogleLoggedIn,
+    hasDicebearSeed,
   };
 });

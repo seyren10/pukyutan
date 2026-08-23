@@ -1,15 +1,34 @@
 <script setup lang="ts">
 import { useUserStore } from '@/stores/user';
 import { storeToRefs } from 'pinia';
-import { ref } from 'vue';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import { Field, FieldDescription, FieldLabel, FieldSet } from '../ui/field/index.ts';
-import { Loader, MousePointerClick, Shuffle } from '@lucide/vue';
+import { Avatar, AvatarFallback } from '../ui/avatar';
+import { FieldDescription, FieldLabel } from '../ui/field/index.ts';
+import { MousePointerClick } from '@lucide/vue';
+import AppAvatar from '../app/AppAvatar.vue';
+import { useMutation } from '@tanstack/vue-query';
+import { deleteDicebearSeed, seedDicebear } from '@/features/auth/api.ts';
+
+
 
 const userStore = useUserStore()
-const { user, userInitials } = storeToRefs(userStore)
+const { user } = storeToRefs(userStore)
 
-const avatarUploading = ref(false)
+const { mutate: seedMutate } = useMutation({ mutationFn: seedDicebear })
+const { mutate: unseedMutate } = useMutation({ mutationFn: deleteDicebearSeed })
+
+const handleSeed = (cb: () => void) => {
+    seedMutate(undefined, {
+        onSuccess: (user) => userStore.setUser(user),
+        onSettled: () => cb()
+    })
+}
+
+const handleUnseed = (cb: () => void) => {
+    unseedMutate(undefined, {
+        onSuccess: (user) => userStore.setUser(user),
+        onSettled: () => cb()
+    })
+}
 </script>
 
 <template>
@@ -20,17 +39,9 @@ const avatarUploading = ref(false)
         <FieldLabel>Avatar</FieldLabel>
 
         <div class="flex items-center gap-4">
-            <div class="group relative rounded-full overflow-hidden">
-                <Avatar class="size-16">
-                    <AvatarImage v-if="user.avatar" :src="user.avatar" :alt="user.name" />
-                    <AvatarFallback>{{ userInitials }}</AvatarFallback>
-                </Avatar>
+            <AppAvatar editable :google-avatar="user.avatar" :fallback="user.name" :seed="user.dicebear_seed"
+                @seed="handleSeed" @unseed="handleUnseed" />
 
-                <span
-                    class="absolute inset-0 bg-background/50 backdrop-blur-sm invisible group-hover:visible grid place-content-center">
-                    <Shuffle class="size-4" />
-                </span>
-            </div>
             <div class="text-muted-foreground flex items-center gap-2">
                 <MousePointerClick class="size-4" />
                 <FieldDescription class="text-xs">Tap your avatar to change it</FieldDescription>

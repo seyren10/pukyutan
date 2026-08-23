@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Eye, Wallet, CalendarClock, HandCoins, MoreHorizontal, UserRound, Rocket } from '@lucide/vue'
 import type { Group } from '@/features/group/type'
 import { computed, ref } from 'vue'
-import { formatFrequencyLabel, getInitials } from '@/lib/helpers'
+import { formatFrequencyLabel } from '@/lib/helpers'
 import { GroupCycleVisual, type GroupCardDropdownEvent } from '.'
 import { format } from 'date-fns'
 import AddMemberDialog from '@/pages/groups/index/components/AddMemberDialog.vue'
@@ -19,6 +18,9 @@ import StartNewRoundDialog from '../dialogs/StartNewRoundDialog.vue'
 import EditGroupDialog from '@/pages/groups/index/components/EditGroupDialog.vue'
 import RenameGroupDialog from '@/pages/groups/index/components/RenameGroupDialog.vue'
 import DeleteGroupDialog from '../dialogs/DeleteGroupDialog.vue'
+import AppAvatar from '@/components/app/AppAvatar.vue'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip/index.ts'
+import { Separator } from '@/components/ui/separator/index.ts'
 
 const { group } = defineProps<{
     group: Group
@@ -79,14 +81,18 @@ const handleGroupDropdownEvent = (e: GroupCardDropdownEvent) => {
                     {{ name }}
                 </RouterLink>
                 <div class="flex -space-x-2">
-                    <Avatar v-for="(member, i) in recentMembers.slice(0, 4)" :key="i"
-                        class="size-6 border-2 border-card">
-                        <AvatarFallback class="bg-accent text-[10px] text-accent-foreground">
-                            {{ getInitials(member.name) }}
-                        </AvatarFallback>
-                    </Avatar>
+                    <Tooltip v-for="member in recentMembers.slice(0, 4)" :key="member.id">
+                        <TooltipTrigger>
+                            <AppAvatar class="size-8 border-2 border-card" :fallback="member.name"
+                                :seed="member.dicebear_seed">
+                            </AppAvatar>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            {{ member.name }}
+                        </TooltipContent>
+                    </Tooltip>
                     <div v-if="membersCount > 4"
-                        class="flex size-6 items-center justify-center rounded-full border-2 border-card bg-muted text-[10px] text-muted-foreground">
+                        class="flex size-8 items-center justify-center rounded-full border-2 border-card bg-muted text-[10px] text-muted-foreground">
                         +{{ membersCount - 4 }}
                     </div>
                 </div>
@@ -101,25 +107,30 @@ const handleGroupDropdownEvent = (e: GroupCardDropdownEvent) => {
             <Badge v-else variant="secondary" class="shrink-0">Completed</Badge>
         </CardHeader>
 
-        <CardContent class="flex flex-col gap-3 grow">
-            <GroupCycleVisual :current-cycle="nextCycle?.cycle_number" :cycles-count="cyclesCount" />
+        <CardContent>
+            <div class="flex flex-col place-content-center  gap-3 grow bg-accent/20 rounded-xl p-4 border border-dashed min-h-25">
+                <GroupCycleVisual :max-cycle-display="10" :current-cycle="nextCycle?.cycle_number"
+                    :cycles-count="cyclesCount" />
+                <div class="flex items-center justify-between font-mono text-xs text-muted-foreground">
+                    <span class="flex items-center gap-1.5" v-if="frequencyUnit && frequencyInterval">
+                        <Wallet class="size-3.5" />
+                        ₱{{ contributionAmount }} · {{
+                            formatFrequencyLabel(frequencyUnit, frequencyInterval) }}
+                    </span>
+                    <span v-if="nextCycle" class="flex items-center gap-1.5">
+                        <CalendarClock class="size-3.5" />
+                        Cycle {{ nextCycle.cycle_number }} · {{ format(nextCycle.due_date, 'MMM d') }}
+                    </span>
+                </div>
 
-            <div class="flex items-center justify-between font-mono text-xs text-muted-foreground">
-                <span class="flex items-center gap-1.5" v-if="frequencyUnit && frequencyInterval">
-                    <Wallet class="size-3.5" />
-                    ₱{{ contributionAmount }} · {{
-                        formatFrequencyLabel(frequencyUnit, frequencyInterval) }}
-                </span>
-                <span v-if="nextCycle" class="flex items-center gap-1.5">
-                    <CalendarClock class="size-3.5" />
-                    Cycle {{ nextCycle.cycle_number }} · {{ format(nextCycle.due_date, 'MMM d') }}
-                </span>
+                <p v-if="isShared" class="text-xs text-muted-foreground">
+                    Owned by {{ user?.name }}
+                </p>
             </div>
 
-            <p v-if="isShared" class="text-xs text-muted-foreground">
-                Owned by {{ user?.name }}
-            </p>
         </CardContent>
+
+        <Separator />
 
         <CardFooter class="gap-2">
             <template v-if="isOwner">

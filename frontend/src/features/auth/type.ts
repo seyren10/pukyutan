@@ -18,6 +18,7 @@ export type User = {
   email_verified_at: string;
   google_id: null | string;
   avatar: null | string;
+  dicebear_seed: string | null;
 };
 
 export type LoginCredential = z.infer<typeof loginCredentialSchema>;

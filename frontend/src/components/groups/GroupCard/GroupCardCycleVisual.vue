@@ -17,8 +17,8 @@ const remainingCyclesCount = computed(() => {
 })
 </script>
 <template>
-    <div class="flex gap-1 flex-wrap">
-        <Hexagon v-for="cycle in finalCycleCount" :key="cycle" class="size-5.5 shrink-0" :class="{
+    <div class="flex flex-wrap">
+        <Hexagon v-for="cycle in finalCycleCount" :key="cycle" class="size-6 shrink-0" :class="{
             'fill-primary text-primary': cycle < currentCycleWithDefault,
             'fill-transparent text-accent-foreground': cycle === currentCycleWithDefault,
             'fill-transparent text-border': cycle > currentCycleWithDefault,
