@@ -17,23 +17,29 @@ use App\Models\Group;
  * @property string $name
  * @property string|null $email
  * @property int $payout_order
+ * @property string $dicebear_seed
  */
 #[Fillable([
     "name",
     "email",
     "payout_order",
+    "dicebear_seed"
 ])]
 class Member extends Model
 {
     use HasFactory, SoftDeletes;
 
-     protected static function booted(): void
+    protected static function booted(): void
     {
         static::addGlobalScope('payoutOrder', function (Builder $builder) {
             $builder->orderBy('payout_order');
         });
+
+        static::creating(function (Member $member) {
+            $member->dicebear_seed = \Str::random(12);
+        });
     }
- 
+
 
     #region ============ RELATIONSHIPS ============
     /**

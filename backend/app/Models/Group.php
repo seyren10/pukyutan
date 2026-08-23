@@ -64,7 +64,7 @@ class Group extends Model
     public function recentMembers(): HasMany
     {
         return $this->members()
-            ->select(['id', 'name', 'email', 'group_id'])
+            ->select(['id', 'name', 'email', 'group_id', 'dicebear_seed'])
             ->limit(5);
     }
 

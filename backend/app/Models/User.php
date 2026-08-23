@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use App\Models\Group;
+use Illuminate\Support\Str;
 
 #[Fillable(['name', 'email', 'password', 'email_verified_at', 'google_id', 'avatar'])]
 #[Hidden(['password', 'remember_token'])]
@@ -41,5 +42,11 @@ class User extends Authenticatable implements MustVerifyEmail
     public function groupShares(): HasMany
     {
         return $this->hasMany(GroupShare::class);
+    }
+
+    public function seedDiceBear()
+    {
+        $this->dicebear_seed = Str::random(12);
+        $this->save();
     }
 }
