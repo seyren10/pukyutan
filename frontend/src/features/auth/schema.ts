@@ -1,5 +1,16 @@
 import z from "zod";
 
+export const passwordsMatch = <
+  T extends { password: string; password_confirmation: string },
+>(
+  data: T,
+) => data.password === data.password_confirmation;
+
+const passwordConfirmationOptions = {
+  message: "Password didn't match",
+  path: ["password"],
+};
+
 export const loginCredentialSchema = z.object({
   email: z.string().email(),
   password: z.string(),
@@ -12,16 +23,9 @@ const registrationBase = z.object({
   password_confirmation: z.string(),
 });
 
-export const registrationSchema = z.object(registrationBase.shape).refine(
-  (data) => {
-    const { password, password_confirmation } = data;
-    return password === password_confirmation;
-  },
-  {
-    message: "Password didn't match",
-    path: ["password"],
-  },
-);
+export const registrationSchema = z
+  .object(registrationBase.shape)
+  .refine(passwordsMatch, passwordConfirmationOptions);
 
 export const userInfoSchema = registrationBase.pick({
   name: true,
@@ -35,13 +39,18 @@ export const resetPasswordSchema = z
     }).shape,
     token: z.string(),
   })
-  .refine(
-    (data) => {
-      const { password, password_confirmation } = data;
-      return password === password_confirmation;
-    },
-    {
-      message: "Password didn't match",
-      path: ["password"],
-    },
-  );
+  .refine(passwordsMatch, passwordConfirmationOptions);
+
+export const updatePasswordSchema = z
+  .object({
+    current_password: z.string(),
+    ...registrationBase.pick({
+      password: true,
+      password_confirmation: true,
+    }).shape,
+  })
+  .refine(passwordsMatch, passwordConfirmationOptions);
+
+export const deleteAccountSchema = z.object({
+  password: z.string(),
+});

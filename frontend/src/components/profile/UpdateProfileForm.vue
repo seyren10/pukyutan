@@ -65,7 +65,7 @@ const submit = handleSubmit((values) => mutate(values, {
             </FormItem>
         </FormField>
 
-        <div v-else class="flex justify-between items-center gap-2 rounded-lg border p-4">
+        <div v-else class="flex justify-between items-center flex-wrap gap-2 rounded-lg border p-4">
             <div class="font-medium text-xs">
                 {{ user?.email }}
             </div>

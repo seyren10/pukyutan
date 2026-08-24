@@ -7,6 +7,7 @@ import UpdatePasswordForm from '@/components/profile/UpdatePasswordForm.vue'
 
 import ProfileInformation from '@/components/profile/ProfileInformation.vue'
 import AvatarPicker from '@/components/profile/AvatarPicker.vue'
+import DeleteAccountCard from '@/components/profile/DeleteAccountCard.vue'
 
 </script>
 
@@ -36,6 +37,7 @@ import AvatarPicker from '@/components/profile/AvatarPicker.vue'
 
             <TabsContent value="security" class="flex flex-col gap-6">
                 <UpdatePasswordForm />
+                <DeleteAccountCard />
             </TabsContent>
         </Tabs>
     </div>

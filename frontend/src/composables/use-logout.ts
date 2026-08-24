@@ -7,10 +7,10 @@ export const useLogout = () => {
   const router = useRouter();
   const userStore = useUserStore();
 
-  const execute = () => {
+  const execute = async (query?: Record<string, string>) => {
     userStore.setUser(null);
     queryClient.clear();
-    router.replace({ name: "login" });
+    await router.replace({ name: "login", query: query });
   };
 
   return {
