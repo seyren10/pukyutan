@@ -103,7 +103,7 @@ const pendingRequestCount = computed(() => pendingRequestsData.value?.meta.total
             <Inbox />
             <AlertTitle>{{ pendingRequestCount }} pending join {{ pendingRequestCount === 1 ? 'request' : 'requests' }}
             </AlertTitle>
-            <AlertDescription class="flex items-center justify-between gap-4">
+            <AlertDescription class="flex flex-wrap items-center justify-between gap-3">
                 <span>Someone wants to view one of your groups. Review before they get access.</span>
                 <Button as-child size="sm" variant="outline">
                     <RouterLink :to="{ name: 'share-requests.index' }">Review requests</RouterLink>
@@ -255,54 +255,5 @@ const pendingRequestCount = computed(() => pendingRequestsData.value?.meta.total
 
             <AddMemberDialog v-model="showAddMemberDialog" :group="createdGroup" v-if="createdGroup" />
         </div>
-
-        <!-- SHARED GROUPS
-        <div class="flex flex-col gap-3">
-            <div class="flex items-center justify-between">
-                <h2 class="font-heading text-lg font-semibold text-foreground">Shared with you</h2>
-                <JoinGroupDialog>
-                    <Button size="sm" variant="outline">
-                        <Ticket data-icon="inline-start" />
-                        Join a group
-                    </Button>
-                </JoinGroupDialog>
-            </div>
-
-            <Card v-if="isSharedGroupsPending">
-                <CardContent class="flex items-center gap-3 py-4">
-                    <Skeleton class="size-9 shrink-0 rounded-md" />
-                    <div class="flex flex-1 flex-col gap-1.5">
-                        <Skeleton class="h-3.5 w-1/3" />
-                        <Skeleton class="h-3 w-1/2" />
-                    </div>
-                </CardContent>
-            </Card>
-            <Card v-else>
-                <CardContent class="flex items-center justify-between gap-4 py-4">
-                    <div class="flex items-center gap-3">
-                        <div
-                            class="flex size-9 shrink-0 items-center justify-center rounded-md bg-accent text-accent-foreground">
-                            <Users2 class="size-4" />
-                        </div>
-                        <div class="flex flex-col">
-                            <span class="text-sm font-medium text-foreground">
-                                {{ sharedGroupsCount > 0
-                                    ? `${sharedGroupsCount} ${sharedGroupsCount === 1 ? 'group' : 'groups'} shared with you`
-                                    : 'No groups shared with you yet' }}
-                            </span>
-                            <span class="text-xs text-muted-foreground">
-                                Groups other people have given you view access to.
-                            </span>
-                        </div>
-                    </div>
-                    <Button as-child size="sm" variant="outline">
-                        <RouterLink :to="{ name: 'shared-groups.index' }">
-                            View all
-                            <ChevronRight data-icon="inline-end" />
-                        </RouterLink>
-                    </Button>
-                </CardContent>
-            </Card>
-        </div> -->
     </div>
 </template>

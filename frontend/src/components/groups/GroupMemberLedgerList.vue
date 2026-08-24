@@ -88,7 +88,7 @@ watchEffect(() => { if (!showEditMemberDialog.value) editingMember.value = null 
             </div>
 
             <Button v-if="isOwner" variant="ghost" size="icon" type="button"
-                class="shrink-0 text-muted-foreground hover:text-foreground" @click="handleEditMember(member)">
+                class="tap-target-44 shrink-0 text-muted-foreground hover:text-foreground" @click="handleEditMember(member)">
                 <Pencil class="size-3.5" />
             </Button>
         </div>

@@ -39,13 +39,13 @@ const shares = computed(() => data.value?.data)
             <ArrowLeft />
             Back
         </Button>
-        <div class="flex items-center justify-between gap-3">
-            <div class="flex flex-col gap-0.5">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+            <div class="flex min-w-0 flex-col gap-0.5">
                 <h2 class="font-heading text-lg font-semibold text-foreground">Access</h2>
                 <p class="text-sm text-muted-foreground">Review requests and manage who can view this group.</p>
             </div>
 
-            <ToggleGroup v-model="tabModel" type="single" variant="outline">
+            <ToggleGroup v-model="tabModel" type="single" variant="outline" class="shrink-0">
                 <ToggleGroupItem value="pending" class="gap-1.5 px-3">
                     <Hourglass class="size-3.5" />
                     Pending

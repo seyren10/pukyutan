@@ -201,14 +201,14 @@ const cycleDialogOpen = computed({
 
                         <Card v-if="group.cycles.length > 0">
                             <CardContent class="flex flex-col gap-4">
-                                <div class="flex items-center justify-between">
+                                <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
                                     <h2 class="font-heading text-lg font-semibold text-foreground">Cycle timeline</h2>
-                                    <span class="text-xs text-muted-foreground flex items-center gap-2">
-                                        <span class="flex">
-                                            <Hexagon class="size-4 fill-primary stroke-none" /> = disbursed
+                                    <span class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                                        <span class="flex items-center gap-1">
+                                            <Hexagon class="size-4 fill-primary stroke-none" /> disbursed
                                         </span>
-                                        <span class="flex">
-                                            <Hexagon class="size-4 stroke-4 stroke-accent-foreground" /> = due next
+                                        <span class="flex items-center gap-1">
+                                            <Hexagon class="size-4 stroke-4 stroke-accent-foreground" /> due next
                                         </span>
                                     </span>
                                 </div>

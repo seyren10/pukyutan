@@ -22,8 +22,9 @@ const handleStatusUpdate = (value: unknown) => {
 </script>
 
 <template>
-    <div class="flex flex-wrap items-center gap-2">
-        <ToggleGroup type="single" variant="outline" :model-value="status" @update:model-value="handleStatusUpdate">
+    <div class="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
+        <ToggleGroup type="single" variant="outline" :model-value="status" @update:model-value="handleStatusUpdate"
+            class="w-full overflow-x-auto [scrollbar-width:none] sm:w-fit sm:overflow-visible [&::-webkit-scrollbar]:hidden">
             <ToggleGroupItem v-for="option in statusOptions" :key="option.value" :value="option.value"
                 class="text-xs">
                 {{ option.label }}
@@ -31,7 +32,7 @@ const handleStatusUpdate = (value: unknown) => {
         </ToggleGroup>
 
         <Select v-model="sort">
-            <SelectTrigger size="sm" class="ml-auto w-[190px]">
+            <SelectTrigger size="sm" class="w-full sm:ml-auto sm:w-[190px]">
                 <ArrowUpDown data-icon="inline-start" />
                 <SelectValue />
             </SelectTrigger>

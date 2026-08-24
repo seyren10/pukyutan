@@ -65,11 +65,11 @@ const submit = handleSubmit((values) => mutate(values, {
             </FormItem>
         </FormField>
 
-        <div v-else class="flex justify-between items-center flex-wrap gap-2 rounded-lg border p-4">
-            <div class="font-medium text-xs">
+        <div v-else class="flex flex-wrap items-center justify-between gap-2 rounded-lg border p-4">
+            <div class="min-w-0 truncate font-medium text-xs">
                 {{ user?.email }}
             </div>
-            <div class="flex items-center gap-2">
+            <div class="flex shrink-0 items-center gap-2">
                 <ShieldCheckIcon class="size-4 text-muted-foreground" />
                 <p class="text-sm text-muted-foreground">Signed in with</p>
                 <Badge variant="secondary">Google</Badge>

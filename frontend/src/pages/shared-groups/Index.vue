@@ -18,15 +18,15 @@ const sharedGroups = computed(() => data.value?.data)
 <template>
     <div class="flex flex-col gap-6">
         <div class="flex flex-col gap-1">
-            <div class="flex items-center justify-between gap-3">
-                <div class="flex flex-col gap-1">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+                <div class="flex min-w-0 flex-col gap-1">
                     <h1 class="font-heading text-xl font-semibold text-foreground">Shared with you</h1>
                     <p class="text-sm text-muted-foreground">
                         Groups other people have given you view access to.
                     </p>
                 </div>
                 <JoinGroupDialog>
-                    <Button size="sm" variant="outline">
+                    <Button size="sm" variant="outline" class="shrink-0">
                         <Ticket data-icon="inline-start" />
                         Join a group
                     </Button>

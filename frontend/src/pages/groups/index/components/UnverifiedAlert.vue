@@ -51,7 +51,7 @@ defineExpose({
         <Alert variant="warning" v-if="!verified" v-bind="$attrs">
             <FlagIcon />
             <AlertTitle>Verify your email to create groups</AlertTitle>
-            <AlertDescription class="flex items-center justify-between gap-4">
+            <AlertDescription class="flex flex-wrap items-center justify-between gap-3">
                 <span>Until then, you can only view groups that have been shared with you.</span>
                 <Button size="sm" variant="outline" :disabled="isPending || cooldown > 0" @click="handleResend">
                     {{ cooldown > 0 ? `Resend email (${cooldown}s)` : 'Resend email' }}
