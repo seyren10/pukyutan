@@ -3,16 +3,9 @@ import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import { isAxiosError } from 'axios'
 import { toast } from 'vue-sonner'
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogDescription,
-    DialogTrigger,
-    DialogFooter,
-} from '@/components/ui/dialog'
+import AppResponsiveDialog from '@/components/app/AppResponsiveDialog.vue'
 import { Button } from '@/components/ui/button'
+import { DialogFooter } from '@/components/ui/dialog'
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Ticket, LogIn } from '@lucide/vue'
@@ -56,23 +49,17 @@ const onSubmit = handleSubmit((payload) => {
 </script>
 
 <template>
-    <Dialog v-model:open="dialog" unmount-on-hide>
-        <DialogTrigger as-child>
-            <slot />
-        </DialogTrigger>
+    <AppResponsiveDialog v-model:open="dialog" title="Join a group" title-class="font-heading"
+        description="Enter the 6-character invite code shared by the group owner. They'll need to approve your request before you can view it.">
+        <slot />
 
-        <DialogContent>
-            <DialogHeader>
-                <div class="flex size-10 items-center justify-center rounded-full bg-accent text-accent-foreground">
-                    <Ticket class="size-5" />
-                </div>
-                <DialogTitle class="font-heading">Join a group</DialogTitle>
-                <DialogDescription>
-                    Enter the 6-character invite code shared by the group owner. They'll need to approve your
-                    request before you can view it.
-                </DialogDescription>
-            </DialogHeader>
+        <template #icon>
+            <div class="flex size-10 items-center justify-center rounded-full bg-accent text-accent-foreground">
+                <Ticket class="size-5" />
+            </div>
+        </template>
 
+        <template #body>
             <form class="flex flex-col gap-4" @submit="onSubmit">
                 <FormField v-slot="{ componentField }" name="invite_code" :validate-on-blur="false">
                     <FormItem>
@@ -92,6 +79,6 @@ const onSubmit = handleSubmit((payload) => {
                     </Button>
                 </DialogFooter>
             </form>
-        </DialogContent>
-    </Dialog>
+        </template>
+    </AppResponsiveDialog>
 </template>

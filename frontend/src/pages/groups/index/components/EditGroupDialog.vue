@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import GroupForm from '@/components/groups/GroupForm.vue';
-import { Dialog, DialogDescription, DialogHeader, DialogScrollContent, DialogTitle, } from '@/components/ui/dialog';
+import AppResponsiveDialog from '@/components/app/AppResponsiveDialog.vue';
 import { useGroupEditMutation } from '@/features/group/composables/use-group-edit-mutation';
 import type { GroupLike, GroupSchema } from '@/features/group/type';
 import { computed } from 'vue';
@@ -29,14 +29,9 @@ const handleSubmit = (payload: GroupSchema) => {
 
 
 <template>
-    <Dialog v-model:open="dialog" unmount-on-hide>
-
-        <DialogScrollContent>
-            <DialogHeader>
-                <DialogTitle>Edit Group</DialogTitle>
-                <DialogDescription>Make necessary changes and click update to save changes.</DialogDescription>
-            </DialogHeader>
-
+    <AppResponsiveDialog v-model:open="dialog" title="Edit Group"
+        description="Make necessary changes and click update to save changes.">
+        <template #body>
             <GroupForm @submit="handleSubmit" :initial-values="{
                 name: group.name,
                 contribution_amount: parseFloat(group.contribution_amount),
@@ -44,8 +39,8 @@ const handleSubmit = (payload: GroupSchema) => {
                 frequency_unit: group.frequency_unit,
                 start_date: group.start_date.slice(0, 10)
             }" v-if="status === 'draft'" :loading="isPending" />
-        </DialogScrollContent>
-    </Dialog>
+        </template>
+    </AppResponsiveDialog>
 </template>
 
 

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import type { HTMLAttributes } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useQuery } from '@tanstack/vue-query'
 import { formatDistanceToNow } from 'date-fns'
@@ -15,11 +16,16 @@ import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription } from '@/components/ui/empty'
 import { Bell, BellOff } from '@lucide/vue'
+import { cn } from '@/lib/utils'
 import { getNotificationsQueryOptions } from '@/features/notification/query'
 import { useMarkNotificationReadMutation } from '@/features/notification/composables/use-mark-notification-read-mutation'
 import { useMarkAllNotificationsReadMutation } from '@/features/notification/composables/use-mark-all-notifications-read-mutation'
 import { describeNotification } from '@/features/notification/notificationVisual'
 import type { AppNotification } from '@/features/notification/type'
+
+// Optional extra classes for the trigger button — e.g. a larger touch
+// target on mobile headers — without every caller needing its own wrapper.
+const { triggerClass } = defineProps<{ triggerClass?: HTMLAttributes['class'] }>()
 
 const router = useRouter()
 const route = useRoute()
@@ -47,7 +53,7 @@ const handleSelect = (notification: AppNotification) => {
 <template>
     <DropdownMenu>
         <DropdownMenuTrigger as-child>
-            <Button variant="ghost" size="icon" class="relative rounded-full">
+            <Button variant="ghost" size="icon" :class="cn('relative rounded-full', triggerClass)">
                 <Bell />
                 <span v-if="unreadCount > 0"
                     class="absolute -right-0.5 -top-0.5 flex size-4 items-center justify-center rounded-full bg-primary font-mono text-[10px] font-medium text-primary-foreground">

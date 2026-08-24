@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import GroupForm from '@/components/groups/GroupForm.vue';
-import { Dialog, DialogDescription, DialogHeader, DialogScrollContent, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import AppResponsiveDialog from '@/components/app/AppResponsiveDialog.vue';
 import { createGroup } from '@/features/group/api';
 import type { Group, GroupSchema } from '@/features/group/type';
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
@@ -35,20 +35,14 @@ const handleSubmit = (payload: GroupSchema, { addMembers }: { addMembers: boolea
 
 
 <template>
-    <Dialog v-model:open="dialog" unmount-on-hide>
-        <DialogTrigger as-child>
-            <slot />
-        </DialogTrigger>
+    <AppResponsiveDialog v-model:open="dialog" title="Create a new group"
+        description="Fill out the form to create a new group">
+        <slot />
 
-        <DialogScrollContent>
-            <DialogHeader>
-                <DialogTitle>Create a new group</DialogTitle>
-                <DialogDescription>Fill out the form to create a new group</DialogDescription>
-            </DialogHeader>
-
+        <template #body>
             <GroupForm @submit="handleSubmit" :loading="isCreateGroupPending" />
-        </DialogScrollContent>
-    </Dialog>
+        </template>
+    </AppResponsiveDialog>
 </template>
 
 
