@@ -55,7 +55,8 @@ const isMobile = useIsMobile()
             <slot />
         </SheetTrigger>
 
-        <SheetContent side="bottom" class="flex max-h-[88dvh] flex-col gap-0 overflow-hidden rounded-t-2xl p-0">
+        <SheetContent side="bottom"
+            class="flex max-h-[88dvh] flex-col gap-0 overflow-hidden rounded-t-2xl p-0">
             <div class="mx-auto mt-2.5 h-1.5 w-10 shrink-0 rounded-full bg-muted" />
 
             <SheetHeader class="shrink-0 border-b border-border px-4 pb-4 pt-3 text-left">
@@ -64,7 +65,7 @@ const isMobile = useIsMobile()
                 <SheetDescription v-if="description">{{ description }}</SheetDescription>
             </SheetHeader>
 
-            <div class="flex-1 overflow-y-auto px-4 py-4"
+            <div class="flex flex-1 flex-col gap-4 overflow-y-auto px-4 py-4"
                 style="padding-bottom: max(1rem, env(safe-area-inset-bottom))">
                 <slot name="body" />
             </div>

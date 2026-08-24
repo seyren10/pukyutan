@@ -126,8 +126,8 @@ const handleDeleted = () => {
             </div>
         </div>
 
-        <div class="flex shrink-0 items-start gap-2">
-            <div v-if="isOwner && group.invite_code" class="flex items-center gap-2">
+        <div class="flex flex-wrap shrink-0 items-start gap-2">
+            <div v-if="isOwner && group.invite_code" class="flex flex-wrap items-center gap-2">
                 <Button as-child variant="outline" size="sm">
                     <RouterLink :to="{ name: 'groups.detail.access.index' }">
                         <ShieldUser data-icon="inline-start" />
@@ -136,7 +136,7 @@ const handleDeleted = () => {
                 </Button>
 
                 <button type="button" @click="copyInviteCode(group.invite_code)"
-                    class="inline-flex items-center gap-1.5 rounded-full border border-dashed border-border bg-muted/40 px-3 py-1.5 font-mono text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
+                    class="tap-target-44 inline-flex items-center gap-1.5 rounded-full border border-dashed border-border bg-muted/40 px-3 py-1.5 font-mono text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
                     <Ticket class="size-3.5" />
                     {{ group.invite_code }}
                     <Check v-if="justCopied" class="size-3 text-success" />
@@ -171,7 +171,7 @@ const handleDeleted = () => {
 
             <DropdownMenu v-if="isOwner">
                 <DropdownMenuTrigger as-child>
-                    <Button variant="outline" size="icon-sm">
+                    <Button variant="outline" size="icon-sm" class="tap-target-44">
                         <MoreVertical />
                     </Button>
                 </DropdownMenuTrigger>

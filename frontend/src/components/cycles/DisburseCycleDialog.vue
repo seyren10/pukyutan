@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger, DialogClose } from '@/components/ui/dialog'
+import AppResponsiveDialog from '@/components/app/AppResponsiveDialog.vue'
 import { Button } from '@/components/ui/button'
+import { DialogClose, DialogFooter } from '@/components/ui/dialog'
 import { format } from 'date-fns'
 import DisburseCycleForm from './DisburseCycleForm.vue'
 
@@ -29,6 +30,10 @@ const {
 
 const open = defineModel<boolean>('open', { default: false })
 
+const title = disbursedAt ? 'Payout already sent' : "Disburse this cycle's payout"
+const description = disbursedAt
+    ? `This cycle was disbursed on ${format(new Date(disbursedAt), 'MMMM dd, yyyy')} and can't be disbursed again.`
+    : `Send the pot to ${recipientName}. This can only be done once per cycle.`
 
 const handleDisburseCycleRecorded = () => {
     emit('recorded')
@@ -37,21 +42,12 @@ const handleDisburseCycleRecorded = () => {
 </script>
 
 <template>
-    <Dialog v-model:open="open" unmount-on-hide>
-        <DialogTrigger as-child>
-            <slot />
-        </DialogTrigger>
+    <AppResponsiveDialog v-model:open="open" :title="title" title-class="font-heading" :description="description"
+        content-class="sm:max-w-md">
+        <slot />
 
-        <DialogContent class="sm:max-w-md">
+        <template #body>
             <template v-if="disbursedAt">
-                <DialogHeader>
-                    <DialogTitle class="font-heading">Payout already sent</DialogTitle>
-                    <DialogDescription>
-                        This cycle was disbursed on {{ format(new Date(disbursedAt), 'MMMM dd, yyyy') }} and can't be
-                        disbursed again.
-                    </DialogDescription>
-                </DialogHeader>
-
                 <div class="flex items-center justify-between rounded-lg border border-border bg-muted/40 p-3 text-sm">
                     <span class="text-muted-foreground">Amount disbursed</span>
                     <span class="font-mono font-medium text-foreground">
@@ -67,13 +63,6 @@ const handleDisburseCycleRecorded = () => {
             </template>
 
             <template v-else>
-                <DialogHeader>
-                    <DialogTitle class="font-heading">Disburse this cycle's payout</DialogTitle>
-                    <DialogDescription>
-                        Send the pot to {{ recipientName }}. This can only be done once per cycle.
-                    </DialogDescription>
-                </DialogHeader>
-
                 <div class="flex flex-col gap-2 rounded-lg border border-border bg-muted/40 p-3 text-sm">
                     <div class="flex items-center justify-between">
                         <span class="text-muted-foreground">This cycle needs</span>
@@ -92,8 +81,8 @@ const handleDisburseCycleRecorded = () => {
                 <DisburseCycleForm :cycle-id="cycleId" :group-id="groupId"
                     :recommended-disbursement="recommendedDisbursement" @recorded="handleDisburseCycleRecorded" />
             </template>
-        </DialogContent>
-    </Dialog>
+        </template>
+    </AppResponsiveDialog>
 </template>
 
 <style scoped></style>
