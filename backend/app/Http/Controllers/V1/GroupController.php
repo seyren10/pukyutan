@@ -12,7 +12,9 @@ use App\Models\Group;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Spatie\Activitylog\Models\Activity;
 
 class GroupController extends Controller
 {
@@ -118,7 +120,11 @@ class GroupController extends Controller
     {
         Gate::authorize("delete", $group);
 
-        $group->delete();
+        DB::transaction(function () use ($group) {
+            Activity::inLog("group.{$group->id}")
+                ->delete();
+            $group->delete();
+        });
 
         return response()->noContent();
     }
