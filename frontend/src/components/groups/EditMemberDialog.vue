@@ -3,7 +3,8 @@ import { watchEffect } from 'vue'
 import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
 import { isAxiosError } from 'axios'
-import { Dialog, DialogDescription, DialogFooter, DialogHeader, DialogScrollContent, DialogTitle } from '@/components/ui/dialog'
+import AppResponsiveDialog from '@/components/app/AppResponsiveDialog.vue'
+import { DialogFooter } from '@/components/ui/dialog'
 import { FormField, FormItem, FormLabel, FormControl, FormDescription, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -60,13 +61,9 @@ watchEffect(() => {
 </script>
 
 <template>
-    <Dialog v-model:open="dialog">
-        <DialogScrollContent>
-            <DialogHeader>
-                <DialogTitle>Edit member</DialogTitle>
-                <DialogDescription>Update {{ member.name }}'s name and email address.</DialogDescription>
-            </DialogHeader>
-
+    <AppResponsiveDialog v-model:open="dialog" title="Edit member"
+        :description="`Update ${member.name}'s name and email address.`">
+        <template #body>
             <form class="space-y-4" @submit="onSubmit">
                 <FormField v-slot="{ componentField }" name="name" :validate-on-blur="false">
                     <FormItem>
@@ -100,6 +97,6 @@ watchEffect(() => {
                     </Button>
                 </DialogFooter>
             </form>
-        </DialogScrollContent>
-    </Dialog>
+        </template>
+    </AppResponsiveDialog>
 </template>

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -10,6 +9,7 @@ import {
 import { Search, User, LogOut } from '@lucide/vue'
 import AppModeToggler from '@/components/app/AppModeToggler.vue'
 import AppNotificationBell from '@/components/app/AppNotificationBell.vue'
+import AppMobileNav from '@/components/app/AppMobileNav.vue'
 import GroupSearchDialog from '@/components/groups/dialogs/GroupSearchDialog.vue'
 import Logo from '@/assets/logo.svg'
 import { useUserStore } from '@/stores/user'
@@ -17,6 +17,7 @@ import { storeToRefs } from 'pinia'
 import { useMutation } from '@tanstack/vue-query'
 import { logout } from '@/features/auth/api'
 import { useLogout } from '@/composables/use-logout'
+import { useNavItems } from '@/composables/use-nav-items'
 import { ref } from 'vue'
 import { Kbd } from '@/components/ui/kbd'
 import AppAvatar from '@/components/app/AppAvatar.vue'
@@ -24,13 +25,9 @@ import AppAvatar from '@/components/app/AppAvatar.vue'
 const showSearchDialog = ref(false)
 
 const userStore = useUserStore()
-const { userInitials, user, isLoggedIn } = storeToRefs(userStore)
+const { user, isLoggedIn } = storeToRefs(userStore)
 
-const navItems = [
-  { label: 'Dashboard', to: { name: 'groups.index' } },
-  { label: 'Shared Groups', to: { name: 'shared-groups.index' } },
-  { label: 'Activities', to: { name: 'activities.index' } },
-]
+const navItems = useNavItems()
 
 
 const { execute } = useLogout()
@@ -44,9 +41,9 @@ const { mutate } = useMutation({
 
 <template>
   <div class="min-h-svh bg-muted/40">
-    <div class="mx-auto max-w-6xl px-4 py-4 md:px-6">
+    <div class="mx-auto max-w-6xl px-4 py-4 pb-24 md:px-6 md:pb-4">
       <header
-        class="flex items-center justify-between gap-4 rounded-2xl border border-border bg-card px-4 py-3 shadow-sm">
+        class="flex items-center justify-between gap-2 rounded-2xl border border-border bg-card px-3 py-2.5 shadow-sm sm:gap-4 sm:px-4 sm:py-3">
         <div class="flex items-center gap-2">
           <img :src="Logo" class="size-10 fill-primary text-primary" />
           <span class="font-heading text-lg font-semibold text-foreground">Puyo</span>
@@ -60,7 +57,7 @@ const { mutate } = useMutation({
           </RouterLink>
         </nav>
 
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2 sm:gap-3">
           <button type="button" @click="showSearchDialog = true"
             class="hidden items-center gap-2 rounded-md border border-input bg-background px-3 py-1.5 text-sm text-muted-foreground shadow-xs transition-colors hover:bg-accent/40 hover:text-foreground lg:flex lg:w-56">
             <Search class="size-4 shrink-0" />
@@ -70,16 +67,16 @@ const { mutate } = useMutation({
             </Kbd>
           </button>
           <button type="button" @click="showSearchDialog = true" aria-label="Search groups"
-            class="flex size-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent/40 hover:text-foreground lg:hidden">
+            class="tap-target-44 flex size-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent/40 hover:text-foreground lg:hidden">
             <Search class="size-4.5" />
           </button>
 
-          <AppNotificationBell />
-          <AppModeToggler />
+          <AppNotificationBell trigger-class="tap-target-44" />
+          <AppModeToggler trigger-class="tap-target-44" />
 
           <DropdownMenu v-if="isLoggedIn">
             <DropdownMenuTrigger as-child>
-              <button class="rounded-full">
+              <button class="tap-target-44 rounded-full">
                 <AppAvatar class="size-8" :google-avatar="user!.avatar" :fallback="user!.name"
                   :seed="user!.dicebear_seed" />
               </button>
@@ -120,5 +117,6 @@ const { mutate } = useMutation({
     </div>
 
     <GroupSearchDialog v-model="showSearchDialog" />
+    <AppMobileNav />
   </div>
 </template>
