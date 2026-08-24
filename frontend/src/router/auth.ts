@@ -2,6 +2,7 @@ import AuthLayout from "@/layouts/AuthLayout.vue";
 import { useUserStore } from "@/stores/user";
 import { storeToRefs } from "pinia";
 import type { RouteRecordRaw } from "vue-router";
+import { toast } from "vue-sonner";
 
 export const authRoutes: RouteRecordRaw = {
   path: "/auth",
@@ -14,6 +15,19 @@ export const authRoutes: RouteRecordRaw = {
       component: () => import("@/pages/auth/Login.vue"),
       meta: {
         requiresGuest: true,
+      },
+      beforeEnter: (to, from) => {
+        if (from.name === "profile" && to.query.password_reset) {
+          toast.info("Your password has been reset", {
+            description: "Log in with your new password to continue",
+          });
+
+          return {
+            path: to.path,
+            query: {},
+            has: to.hash,
+          };
+        }
       },
     },
     {

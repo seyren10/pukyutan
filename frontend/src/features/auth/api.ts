@@ -1,8 +1,10 @@
 import { httpClient } from "@/services/axios/axios";
 import type {
+  DeleteAccountPayload,
   LoginCredentials,
   RegistrationPayload,
   ResetPasswordSchema,
+  UpdatePasswordPayload,
   User,
   UserInfoPayload,
 } from "./type";
@@ -49,6 +51,13 @@ export const resetPassword = async (payload: ResetPasswordSchema) => {
   await httpClient.post("/reset-password", payload);
 };
 
+export const updatePassword = async (payload: UpdatePasswordPayload) => {
+  await httpClient.put("/update-password", payload);
+};
+
+export const deleteAccount = async (payload: DeleteAccountPayload) => {
+  await httpClient.post("/api/user", { ...payload, _method: "DELETE" });
+};
 /* DICEBEAR */
 export const seedDicebear = async () => {
   const res = await httpClient.put<User>("/api/v1/dicebear");

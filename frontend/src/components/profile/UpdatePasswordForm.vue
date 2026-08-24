@@ -1,11 +1,7 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import axios from 'axios'
 import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
-import { toast } from 'vue-sonner'
-import { LockIcon } from '@lucide/vue'
-import * as z from 'zod'
+import { LockIcon, ShieldCheckIcon } from '@lucide/vue'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -26,21 +22,23 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Spinner } from '@/components/ui/spinner'
+import { updatePasswordSchema } from '@/features/auth/schema'
+import { useMutation } from '@tanstack/vue-query'
+import { updatePassword } from '@/features/auth/api'
+import { isAxiosError } from 'axios'
+import type { LaravelError } from '@/types/common'
+import { toast } from 'vue-sonner'
+import { useLogout } from '@/composables/use-logout'
+import { useUserStore } from '@/stores/user'
+import { storeToRefs } from 'pinia'
+import { Badge } from '../ui/badge'
 
-const passwordSchema = z
-    .object({
-        current_password: z.string().min(1, 'Enter your current password.'),
-        password: z.string().min(8, 'Password must be at least 8 characters.'),
-        password_confirmation: z.string(),
-    })
-    .refine((data) => data.password === data.password_confirmation, {
-        message: 'Passwords do not match.',
-        path: ['password_confirmation'],
-    })
+const { execute } = useLogout()
+const userStore = useUserStore()
+const { isGoogleLoggedIn } = storeToRefs(userStore)
+const formSchema = toTypedSchema(updatePasswordSchema)
 
-const formSchema = toTypedSchema(passwordSchema)
-
-const form = useForm({
+const { handleSubmit, setErrors } = useForm({
     validationSchema: formSchema,
     initialValues: {
         current_password: '',
@@ -49,41 +47,30 @@ const form = useForm({
     },
 })
 
-const processing = ref(false)
+const { mutate, isPending } = useMutation({
+    mutationFn: updatePassword,
+    onError: (error) => {
+        if (isAxiosError(error)) {
+            const err = error as LaravelError;
 
-const submit = form.handleSubmit(async (values) => {
-    processing.value = true
-
-    try {
-        await axios.put('/api/user/password', values)
-
-        toast.success('Password updated', {
-            description: 'Your password has been changed successfully.',
-        })
-        form.resetForm()
-    } catch (error) {
-        if (axios.isAxiosError(error) && error.response?.status === 422) {
-            const validationErrors = error.response.data.errors as Record<string, string[]>
-
-            // Map server field errors (e.g. current_password) onto the vee-validate form.
-            form.setErrors(
-                Object.fromEntries(
-                    Object.entries(validationErrors).map(([key, messages]) => [key, messages[0]]),
-                ),
-            )
-        } else {
-            toast.error('Something went wrong', {
-                description: 'Could not update your password. Please try again.',
-            })
+            if (err.response?.status === 422)
+                setErrors(err.response?.data.errors)
+            else
+                toast.warning(err.response?.data?.message || 'Something went wrong')
         }
-    } finally {
-        processing.value = false
-    }
+        else
+            toast.error(error.message);
+    },
+    onSuccess: async () => await execute({
+        password_reset: '1'
+    })
 })
+const submit = handleSubmit((v) => mutate(v))
+
 </script>
 
 <template>
-    <Card>
+    <Card v-if="!isGoogleLoggedIn">
         <CardHeader>
             <CardTitle class="flex items-center gap-2">
                 <LockIcon class="size-4 text-muted-foreground" />
@@ -94,7 +81,7 @@ const submit = form.handleSubmit(async (values) => {
             </CardDescription>
         </CardHeader>
 
-        <form @submit="submit">
+        <form @submit="submit" class="space-y-4">
             <CardContent>
                 <div class="flex flex-col gap-6">
                     <FormField v-slot="{ componentField }" name="current_password">
@@ -131,13 +118,21 @@ const submit = form.handleSubmit(async (values) => {
                     </FormField>
                 </div>
             </CardContent>
-
-            <CardFooter class="justify-end border-t">
-                <Button type="submit" :disabled="processing">
-                    <Spinner v-if="processing" data-icon="inline-start" />
+            <CardFooter>
+                <Button type="submit" :disabled="isPending">
+                    <Spinner v-if="isPending" data-icon="inline-start" />
                     Update password
                 </Button>
             </CardFooter>
         </form>
+    </Card>
+    <Card v-else>
+
+        <div class="flex items-center justify-center gap-2">
+            <ShieldCheckIcon class="size-4 text-muted-foreground" />
+            <p class="text-sm text-muted-foreground">Signed in with</p>
+            <Badge variant="secondary">Google</Badge>
+        </div>
+
     </Card>
 </template>
