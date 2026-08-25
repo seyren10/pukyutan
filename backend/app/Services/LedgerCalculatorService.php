@@ -20,31 +20,84 @@ class LedgerCalculatorService
 
     /**
      * given a member, tell you what they've paid, what they owe, and their running balance
+     *
+     * Derived from ledgerForMember() rather than computed independently, so
+     * the totals here can never drift out of sync with the per-cycle
+     * breakdown — same rows, just summed.
      */
     public function balanceForMember(Member $member): array
     {
-        // 1. Get all cycles that existed during this member's active tenure —
-        //    i.e. cycles created on/after this member joined. This matters for
-        //    replaced members: a new member shouldn't be charged for cycles
-        //    that happened before they existed.
-        $cyclesElapsed = $member->group->cycles()
-            ->where('created_at', '>=', $member->created_at)
-            ->where("due_date", "<=", now())
-            ->count();
+        $ledger = $this->ledgerForMember($member);
 
-        $expectedTotal = $cyclesElapsed * $member->group->contribution_amount;
-
-        // 2. Sum everything this member has actually paid, across all their
-        //    contribution rows (this is where partial payments and
-        //    overpayments naturally net out — no special-case code needed).
-        $paidTotal = (float) $member->contributions()->sum('amount');
-        $balance = $expectedTotal - $paidTotal;
+        $expectedTotal = (float) $ledger->sum('expected');
+        $paidTotal = (float) $ledger->sum('paid');
 
         return [
             'expected_total' => $expectedTotal,
             'paid_total' => $paidTotal,
-            'balance' => $balance, // positive = owes money, negative = credit
+            'balance' => $expectedTotal - $paidTotal, // positive = owes money, negative = credit
         ];
+    }
+
+    /**
+     * Given a member, break down their contribution history cycle by cycle —
+     * what was expected, what was actually paid (including every individual
+     * payment, since a cycle can have several partial contributions), and
+     * the running balance as of that cycle.
+     *
+     * Only cycles that are due-or-past today are included, matching
+     * balanceForMember()'s window exactly — a future cycle isn't "owed" yet.
+     */
+    public function ledgerForMember(Member $member): Collection
+    {
+        // Same tenure + due-date rules as balanceForMember() used to apply
+        // directly: cycles that existed before this member joined (e.g. they
+        // replaced someone) don't count, and neither do cycles not yet due.
+        $cycles = $member->group->cycles()
+            ->has('contributions')
+            ->where('created_at', '>=', $member->created_at)
+            ->orderBy('cycle_number')
+            ->get();
+
+        // One query for every contribution across every relevant cycle,
+        // grouped in memory — avoids an N+1 (one query per cycle) that a
+        // loop calling something like balanceForMemberAsOfCycle() would
+        // otherwise cause here.
+        $contributionsByCycle = $member->contributions()
+            ->whereIn('cycle_id', $cycles->pluck('id'))
+            ->orderBy('paid_at')
+            ->get()
+            ->groupBy('cycle_id');
+
+        $contributionAmount = (float) $member->group->contribution_amount;
+        $runningExpected = 0.0;
+        $runningPaid = 0.0;
+
+        return $cycles->map(function (Cycle $cycle) use (&$runningExpected, &$runningPaid, $contributionAmount, $contributionsByCycle) {
+            $contributions = $contributionsByCycle->get($cycle->id, collect());
+            $paid = (float) $contributions->sum('amount');
+
+            $runningExpected += $contributionAmount;
+            $runningPaid += $paid;
+
+            return [
+                'cycle_number' => $cycle->cycle_number,
+                'round_number' => $cycle->round_number,
+                'due_date' => $cycle->due_date->toDateString(),
+                'expected' => $contributionAmount,
+                'paid' => $paid,
+                // positive = owes money, negative = credit — cumulative
+                // through this cycle, so an overpayment on an earlier cycle
+                // visibly offsets a shortfall on a later one.
+                'running_balance' => $runningExpected - $runningPaid,
+                'contributions' => $contributions->map(fn(Contribution $contribution) => [
+                    'id' => $contribution->id,
+                    'amount' => (float) $contribution->amount,
+                    'paid_at' => $contribution->paid_at?->toDateString(),
+                    'notes' => $contribution->notes,
+                ])->values(),
+            ];
+        });
     }
 
     public function collectionSummaryForCycle(Cycle $cycle): array
