@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { HTMLAttributes } from 'vue'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog'
+import { Dialog, DialogHeader, DialogTitle, DialogDescription, DialogTrigger, DialogScrollContent } from '@/components/ui/dialog'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetTrigger } from '@/components/ui/sheet'
 import { useIsMobile } from '@/composables/use-is-mobile'
 import { cn } from '@/lib/utils'
@@ -39,7 +39,7 @@ const isMobile = useIsMobile()
             <slot />
         </DialogTrigger>
 
-        <DialogContent :class="cn('max-h-[85vh] overflow-y-auto', contentClass)">
+        <DialogScrollContent :class="cn(contentClass)">
             <DialogHeader>
                 <slot name="icon" />
                 <DialogTitle :class="titleClass">{{ title }}</DialogTitle>
@@ -47,7 +47,7 @@ const isMobile = useIsMobile()
             </DialogHeader>
 
             <slot name="body" />
-        </DialogContent>
+        </DialogScrollContent>
     </Dialog>
 
     <Sheet v-else v-model:open="open" :unmount-on-hide="unmountOnHide">

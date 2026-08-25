@@ -1,14 +1,13 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { Button } from '@/components/ui/button'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { CheckCircle2, ChevronsUpDownIcon, CirclePlus } from '@lucide/vue'
-import { getInitials } from '@/lib/helpers'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../ui/collapsible'
 import ContributionForm from './ContributionForm.vue'
 import type { GroupDetail } from '@/features/group/type.ts'
 import { useGroupDetail } from '@/features/group/composables/use-group.ts'
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip/index.ts'
+import AppAvatar from '../app/AppAvatar.vue'
 
 const { groupDetail } = defineProps<{
     loading?: boolean
@@ -34,11 +33,7 @@ function closeCollapsible(memberId: number) {
             class="rounded-lg border border-border p-2.5" #="{ open }"
             @update:open="(value) => (openStates[member.id] = value)">
             <div class="flex items-center gap-4">
-                <Avatar class="size-8 shrink-0">
-                    <AvatarFallback class="bg-accent text-xs text-accent-foreground">
-                        {{ getInitials(member.name) }}
-                    </AvatarFallback>
-                </Avatar>
+                <AppAvatar class="size-8 shrink-0" :seed="member.dicebear_seed" :fallback="member.name"/>
 
                 <div class="flex min-w-0 flex-1 flex-col">
                     <span class="truncate text-sm font-medium text-foreground">{{ member.name }}</span>

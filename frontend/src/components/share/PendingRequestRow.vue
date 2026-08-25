@@ -1,14 +1,13 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { formatDistanceToNow } from 'date-fns'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Check, X } from '@lucide/vue'
-import { getInitials } from '@/lib/helpers'
 import { useAcceptShareMutation } from '@/features/share/composables/use-accept-share-mutation'
 import { useRejectShareMutation } from '@/features/share/composables/use-reject-share-mutation'
 import type { GroupShare } from '@/features/share/type'
+import AppAvatar from '../app/AppAvatar.vue'
 
 const { share, showGroup = false } = defineProps<{
     share: GroupShare
@@ -27,9 +26,8 @@ const isBusy = computed(() => isAccepting.value || isRejecting.value)
 
 <template>
     <div class="flex items-center gap-3 py-3 first:pt-0 last:pb-0">
-        <Avatar class="size-9">
-            <AvatarFallback class="font-mono text-xs">{{ getInitials(share.user.name) }}</AvatarFallback>
-        </Avatar>
+        <AppAvatar class="size-9" :fallback="share.user.name" :google-avatar="share.user.avatar"
+            :seed="share.user.dicebear_seed" />
 
         <div class="flex min-w-0 flex-1 flex-col gap-0.5">
             <div class="flex flex-wrap items-center gap-2">
@@ -44,8 +42,7 @@ const isBusy = computed(() => isAccepting.value || isRejecting.value)
         </div>
 
         <div class="flex shrink-0 items-center gap-1.5">
-            <Button size="sm" variant="ghost" :disabled="isBusy"
-                class="text-muted-foreground hover:text-destructive"
+            <Button size="sm" variant="ghost" :disabled="isBusy" class="text-muted-foreground hover:text-destructive"
                 @click="rejectMutate(share.id)">
                 <X />
                 <span class="hidden sm:inline">Decline</span>

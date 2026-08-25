@@ -110,7 +110,7 @@ const handleGroupDropdownEvent = (e: GroupCardDropdownEvent) => {
         <CardContent>
             <div class="flex flex-col place-content-center  gap-3 grow bg-accent/20 rounded-xl p-4 border border-dashed min-h-25">
                 <GroupCycleVisual :max-cycle-display="10" :current-cycle="nextCycle?.cycle_number"
-                    :cycles-count="cyclesCount" />
+                    :cycles-count="cyclesCount" v-if="cyclesCount" />
                 <div class="flex items-center justify-between font-mono text-xs text-muted-foreground">
                     <span class="flex items-center gap-1.5" v-if="frequencyUnit && frequencyInterval">
                         <Wallet class="size-3.5" />

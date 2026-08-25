@@ -16,5 +16,7 @@ export type GroupShare = TimeStamp & {
     id: number;
     name: string;
     email: string;
+    avatar: string | null;
+    dicebear_seed: string| null;
   };
 };

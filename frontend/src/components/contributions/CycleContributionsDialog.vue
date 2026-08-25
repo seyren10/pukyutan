@@ -6,16 +6,15 @@ import { Wallet, ChevronDown, HandCoins, NotepadText } from '@lucide/vue'
 import AppResponsiveDialog from '@/components/app/AppResponsiveDialog.vue'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription } from '@/components/ui/empty'
-import { getInitials } from '@/lib/helpers'
 import type { CycleSummary } from '@/features/cycle/type'
 import type { Member } from '@/features/members/type'
 import { getCycleContributionsInfiniteQueryOptions } from '@/features/contribution/query'
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
 import { ScrollArea } from '../ui/scroll-area'
 import ContributionUndoDialog from './ContributionUndoDialog.vue'
+import AppAvatar from '../app/AppAvatar.vue'
 
 const open = defineModel<boolean>('open', { default: false })
 
@@ -91,13 +90,10 @@ const description = computed(() => cycle.disbursed_at
                         <div class="pr-4">
                             <div v-for="contribution in contributions" :key="contribution.id"
                                 class="flex items-center gap-3 py-3 first:pt-0 last:pb-0">
-                                <Avatar class="size-8 shrink-0">
-                                    <AvatarFallback class="bg-accent text-xs text-accent-foreground">
-                                        {{ getInitials(contribution.member?.name
-                                            ?? memberById.get(contribution.member_id)?.name
-                                            ?? '?') }}
-                                    </AvatarFallback>
-                                </Avatar>
+                                <AppAvatar class="size-8 shrink-0"
+                                    :fallback="contribution.member?.name || memberById.get(contribution.member_id)?.name || '?'"
+                                    :seed="memberById.get(contribution.member_id)?.dicebear_seed || '?'" />
+
                                 <div class="flex min-w-0 flex-1 flex-col">
                                     <span class="truncate text-sm font-medium text-foreground">
                                         {{
@@ -115,7 +111,8 @@ const description = computed(() => cycle.disbursed_at
                                 </div>
                                 <Popover v-if="contribution.notes">
                                     <PopoverTrigger as-child>
-                                        <Button variant="ghost" size="icon-sm" class="rounded-full text-accent-foreground">
+                                        <Button variant="ghost" size="icon-sm"
+                                            class="rounded-full text-accent-foreground">
                                             <NotepadText />
                                         </Button>
                                     </PopoverTrigger>
@@ -133,8 +130,8 @@ const description = computed(() => cycle.disbursed_at
                         </div>
                     </ScrollArea>
 
-                    <Button v-if="hasNextPage" variant="ghost" size="sm" class="self-center" :disabled="isFetchingNextPage"
-                        @click="fetchNextPage()">
+                    <Button v-if="hasNextPage" variant="ghost" size="sm" class="self-center"
+                        :disabled="isFetchingNextPage" @click="fetchNextPage()">
                         <ChevronDown data-icon="inline-start" />
                         {{ isFetchingNextPage ? 'Loading...' : 'Load more' }}
                     </Button>

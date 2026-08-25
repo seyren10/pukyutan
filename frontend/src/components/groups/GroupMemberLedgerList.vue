@@ -1,10 +1,8 @@
 <script setup lang="ts">
 import { ref, watchEffect } from 'vue'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { Mail, CheckCircle2, CirclePlus, Pencil, Trophy } from '@lucide/vue'
-import { getInitials } from '@/lib/helpers'
 import type { Member, MemberWithLedger } from '@/features/members/type'
 import EditMemberDialog from './EditMemberDialog.vue'
 import AppAvatar from '../app/AppAvatar.vue'

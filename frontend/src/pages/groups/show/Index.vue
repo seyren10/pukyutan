@@ -238,7 +238,7 @@ const cycleDialogOpen = computed({
                 </div>
 
                 <CycleContributionsDialog v-if="selectedCycle" v-model:open="cycleDialogOpen" :cycle="selectedCycle"
-                    :members="group.members" :expected-total="expectedPerCycle" :disable-undo="!isCurrentCycle" />
+                    :members="group.members" :expected-total="expectedPerCycle" :disable-undo="!isCurrentCycle || !isOwner" />
             </div>
         </template>
 
