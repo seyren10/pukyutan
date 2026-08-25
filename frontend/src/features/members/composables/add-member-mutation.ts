@@ -42,6 +42,7 @@ export const useAddMemberMutation = () => {
           group_id: groupId,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
+          dicebear_seed: null,
         };
 
         queryClient.setQueryData(

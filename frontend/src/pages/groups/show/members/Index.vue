@@ -35,13 +35,13 @@ const members = computed(() => data.value?.data ?? [])
 // same open item instead of a reset, collapsed list.
 const openValue = computed(() => (memberId ? String(memberId) : ''))
 
-const handleOpenChange = (value: string | string[]) => {
+const handleOpenChange = (value: string | string[] | undefined) => {
     const nextId = typeof value === 'string' && value ? Number(value) : null
 
     if (nextId) {
-        router.push({ name: 'groups.detail.members.ledger', params: { id: groupId, memberId: nextId } })
+        router.replace({ name: 'groups.detail.members.ledger', params: { id: groupId, memberId: nextId } })
     } else {
-        router.push({ name: 'groups.detail.members.index', params: { id: groupId } })
+        router.replace({ name: 'groups.detail.members.index', params: { id: groupId } })
     }
 }
 </script>

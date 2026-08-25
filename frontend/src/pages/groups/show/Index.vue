@@ -2,7 +2,7 @@
 import { computed, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import { ArrowLeft, Rocket, FolderX, Wallet, HandCoins, CheckCircle2, Users, Hexagon, Component, UserRound } from '@lucide/vue'
+import { ArrowLeft, Rocket, FolderX, Wallet, HandCoins, CheckCircle2, Users, Hexagon, Component, UserRound, ArrowRight } from '@lucide/vue'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription, EmptyContent } from '@/components/ui/empty'
@@ -203,7 +203,8 @@ const cycleDialogOpen = computed({
                             <CardContent class="flex flex-col gap-4">
                                 <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
                                     <h2 class="font-heading text-lg font-semibold text-foreground">Cycle timeline</h2>
-                                    <span class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                                    <span
+                                        class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
                                         <span class="flex items-center gap-1">
                                             <Hexagon class="size-4 fill-primary stroke-none" /> disbursed
                                         </span>
@@ -224,7 +225,16 @@ const cycleDialogOpen = computed({
                         <Card>
                             <CardContent class="flex flex-col gap-4">
                                 <div class="flex flex-col gap-0.5">
-                                    <h2 class="font-heading text-lg font-semibold text-foreground">Members</h2>
+                                    <div class="flex items-center justify-between">
+                                        <h2 class="font-heading text-lg font-semibold text-foreground">Members</h2>
+                                        <Button as-child variant="link">
+                                            <RouterLink
+                                                :to="{ name: 'groups.detail.members.index', params: { id: group.id } }">
+                                                View Ledger
+                                                <ArrowRight />
+                                            </RouterLink>
+                                        </Button>
+                                    </div>
                                     <p class="text-sm text-muted-foreground">Payout order and current balances.</p>
                                 </div>
                                 <GroupMemberLedgerList :members="group.members" :ledger-by-member-id="ledgerByMemberId"
@@ -238,7 +248,8 @@ const cycleDialogOpen = computed({
                 </div>
 
                 <CycleContributionsDialog v-if="selectedCycle" v-model:open="cycleDialogOpen" :cycle="selectedCycle"
-                    :members="group.members" :expected-total="expectedPerCycle" :disable-undo="!isCurrentCycle || !isOwner" />
+                    :members="group.members" :expected-total="expectedPerCycle"
+                    :disable-undo="!isCurrentCycle || !isOwner" />
             </div>
         </template>
 
