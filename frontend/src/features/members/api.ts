@@ -1,9 +1,36 @@
 import { httpClient } from "@/services/axios/axios";
-import type { CreateMemberPayload, Member, UpdateMemberPayload } from "./type";
+import type {
+  CreateMemberPayload,
+  Member,
+  MemberLedgerCycle,
+  MemberWithSummary,
+  UpdateMemberPayload,
+} from "./type";
 
 export const getGroupMembers = async (groupId: number) => {
   const res = await httpClient.get<{ data: Member[] }>(
     `/api/v1/groups/${groupId}/members`,
+  );
+
+  return res.data;
+};
+
+// Same endpoint as getGroupMembers, opted into the per-member ledger
+// summary via `include=summary` — kept as its own function/query key so the
+// plain member list used elsewhere doesn't pay for a calculation it never
+// asked for.
+export const getGroupMembersWithSummary = async (groupId: number) => {
+  const res = await httpClient.get<{ data: MemberWithSummary[] }>(
+    `/api/v1/groups/${groupId}/members`,
+    { params: { include: "summary" } },
+  );
+
+  return res.data;
+};
+
+export const getMemberLedger = async (memberId: number) => {
+  const res = await httpClient.get<MemberLedgerCycle[]>(
+    `/api/v1/members/${memberId}/ledger`,
   );
 
   return res.data;

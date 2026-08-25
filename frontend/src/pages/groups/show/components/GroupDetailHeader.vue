@@ -111,10 +111,11 @@ const handleDeleted = () => {
                         <CalendarClock class="size-3.5" />
                         Started {{ startDateLabel }}
                     </span>
-                    <span class="flex items-center gap-1.5">
+                    <RouterLink :to="{ name: 'groups.detail.members.index' }"
+                        class="tap-target-44 flex items-center gap-1.5 rounded-sm underline-offset-2 hover:text-foreground hover:underline">
                         <Users class="size-3.5" />
                         {{ membersCount }} {{ membersCount === 1 ? 'member' : 'members' }}
-                    </span>
+                    </RouterLink>
                     <span v-if="cyclesCount > 0" class="font-mono text-xs">
                         {{ cyclesCount }} {{ cyclesCount === 1 ? 'cycle' : 'cycles' }} total
                     </span>

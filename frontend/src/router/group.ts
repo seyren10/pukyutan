@@ -27,6 +27,24 @@ export const groupRoutes: RouteRecordRaw = {
           component: () => import("@/pages/groups/show/access/Index.vue"),
           props: (route) => ({ groupId: Number(route.params.id) }),
         },
+        {
+          path: "members",
+          name: "groups.detail.members.index",
+          component: () => import("@/pages/groups/show/members/Index.vue"),
+          props: (route) => ({ groupId: Number(route.params.id) }),
+        },
+        {
+          // Same page as above — opening a member's ledger accordion pushes
+          // here instead of toggling local state, so the expanded row is
+          // deep-linkable and survives a refresh/back button.
+          path: "members/:memberId/ledger",
+          name: "groups.detail.members.ledger",
+          component: () => import("@/pages/groups/show/members/Index.vue"),
+          props: (route) => ({
+            groupId: Number(route.params.id),
+            memberId: Number(route.params.memberId),
+          }),
+        },
       ],
     },
   ],
