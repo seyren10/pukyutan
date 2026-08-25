@@ -8,17 +8,17 @@ use App\Services\LedgerCalculatorService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
-class MemberLedgerController extends Controller
+class MemberLedgerSummaryController extends Controller
 {
     /**
-     * Return the given member's contribution history, cycle by cycle.
+     * Return the totals (expected, paid, balance) for a given member.
      */
     public function __invoke(Request $request, Member $member, LedgerCalculatorService $ledgerCalculatorService)
     {
         Gate::authorize('view', $member);
 
-        $ledger = $ledgerCalculatorService->ledgerForMember($member);
+        $balances = $ledgerCalculatorService->balanceForMember($member);
 
-        return response()->json($ledger);
+        return response()->json($balances);
     }
 }
