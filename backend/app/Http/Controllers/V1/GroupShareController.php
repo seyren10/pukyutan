@@ -33,7 +33,7 @@ class GroupShareController extends Controller
         ]);
 
         $groupShares = $group->groupShares()
-            ->with("user:id,name,email")
+            ->with("user:id,name,email,dicebear_seed,avatar")
             ->when($validated["status"] ?? null, fn($query, $status) => $query->where("status", $status))
             ->latest("requested_at")
             ->get();
@@ -54,7 +54,7 @@ class GroupShareController extends Controller
         $shares = GroupShare::query()
             ->where("status", GroupShareStatus::PENDING)
             ->whereHas("group", fn($query) => $query->where("user_id", $request->user()->id))
-            ->with(["user:id,name,email", "group:id,name"])
+            ->with(["user:id,name,email,dicebear_seed,avatar", "group:id,name"])
             ->latest("requested_at")
             ->paginate($perPage);
 

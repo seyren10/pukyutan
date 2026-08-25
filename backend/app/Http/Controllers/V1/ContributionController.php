@@ -10,7 +10,6 @@ use App\Http\Resources\V1\ContributionResource;
 use App\Models\Contribution;
 use App\Models\Cycle;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Log;
 
 class ContributionController extends Controller
 {

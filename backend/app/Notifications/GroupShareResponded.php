@@ -49,15 +49,14 @@ class GroupShareResponded extends Notification
         $group = $this->share->group;
         $accepted = $this->share->status === GroupShareStatus::ACCEPTED;
 
-        $mail = (new MailMessage)->subject(
-            $accepted
-            ? "You've been added to \"{$group->name}\""
-            : "Your request to join \"{$group->name}\" was declined"
+        return (new MailMessage)->view(
+            'emails.group-share-responded',
+            [
+                'groupName' => $group->name,
+                'accepted' => $accepted,
+                'groupUrl' => $accepted ? rtrim(config('app.frontend_url'), '/') . "/app/groups/{$group->id}" : null,
+            ]
         );
-
-        return $accepted
-            ? $mail->line("Your request to join \"{$group->name}\" has been accepted. You can now view the group.")
-            : $mail->line("Your request to join \"{$group->name}\" was declined by the group owner.");
     }
 
     /**

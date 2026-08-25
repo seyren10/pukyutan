@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Notifications\ResetPasswordNotification;
 use Database\Factories\UserFactory;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -20,6 +21,22 @@ class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
+
+    /**
+     * Send a password reset notification to the user.
+     *
+     * @param  string  $token
+     */
+    public function sendPasswordResetNotification($token): void
+    {
+        $base = rtrim(config('app.frontend_url', 'http://localhost:5173'), '/');
+
+        $url = "{$base}/auth/password-reset/{$token}?" . http_build_query([
+            'email' => $this->email,
+        ]);
+
+        $this->notify(new ResetPasswordNotification($url, $this->name));
+    }
 
     /**
      * Get the attributes that should be cast.

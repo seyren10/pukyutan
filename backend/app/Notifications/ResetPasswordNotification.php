@@ -2,20 +2,19 @@
 
 namespace App\Notifications;
 
-use App\Models\Cycle;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class CycleDueReminder extends Notification
+class ResetPasswordNotification extends Notification
 {
     use Queueable;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct(protected Cycle $cycle)
+    public function __construct(private string $url, private string $name)
     {
         //
     }
@@ -35,15 +34,13 @@ class CycleDueReminder extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $group = $this->cycle->group;
-
-        return (new MailMessage)->view('emails.cycle-due-reminder', [
-            'groupName' => $group->name,
-            'contributionAmount' => number_format((float) $group->contribution_amount, 2),
-            'dueDate' => $this->cycle->due_date->format('F j, Y'),
-            'cycleNumber' => $this->cycle->cycle_number,
-            'groupUrl' => rtrim(config('app.frontend_url'), '/') . "/app/groups/{$group->id}",
-        ]);
+        return (new MailMessage)->view(
+            'emails.password-reset',
+            [
+                'url' => $this->url,
+                'name' => $this->name
+            ]
+        );
     }
 
     /**

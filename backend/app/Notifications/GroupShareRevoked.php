@@ -46,9 +46,9 @@ class GroupShareRevoked extends Notification
     {
         $group = $this->share->group;
 
-        return (new MailMessage)
-            ->subject("Your access to \"{$group->name}\" was removed")
-            ->line("The owner of \"{$group->name}\" has removed your access to this group.");
+        return (new MailMessage)->view('emails.group-share-revoked', [
+            'groupName' => $group->name
+        ]);
     }
 
     /**

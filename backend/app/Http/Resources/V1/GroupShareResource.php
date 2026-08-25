@@ -25,6 +25,8 @@ class GroupShareResource extends JsonResource
                 'id' => $this->user->id,
                 'name' => $this->user->name,
                 'email' => $this->user->email,
+                'avatar' => $this->user->avatar,
+                'dicebear_seed' => $this->user->dicebear_seed
             ],
         ];
     }

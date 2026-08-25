@@ -47,10 +47,11 @@ class GroupShareRequested extends Notification
         $group = $this->share->group;
         $requester = $this->share->user;
 
-        return (new MailMessage)
-            ->subject("New request to join \"{$group->name}\"")
-            ->line("{$requester->name} has requested to join \"{$group->name}\".")
-            ->line('You can accept or reject this request at any time from the group\'s share requests.');
+        return (new MailMessage)->view('emails.group-share-requested', [
+            'groupName' => $group->name,
+            'requesterName' => $requester->name,
+            'accessUrl' => rtrim(config('app.frontend_url'), '/') . "/app/groups/{$group->id}/access",
+        ]);
     }
 
     /**
