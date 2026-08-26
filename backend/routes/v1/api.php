@@ -14,6 +14,7 @@ use App\Http\Controllers\V1\GroupRoundController;
 use App\Http\Controllers\V1\GroupShareController;
 use App\Http\Controllers\V1\MemberController;
 use App\Http\Controllers\V1\MemberLedgerController;
+use App\Http\Controllers\V1\MemberLedgerPdfController;
 use App\Http\Controllers\V1\MemberLedgerSummaryController;
 use App\Http\Controllers\V1\MemberReorderController;
 use App\Http\Controllers\V1\NotificationController;
@@ -49,6 +50,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::apiResource("groups.members", MemberController::class)->shallow()->withoutMiddlewareFor(['index', 'show'], 'verified');
     Route::get("members/{member}/ledger", MemberLedgerController::class)->withoutMiddleware('verified');
     Route::get("members/{member}/ledger/summary", MemberLedgerSummaryController::class)->withoutMiddleware('verified');
+    Route::get("members/{member}/ledger/pdf", MemberLedgerPdfController::class)->withoutMiddleware('verified');
 
     Route::post("cycles/{cycle}/disburse", CycleDisburseController::class);
     Route::apiResource('cycles.contributions', ContributionController::class)->shallow()->only(['index', 'store', 'destroy'])->withoutMiddlewareFor(['index'], 'verified');

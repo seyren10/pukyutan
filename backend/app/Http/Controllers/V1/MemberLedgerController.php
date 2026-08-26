@@ -15,7 +15,7 @@ class MemberLedgerController extends Controller
      */
     public function __invoke(Request $request, Member $member, LedgerCalculatorService $ledgerCalculatorService)
     {
-        Gate::authorize('view', $member);
+        Gate::authorize('view', $member->group);
 
         $ledger = $ledgerCalculatorService->ledgerForMember($member);
 
