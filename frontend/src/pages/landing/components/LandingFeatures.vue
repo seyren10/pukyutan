@@ -1,27 +1,27 @@
 <script setup lang="ts">
 import ScrollReveal from '@/components/app/AppScrollReveal.vue'
-import { Users, CalendarClock, Share2, Activity } from '@lucide/vue'
+import { Users, Mail, Eye, Activity } from '@lucide/vue'
 
 const listFeatures = [
     {
         icon: Users,
         title: 'Member management',
-        description: "Add members, reorder the payout line, and keep everyone's slot straight from one screen.",
+        description: 'Add members by name, no accounts required, and reorder the payout line whenever you need to.',
     },
     {
-        icon: CalendarClock,
-        title: 'Cycle tracking',
-        description: 'See every cycle at a glance, from the current one to how many are left before the group wraps up.',
+        icon: Mail,
+        title: 'Automatic email reminders',
+        description: "As a due date nears, members with an email on file get reminded automatically — no app, no login, on their end.",
     },
     {
-        icon: Share2,
-        title: 'Shared access',
-        description: "Invite members with a code or link — they see the group's status without needing edit access.",
+        icon: Eye,
+        title: 'Read-only sharing',
+        description: 'Approve a view request from your invite code and someone gets a live look at the books — never edit access.',
     },
     {
         icon: Activity,
-        title: 'Activity feed',
-        description: 'Every contribution, payout, and member change is logged, so there\'s never a "did they pay?" debate.',
+        title: 'Activity log & PDF ledgers',
+        description: 'Every action is timestamped and logged, and each member gets a downloadable, printable ledger.',
     },
 ]
 
@@ -39,8 +39,8 @@ const wheel = [
     <section id="features" class="py-16 sm:py-24">
         <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
             <ScrollReveal class="mx-auto max-w-2xl text-center">
-                <h2 class="font-heading text-3xl font-semibold text-foreground sm:text-4xl">Everything your group
-                    needs, nothing it doesn't</h2>
+                <h2 class="font-heading text-3xl font-semibold text-foreground sm:text-4xl">Everything the organizer
+                    needs, nothing anyone else can mess with</h2>
                 <p class="mt-4 text-lg text-muted-foreground">Built around how paluwagan groups actually run —
                     not a generic budgeting app bent into shape.</p>
             </ScrollReveal>

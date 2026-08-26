@@ -81,7 +81,7 @@ const { mutate, isPending: isPdfDownloading } = useDownloadMemberLedgerPdfMutati
                     <p v-else class="mt-2 text-xs text-muted-foreground">No payments recorded for this cycle.</p>
                 </div>
             </div>
-            <Button class="self-end" size="sm" @click="mutate({
+            <Button v-if="data && data.length" class="self-end" size="sm" @click="mutate({
                 memberId,
                 memberName
             })" :disabled="isPdfDownloading">

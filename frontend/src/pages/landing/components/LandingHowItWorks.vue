@@ -3,20 +3,28 @@ import ScrollReveal from '@/components/app/AppScrollReveal.vue'
 import PuyoHowItWorksImage from '@/assets/puyo_how_it_works.webp'
 const steps = [
     {
+        title: 'Sign up',
+        description: 'Create an account with email or Google. You\'re the only one who needs one.',
+    },
+    {
         title: 'Create a group',
-        description: 'Name your group and set the contribution amount and schedule — daily, weekly, or monthly.',
+        description: 'Set your group name, contribution amount, and schedule.',
     },
     {
         title: 'Add your members',
-        description: 'Add everyone by hand, or share an invite code so members can join themselves.',
+        description: 'Add names (and optional emails). Members don\'t need to log in or create accounts.',
     },
     {
         title: 'Set the payout order',
-        description: 'Arrange who takes the pot each cycle — drag to reorder any time before the group starts.',
+        description: 'Arrange the sequence for who receives the pot.',
     },
     {
-        title: 'Track every cycle',
-        description: 'Log contributions as they come in and watch the group move through each cycle automatically.',
+        title: 'Activate and track cycles',
+        description: 'Log payments, add optional notes and trigger disbursements. Cycles roll over automatically.',
+    },
+    {
+        title: 'Invite trusted eyes (optional)',
+        description: 'Invite co-organizers or members to view live progress with read-only access.',
     },
 ]
 </script>
@@ -28,8 +36,7 @@ const steps = [
                 <div>
                     <ScrollReveal>
                         <h2 class="font-heading text-3xl font-semibold text-foreground sm:text-4xl">How it works</h2>
-                        <p class="mt-4 max-w-lg text-lg text-muted-foreground">From a blank slate to a running group
-                            in about a minute.</p>
+                        <p class="mt-4 max-w-lg text-lg text-muted-foreground">Set up and run a savings group in minutes—no sign-ups required for members.</p>
                     </ScrollReveal>
 
                     <ol class="relative mt-10 space-y-8">
@@ -50,7 +57,7 @@ const steps = [
                     </ol>
                 </div>
 
-                <ScrollReveal :delay="200" class="mx-auto lg:mx-0 lg:mt-24">
+                <ScrollReveal :delay="200" class="self-center lg:mx-0 lg:mt-24">
                     <img :src="PuyoHowItWorksImage" class="w-100" />
                 </ScrollReveal>
             </div>

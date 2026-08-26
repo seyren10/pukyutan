@@ -24,8 +24,8 @@ import { ArrowRight } from '@lucide/vue'
                     <div class="relative">
                         <h2 class="font-heading text-3xl font-semibold text-foreground sm:text-4xl">Ready to
                             organize your group?</h2>
-                        <p class="mx-auto mt-3 max-w-md text-muted-foreground">Set it up in a minute. Invite your
-                            members whenever you're ready.</p>
+                        <p class="mx-auto mt-3 max-w-md text-muted-foreground">Set it up in a minute. Zero sign-ups
+                            required for your members.</p>
                         <Button as-child size="lg" class="mt-6">
                             <RouterLink :to="{ name: 'register' }">
                                 Create your group

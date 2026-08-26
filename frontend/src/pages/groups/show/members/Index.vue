@@ -99,7 +99,7 @@ const handleOpenChange = (value: string | string[] | undefined) => {
                         <AccordionTrigger>
                             <div class="flex min-w-0 flex-1 items-center gap-3">
                                 <span
-                                    class="flex size-7 shrink-0 items-center justify-center rounded-full bg-muted font-mono text-xs text-muted-foreground">
+                                    class="hidden md:flex size-7 shrink-0 items-center justify-center rounded-full bg-muted font-mono text-xs text-muted-foreground">
                                     {{ index + 1 }}
                                 </span>
 

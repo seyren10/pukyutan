@@ -13,7 +13,7 @@ import { getPendingShareRequestsQueryOptions } from '@/features/share/query'
 
 const page = useRouteQuery('page', null, { transform: Number })
 
-const { data, isPending } = useQuery(getPendingShareRequestsQueryOptions(page))
+const { data, isPending } = useQuery(getPendingShareRequestsQueryOptions(() => ({ page: page.value })))
 const requests = computed(() => data.value?.data)
 </script>
 
