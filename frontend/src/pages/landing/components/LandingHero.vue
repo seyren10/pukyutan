@@ -12,12 +12,6 @@ const { state } = useColorMode()
 
 <template>
     <section class="relative overflow-hidden">
-        <!-- Soft honey-toned glow, not a generic blue SaaS gradient -->
-        <div class="pointer-events-none absolute inset-x-0 -top-40 -z-10 flex justify-center blur-3xl"
-            aria-hidden="true">
-            <div class="aspect-square w-160 rounded-full bg-primary/25" />
-        </div>
-
         <div class="mx-auto grid max-w-6xl gap-12 px-4 py-16 sm:px-6 md:py-24 lg:grid-cols-2 lg:items-center lg:px-8">
             <div class="flex flex-col items-start gap-6">
                 <img :src="PuyoHeroImage" class="w-40 pointer-events-none select-none" />

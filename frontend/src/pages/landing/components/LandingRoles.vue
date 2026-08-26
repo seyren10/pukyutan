@@ -21,17 +21,18 @@ const viewerPowers = [
 <template>
     <section id="roles" class="py-16 sm:py-24">
         <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-            <ScrollReveal class="mx-auto max-w-2xl text-center">
+            <ScrollReveal>
+            <div class="mx-auto max-w-2xl text-center">
                 <h2 class="font-heading text-3xl font-semibold text-balance text-foreground sm:text-4xl">One owner in
                     control. Total transparency for everyone else.</h2>
                 <p class="mt-4 text-lg text-muted-foreground text-balance">
                     Puyo isn't a group chat where everyone pokes at the same data. It's your ledger — with an
                     optional, read-only window for anyone you trust.
                 </p>
-            </ScrollReveal>
+            </div>
 
             <div class="mt-12 grid gap-6 md:grid-cols-2">
-                <ScrollReveal>
+                <div>
                     <Card class="h-full border-primary/25 bg-primary/5">
                         <CardHeader class="flex-row items-center gap-3 space-y-0">
                             <div
@@ -54,9 +55,9 @@ const viewerPowers = [
                             </ul>
                         </CardContent>
                     </Card>
-                </ScrollReveal>
+                </div>
 
-                <ScrollReveal :delay="120">
+                <div>
                     <Card class="h-full">
                         <CardHeader class="flex-row items-center gap-3 space-y-0">
                             <div
@@ -84,11 +85,10 @@ const viewerPowers = [
                             </span>
                         </CardContent>
                     </Card>
-                </ScrollReveal>
+                </div>
             </div>
 
-            <ScrollReveal :delay="200"
-                class="mt-6 flex flex-col items-start gap-3 rounded-2xl border border-dashed border-border bg-muted/30 p-5 sm:flex-row sm:items-center">
+            <div class="mt-6 flex flex-col items-start gap-3 rounded-2xl border border-dashed border-border bg-muted/30 p-5 sm:flex-row sm:items-center">
                 <div class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/15 text-primary">
                     <Mail class="size-4.5" />
                 </div>
@@ -97,6 +97,7 @@ const viewerPowers = [
                     optional emails. Puyo handles payment reminders automatically so you don't have to chase anyone or
                     force them to download an app.
                 </p>
+            </div>
             </ScrollReveal>
         </div>
     </section>

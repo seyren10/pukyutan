@@ -40,13 +40,11 @@ const faqs = [
                     questions</h2>
             </ScrollReveal>
 
-            <div class="mt-10 space-y-3">
-                <ScrollReveal v-for="(faq, i) in faqs" :key="faq.question" :delay="i * 60">
-                    <LandingFaqItem :question="faq.question">
-                        {{ faq.answer }}
-                    </LandingFaqItem>
-                </ScrollReveal>
-            </div>
+            <ScrollReveal class="mt-10 space-y-3">
+                <LandingFaqItem v-for="faq in faqs" :key="faq.question" :question="faq.question">
+                    {{ faq.answer }}
+                </LandingFaqItem>
+            </ScrollReveal>
         </div>
     </section>
 </template>

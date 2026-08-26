@@ -45,9 +45,10 @@ const wheel = [
                     not a generic budgeting app bent into shape.</p>
             </ScrollReveal>
 
+            <ScrollReveal>
             <div class="mt-12 grid gap-6 lg:grid-cols-5 lg:items-stretch">
                 <!-- Spotlight: the mechanic that actually differentiates Puyo -->
-                <ScrollReveal class="lg:col-span-3">
+                <div class="lg:col-span-3">
                     <div
                         class="flex h-full flex-col gap-6 rounded-2xl border border-border bg-card p-6 sm:p-8 lg:flex-row lg:items-center">
                         <svg viewBox="0 0 200 200" class="h-48 w-48 shrink-0 sm:h-56 sm:w-56" aria-hidden="true">
@@ -90,10 +91,10 @@ const wheel = [
                             </p>
                         </div>
                     </div>
-                </ScrollReveal>
+                </div>
 
                 <!-- Everything else: a compact list, not a wall of matching cards -->
-                <ScrollReveal :delay="100" class="lg:col-span-2">
+                <div class="lg:col-span-2">
                     <div class="h-full divide-y divide-border rounded-2xl border border-border bg-card px-2">
                         <div v-for="feature in listFeatures" :key="feature.title"
                             class="flex items-start gap-3.5 px-4 py-4 transition-colors hover:bg-muted/40">
@@ -108,8 +109,9 @@ const wheel = [
                             </div>
                         </div>
                     </div>
-                </ScrollReveal>
+                </div>
             </div>
+            </ScrollReveal>
         </div>
     </section>
 </template>
