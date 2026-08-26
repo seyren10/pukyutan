@@ -1,11 +1,13 @@
 import { httpClient } from "@/services/axios/axios";
 import type {
   CreateMemberPayload,
+  DownloadMemberLedgerPdfPayload,
   Member,
   MemberLedgerCycle,
   MemberWithSummary,
   UpdateMemberPayload,
 } from "./type";
+import { filenameFromContentDisposition } from "@/lib/helpers";
 
 export const getGroupMembers = async (groupId: number) => {
   const res = await httpClient.get<{ data: Member[] }>(
@@ -72,4 +74,25 @@ export const reorderMembers = async (groupId: number, memberIds: number[]) => {
   );
 
   return res.data;
+};
+
+export const downloadMemberLedgerPdf = async ({
+  memberId,
+  memberName,
+}: DownloadMemberLedgerPdfPayload) => {
+  const response = await httpClient.get(`/api/v1/members/${memberId}/ledger/pdf`, {
+    responseType: "blob",
+  });
+
+  const filename = filenameFromContentDisposition(
+    response.headers["content-disposition"],
+    `${memberName}-ledger.pdf`,
+  );
+
+  const url = URL.createObjectURL(response.data);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  link.click();
+  URL.revokeObjectURL(url);
 };

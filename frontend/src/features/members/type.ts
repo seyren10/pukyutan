@@ -59,3 +59,7 @@ export type MemberLedgerCycle = {
 export type MemberSchema = z.infer<typeof memberSchema>;
 export type CreateMemberPayload = MemberSchema;
 export type UpdateMemberPayload = MemberSchema;
+export type DownloadMemberLedgerPdfPayload = {
+  memberId: number;
+  memberName: string;
+};

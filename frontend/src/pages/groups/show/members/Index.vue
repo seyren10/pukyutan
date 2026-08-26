@@ -139,7 +139,7 @@ const handleOpenChange = (value: string | string[] | undefined) => {
                         </AccordionTrigger>
 
                         <AccordionContent>
-                            <MemberLedgerPanel v-if="openValue === String(member.id)" :member-id="member.id" />
+                            <MemberLedgerPanel v-if="openValue === String(member.id)" :member-id="member.id" :member-name="member.name" />
                         </AccordionContent>
                     </AccordionItem>
                 </Accordion>

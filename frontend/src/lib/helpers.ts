@@ -28,3 +28,11 @@ export const formatFrequencyLabel = (
 
   return `every ${interval} ${unit}s`;
 };
+
+export const filenameFromContentDisposition = (
+  header: string | undefined,
+  fallback: string,
+): string => {
+  const match = header?.match(/filename="?([^"]+)"?/);
+  return match?.[1] ?? fallback;
+};
