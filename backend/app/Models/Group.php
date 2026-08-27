@@ -107,6 +107,16 @@ class Group extends Model
         return $this->status === GroupStatus::DRAFT;
     }
 
+    public function isActive(): bool
+    {
+        return $this->status === GroupStatus::ACTIVE;
+    }
+
+    public function isCompleted(): bool
+    {
+        return $this->status === GroupStatus::COMPLETED;
+    }
+
     /**
      * Determine if the current round is completed by looking at the cycle's
      * maximum round_number and see if it is already disbursed

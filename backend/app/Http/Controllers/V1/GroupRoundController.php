@@ -19,7 +19,10 @@ class GroupRoundController extends Controller
      */
     public function newRound(Request $request, Group $group, CycleGeneratorService $service)
     {
-        Gate::authorize("update", $group);
+        // Ownership + "group must still be active" both live in the policy —
+        // isRoundCompleted() alone never flips back to false, so without this
+        // a completed group could otherwise have a new round started on it.
+        Gate::authorize("startRound", $group);
 
         abort_unless($group->isRoundCompleted(), 400, "Current round is not yet completed.");
 

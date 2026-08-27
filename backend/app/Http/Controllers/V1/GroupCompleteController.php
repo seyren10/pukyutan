@@ -16,7 +16,10 @@ class GroupCompleteController extends Controller
      */
     public function __invoke(Request $request, Group $group)
     {
-        Gate::authorize("update", $group);
+        // Ownership + "must currently be active" both live in the policy —
+        // stops this from being callable a second time on a group that's
+        // already completed.
+        Gate::authorize("complete", $group);
         abort_unless($group->isRoundCompleted(), 400, "Current round is not yet completed.");
 
         $group->status = GroupStatus::COMPLETED;

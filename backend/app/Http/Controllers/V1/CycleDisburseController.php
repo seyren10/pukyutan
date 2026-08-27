@@ -16,8 +16,10 @@ class CycleDisburseController extends Controller
      */
     public function __invoke(Request $request, Cycle $cycle, LedgerCalculatorService $ledgerCalculatorService)
     {
-        //cycle must belong to a group of auth user making the request
-        Gate::authorize("update", $cycle->group);
+        // Ownership + "group must be active" both live in the policy — this
+        // previously only checked ownership, so a cycle belonging to a
+        // non-active group had nothing stopping it from being disbursed.
+        Gate::authorize("disburse", $cycle->group);
 
         abort_if($cycle->disbursed_at !== null, 400, "Can't disbursed twice.");
 

@@ -18,10 +18,10 @@ class GroupActivateController extends Controller
      */
     public function __invoke(Request $request, Group $group, CycleGeneratorService $cycleGeneratorService)
     {
-        // Check if the user is authorized to activate the group
+        // Check if the user is authorized to activate the group — the
+        // policy now also asserts the group is still a draft.
         Gate::authorize("activate", $group);
 
-        abort_if($group->status !== GroupStatus::DRAFT, 400, "Group is already activated");
         abort_if($group->members()->count() <= 0, 400, 'Group has no members');
 
         $cycles = $cycleGeneratorService->generateRound($group, roundNumber: 1);

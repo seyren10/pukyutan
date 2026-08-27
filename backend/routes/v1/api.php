@@ -28,7 +28,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::post("groups/{group}/activate", GroupActivateController::class);
     Route::post("groups/{group}/rounds", [GroupRoundController::class, 'newRound']);
     Route::get("groups/{group}/rounds/{roundNumber}/summary", [GroupRoundController::class, 'summary'])->withoutMiddleware('verified');
-    Route::post("groups/{group}/complete", GroupCompleteController::class);
+    Route::put("groups/{group}/complete", GroupCompleteController::class);
     Route::get("groups/{group}/activities", GroupActivityController::class)->withoutMiddleware('verified');
     Route::put('groups/{group}/members/reorder', MemberReorderController::class);
 
