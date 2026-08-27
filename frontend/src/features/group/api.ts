@@ -59,6 +59,9 @@ export const activateGroup = async (groupId: number) => {
   return res.data;
 };
 
+export const markGroupAsComplete = async (groupId: number) => {
+  await httpClient.put(`/api/v1/groups/${groupId}/complete`);
+};
 /**
  * GROUP ROUNDS
  */

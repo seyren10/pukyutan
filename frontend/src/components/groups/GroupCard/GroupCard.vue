@@ -2,7 +2,7 @@
 import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Eye, Wallet, CalendarClock, HandCoins, MoreHorizontal, UserRound, Rocket } from '@lucide/vue'
+import { Eye, Wallet, CalendarClock, HandCoins, MoreHorizontal, UserRound, Rocket, CheckCircle2, BookOpen } from '@lucide/vue'
 import type { Group } from '@/features/group/type'
 import { computed, ref } from 'vue'
 import { formatFrequencyLabel } from '@/lib/helpers'
@@ -15,6 +15,7 @@ import { ContributionDialog } from '@/components/contributions/ContributionDialo
 import ActivateGroupDialog from '@/pages/groups/index/components/ActivateGroupDialog.vue'
 import { useGroupActivateMutation } from '@/features/group/composables/use-group-activate-mutation.ts'
 import StartNewRoundDialog from '../dialogs/StartNewRoundDialog.vue'
+import MarkGroupAsCompleteDialog from '../dialogs/MarkGroupAsCompleteDialog.vue'
 import EditGroupDialog from '@/pages/groups/index/components/EditGroupDialog.vue'
 import RenameGroupDialog from '@/pages/groups/index/components/RenameGroupDialog.vue'
 import DeleteGroupDialog from '../dialogs/DeleteGroupDialog.vue'
@@ -108,7 +109,8 @@ const handleGroupDropdownEvent = (e: GroupCardDropdownEvent) => {
         </CardHeader>
 
         <CardContent>
-            <div class="flex flex-col place-content-center  gap-3 grow bg-accent/20 rounded-xl p-4 border border-dashed min-h-25">
+            <div
+                class="flex flex-col place-content-center  gap-3 grow bg-accent/20 rounded-xl p-4 border border-dashed min-h-25">
                 <GroupCycleVisual :max-cycle-display="10" :current-cycle="nextCycle?.cycle_number"
                     :cycles-count="cyclesCount" v-if="cyclesCount" />
                 <div class="flex items-center justify-between font-mono text-xs text-muted-foreground">
@@ -146,12 +148,23 @@ const handleGroupDropdownEvent = (e: GroupCardDropdownEvent) => {
                         Manage Members
                     </Button>
                 </AddMemberDialog>
-                <StartNewRoundDialog v-else-if="group.is_round_completed" :group="group"
-                    #="{ props: { nextRoundNumber } }">
-                    <Button size="xs">
-                        <Rocket /> Start Round {{ nextRoundNumber }}
-                    </Button>
-                </StartNewRoundDialog>
+                <template v-else-if="group.is_round_completed && group.status !== 'completed'">
+                    <StartNewRoundDialog :group="group" #="{ props: { nextRoundNumber } }">
+                        <Button size="xs">
+                            <Rocket /> Start Round {{ nextRoundNumber }}
+                        </Button>
+                    </StartNewRoundDialog>
+                    <MarkGroupAsCompleteDialog :group="group">
+                        <Button variant="outline" size="xs">
+                            <CheckCircle2 /> Mark as Complete
+                        </Button>
+                    </MarkGroupAsCompleteDialog>
+                </template>
+                <Button v-else variant="outline" size="xs" as-child>
+                    <RouterLink :to="{ name: 'groups.detail.members.index', params: { id: group.id } }">
+                        <BookOpen /> View Ledger
+                    </RouterLink>
+                </Button>
                 <ActivateGroupDialog :group="group" :members-count="group.members_count"
                     v-if="group.members_count && group.status === 'draft'" @confirm="groupActivateMutate(group.id)"
                     :loading="isGroupActivePending">

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
-import { Trophy, PiggyBank, Wallet, HandCoins, PartyPopper, CheckCircle2, CalendarClock } from '@lucide/vue'
+import { Trophy, PiggyBank, Wallet, HandCoins, PartyPopper, CheckCircle2, CalendarClock, RefreshCw } from '@lucide/vue'
 import { Card, CardContent } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { Progress } from '@/components/ui/progress'
@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { ContributionDialog } from '@/components/contributions/ContributionDialog'
 import DisburseCycleDialog from '@/components/cycles/DisburseCycleDialog.vue'
 import StartNewRoundDialog from '../dialogs/StartNewRoundDialog.vue'
+import MarkGroupAsCompleteDialog from '../dialogs/MarkGroupAsCompleteDialog.vue'
 import { useUserStore } from '@/stores/user'
 import type { GroupDetail } from '@/features/group/type'
 import { formatDate } from 'date-fns'
@@ -118,7 +119,20 @@ const collectedPercent = computed(() => {
                 <p class="font-heading text-base font-semibold text-foreground">This round is complete</p>
                 <p class="text-sm text-muted-foreground">Every member has received their payout.</p>
             </div>
-            <StartNewRoundDialog v-if="isOwner" :group="group" />
+            <div v-if="isOwner" class="flex flex-col gap-2 sm:flex-row">
+                <StartNewRoundDialog :group="group" #="{ props: { nextRoundNumber } }">
+                    <Button>
+                        <RefreshCw data-icon="inline-start" />
+                        Start round {{ nextRoundNumber }}
+                    </Button>
+                </StartNewRoundDialog>
+                <MarkGroupAsCompleteDialog :group="group">
+                    <Button variant="outline">
+                        <CheckCircle2 data-icon="inline-start" />
+                        Mark as Complete
+                    </Button>
+                </MarkGroupAsCompleteDialog>
+            </div>
         </CardContent>
     </Card>
 

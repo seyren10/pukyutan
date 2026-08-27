@@ -87,8 +87,8 @@ const handleUnseed = () => {
                 <Shuffle class="size-4" />
             </AppButtonLoaderSwap>
         </button>
-        <Button @click="handleUnseed()" :disabled="isDeletingSeed || isPending" variant="destructive" size="icon-xs"
-            class="absolute left-0 top-0 md:invisible md:group-hover:visible" v-if="hasDicebearSeed">
+        <Button v-if="editable && hasDicebearSeed" @click="handleUnseed()" :disabled="isDeletingSeed || isPending" variant="destructive"
+            size="icon-xs" class="absolute left-0 top-0 md:invisible md:group-hover:visible">
             <X />
         </Button>
     </div>
