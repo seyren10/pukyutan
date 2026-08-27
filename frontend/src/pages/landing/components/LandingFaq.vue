@@ -2,6 +2,8 @@
 import ScrollReveal from '@/components/app/AppScrollReveal.vue'
 import LandingFaqItem from './LandingFaqItem.vue'
 import PuyoFaqImage from '@/assets/puyo_faq.webp'
+import { Accordion } from '@/components/ui/accordion/index.ts';
+import { computed, ref } from 'vue';
 
 const faqs = [
     {
@@ -11,6 +13,14 @@ const faqs = [
     {
         question: 'Can a member log in and see their own contributions?',
         answer: "Not as a \"member\" account directly — but if they register or sign in as a Puyo user and you approve their view-access request using your group's invite code, they'll be able to see the full group ledger, including their own contribution history.",
+    },
+    {
+        question: 'Can I change the payout order or remove members after a group starts?',
+        answer: 'Only while the group is in Draft. Once a group is Active, payout positions are locked and members cannot be deleted (you can only edit member info like names or emails). This ensures fairness and prevents sudden changes mid-cycle.'
+    },
+    {
+        question: 'Can I edit group settings like the contribution amount or schedule?',
+        answer: 'In Draft mode, you can change anything—contribution amount, interval, or start date. Once the group becomes Active, these core settings lock, though you can still update the group\'s name anytime.'
     },
     {
         question: 'Can someone with view access edit anything — add a contribution, change the order?',
@@ -29,6 +39,8 @@ const faqs = [
         answer: "Yes. If you've added an email for a member, Puyo automatically emails them a reminder as their contribution due date approaches — no account or login required on their end.",
     },
 ]
+
+const accorion = ref<string>('')
 </script>
 
 <template>
@@ -40,10 +52,12 @@ const faqs = [
                     questions</h2>
             </ScrollReveal>
 
-            <ScrollReveal class="mt-10 space-y-3">
-                <LandingFaqItem v-for="faq in faqs" :key="faq.question" :question="faq.question">
-                    {{ faq.answer }}
-                </LandingFaqItem>
+            <ScrollReveal class="mt-10 divide-y" >
+                <Accordion v-model="accorion" type="single" collapsible v-for="faq in faqs" :key="faq.question"">
+                    <LandingFaqItem :question="faq.question">
+                        {{ faq.answer }}
+                    </LandingFaqItem>
+                </Accordion>
             </ScrollReveal>
         </div>
     </section>

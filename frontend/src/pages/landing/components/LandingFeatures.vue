@@ -11,7 +11,7 @@ const listFeatures = [
     {
         icon: Mail,
         title: 'Automatic email reminders',
-        description: "As a due date nears, members with an email on file get reminded automatically — no app, no login, on their end.",
+        description: "Members receive timely email updates automatically—no app installation or logins required.",
     },
     {
         icon: Eye,
@@ -21,7 +21,7 @@ const listFeatures = [
     {
         icon: Activity,
         title: 'Activity log & PDF ledgers',
-        description: 'Every action is timestamped and logged, and each member gets a downloadable, printable ledger.',
+        description: 'Every action is timestamped. Download or print full ledger histories for complete transparency.',
     },
 ]
 
@@ -39,8 +39,7 @@ const wheel = [
     <section id="features" class="py-16 sm:py-24">
         <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
             <ScrollReveal class="mx-auto max-w-2xl text-center">
-                <h2 class="font-heading text-3xl font-semibold text-foreground sm:text-4xl">Everything the organizer
-                    needs, nothing anyone else can mess with</h2>
+                <h2 class="font-heading text-3xl font-semibold text-foreground sm:text-4xl">Total control for organizers. Zero confusion for members.</h2>
                 <p class="mt-4 text-lg text-muted-foreground">Built around how paluwagan groups actually run —
                     not a generic budgeting app bent into shape.</p>
             </ScrollReveal>
@@ -80,7 +79,7 @@ const wheel = [
                         </svg>
 
                         <div>
-                            <h3 class="font-heading text-xl font-semibold text-foreground">Automatic payout order
+                            <h3 class="font-heading text-xl font-semibold text-foreground">Automated payout tracking
                             </h3>
                             <p class="mt-2 max-w-sm text-sm text-muted-foreground">
                                 Set the order once — Puyo tracks whose turn is next, so nobody has to remember,
