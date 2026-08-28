@@ -3,7 +3,7 @@ import ScrollReveal from '@/components/app/AppScrollReveal.vue'
 import LandingFaqItem from './LandingFaqItem.vue'
 import PuyoFaqImage from '@/assets/puyo_faq.webp'
 import { Accordion } from '@/components/ui/accordion/index.ts';
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 
 const faqs = [
     {
