@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { Button } from '@/components/ui/button'
-import BlurText from '@/components/bits/BlurText.vue'
 import { ArrowRight } from '@lucide/vue'
 import PuyoHeroImage from '@/assets/puyo_splash.webp'
 import GroupShotLightImage from '@/assets/group_shot_light.webp'
@@ -16,8 +15,9 @@ const { state } = useColorMode()
             <div class="flex flex-col items-start gap-6">
                 <img :src="PuyoHeroImage" class="w-40 pointer-events-none select-none" />
 
-                <BlurText text="Your paluwagan, finally organized." :delay="80" tag="h1"
-                    class="font-heading text-4xl leading-tight font-semibold text-balance text-foreground sm:text-5xl" />
+                <h1 class="font-heading text-4xl leading-tight font-semibold text-balance text-foreground sm:text-5xl">
+                    Your paluwagan, finally organized.
+                </h1>
 
                 <p class="max-w-lg text-lg text-muted-foreground text-balance">
                     Puyo keeps your group's contributions, payout order, and cycles in one place — no more spreadsheets,
