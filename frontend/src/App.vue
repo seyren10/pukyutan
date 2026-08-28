@@ -7,6 +7,7 @@ import { useBootstrapStore } from './stores/bootstrap';
 import { storeToRefs } from 'pinia';
 import AppSplashScreen from './components/app/AppSplashScreen.vue';
 import { useColorMode } from '@vueuse/core';
+import { Analytics } from '@vercel/analytics/vue';
 
 useColorMode()
 const bootstrapStore = useBootstrapStore()
@@ -21,5 +22,6 @@ const { isBootstrapping } = storeToRefs(bootstrapStore)
     </TooltipProvider>
     <Toaster rich-colors />
     <VueQueryDevtools />
+    <Analytics />
   </div>
 </template>
