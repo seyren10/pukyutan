@@ -50,7 +50,7 @@ const wheel = [
                 <div class="lg:col-span-3">
                     <div
                         class="flex h-full flex-col gap-6 rounded-2xl border border-border bg-card p-6 sm:p-8 lg:flex-row lg:items-center">
-                        <svg viewBox="0 0 200 200" class="h-48 w-48 shrink-0 sm:h-56 sm:w-56" aria-hidden="true">
+                        <svg viewBox="0 0 200 200" class="h-48 w-48 shrink-0 sm:h-56 sm:w-56 mx-auto" aria-hidden="true">
                             <circle cx="100" cy="100" r="72" fill="none" class="stroke-border" stroke-width="1.5"
                                 stroke-dasharray="3 5" />
                             <path d="M162 64 Q198 100 162 136" fill="none" class="stroke-primary" stroke-width="2.5"

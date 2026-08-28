@@ -24,14 +24,14 @@ const { state } = useColorMode()
                     group chats, or arguments over whose turn it is.
                 </p>
 
-                <div class="flex flex-col gap-3 sm:flex-row">
-                    <Button as-child size="lg">
+                <div class="flex gap-3 flex-wrap">
+                    <Button as-child size="lg" class="grow">
                         <RouterLink :to="{ name: 'register' }">
                             Start your first group
                             <ArrowRight data-icon="inline-end" />
                         </RouterLink>
                     </Button>
-                    <Button as-child size="lg" variant="outline">
+                    <Button as-child size="lg" variant="outline" class="grow">
                         <a href="#how-it-works">See how it works</a>
                     </Button>
                 </div>

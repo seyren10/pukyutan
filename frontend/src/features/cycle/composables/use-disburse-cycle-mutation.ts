@@ -17,6 +17,7 @@ export const useDisburseCycleMutation = ({
       // Picks up the new disbursed_at / disbursed_amount from the server,
       // which is also what flips this dialog into its "already disbursed" state.
       queryClient.invalidateQueries({ queryKey: ["groups"] });
+      queryClient.invalidateQueries({ queryKey: ["members"] });
     },
   });
 

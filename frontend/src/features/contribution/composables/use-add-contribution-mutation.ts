@@ -18,17 +18,13 @@ export const useAddContributionMutation = ({
     mutationFn: (payload: ContributionSchema) =>
       addContribution(cycleId, payload),
     onSettled: () => {
-      // Refetches collected_total / recipient / progress on the cycle
-      // detail dialog — the whole reason this needed to be reactive.
       queryClient.invalidateQueries({ queryKey });
       queryClient.invalidateQueries({
         queryKey: ["cycles", "detail", toValue(cycleId)],
       });
-      // The two invalidations above are scoped to this specific group/cycle,
-      // so they don't reach ["groups", "stats"] (a sibling key, not a
-      // descendant of either) — recording a payment changes the dashboard's
-      // "collected this cycle" figure, so it needs its own invalidation.
       queryClient.invalidateQueries({ queryKey: ["groups", "stats"] });
+      queryClient.invalidateQueries({ queryKey: ["groups", groupId, 'members'] });
+      queryClient.invalidateQueries({ queryKey: ["members"] });
     },
   });
 
