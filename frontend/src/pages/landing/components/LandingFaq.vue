@@ -53,7 +53,7 @@ const accorion = ref<string>('')
             </ScrollReveal>
 
             <ScrollReveal class="mt-10 divide-y" >
-                <Accordion v-model="accorion" type="single" collapsible v-for="faq in faqs" :key="faq.question"">
+                <Accordion v-model="accorion" type="single" collapsible v-for="faq in faqs" :key="faq.question">
                     <LandingFaqItem :question="faq.question">
                         {{ faq.answer }}
                     </LandingFaqItem>

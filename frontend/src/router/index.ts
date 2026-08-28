@@ -1,5 +1,6 @@
 import MainLayout from "@/layouts/MainLayout.vue";
 import PublicLayout from "@/layouts/PublicLayout.vue";
+import LandingPage from "@/pages/landing/Index.vue";
 import { createRouter, createWebHistory } from "vue-router";
 import { authRoutes } from "./auth";
 import { useUserStore } from "@/stores/user";
@@ -23,7 +24,7 @@ const router = createRouter({
         {
           path: "",
           name: "landing",
-          component: () => import("@/pages/landing/Index.vue"),
+          component: LandingPage,
           meta: {
             requiresGuest: true,
           },
