@@ -65,6 +65,17 @@ return [
             'transport' => 'resend',
         ],
 
+        'maileroo_smtp' => [
+            'transport' => 'smtp',
+            'host' => env('MAILEROO_MAIL_HOST', '://maileroo.com'),
+            'port' => env('MAILEROO_MAIL_PORT', 587),
+            'encryption' => env('MAILEROO_MAIL_ENCRYPTION', 'tls'),
+            'username' => env('MAILEROO_MAIL_USERNAME'),
+            'password' => env('MAILEROO_MAIL_PASSWORD'),
+            'timeout' => null,
+            'local_domain' => env('MAIL_EHLO_DOMAIN'),
+        ],
+        
         'sendmail' => [
             'transport' => 'sendmail',
             'path' => env('MAIL_SENDMAIL_PATH', '/usr/sbin/sendmail -bs -i'),
@@ -82,8 +93,8 @@ return [
         'failover' => [
             'transport' => 'failover',
             'mailers' => [
-                'smtp',
-                'log',
+                'resend',
+                'maileroo_smtp',
             ],
             'retry_after' => 60,
         ],
