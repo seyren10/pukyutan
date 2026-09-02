@@ -34,15 +34,19 @@ const cooldown = computed(() => {
 function handleResend() {
     mutate(undefined, {
         onSuccess: () => {
-            resendAvailableAt.value = Date.now() + COOLDOWN_SECONDS * 1000
+            resetCooldown()
         },
     })
 }
 
+function resetCooldown() {
+    resendAvailableAt.value = Date.now() + COOLDOWN_SECONDS * 1000
+}
 defineExpose({
     cooldown,
     resendAvailableAt,
-    handleResend
+    handleResend,
+    resetCooldown
 })
 </script>
 

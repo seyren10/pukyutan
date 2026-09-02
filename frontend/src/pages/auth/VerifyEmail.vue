@@ -15,11 +15,10 @@ const unverifiedRef = useTemplateRef('unverifiedRef')
 onMounted(() => {
     if (!unverifiedRef.value) return;
 
-
     if (
         unverifiedRef.value.cooldown <= 0
     ) {
-        unverifiedRef.value.handleResend()
+        unverifiedRef.value.resetCooldown()
     }
 })
 </script>
