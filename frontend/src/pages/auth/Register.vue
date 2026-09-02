@@ -13,6 +13,8 @@ import type { LaravelError } from '@/types/common'
 import { isAxiosError } from 'axios'
 import AppGoogleLoginButton from '@/components/app/AppGoogleLoginButton.vue'
 import { Marker, MarkerContent } from '@/components/ui/marker'
+import AppButtonLoaderSwap from '@/components/app/AppButtonLoaderSwap.vue'
+import { toast } from 'vue-sonner'
 
 
 const { handleSubmit, setErrors } = useForm({
@@ -20,13 +22,16 @@ const { handleSubmit, setErrors } = useForm({
 })
 
 const { registerMutation } = useAuthMutations()
-const { mutate } = registerMutation
+const { mutate, isPending } = registerMutation
 const submit = handleSubmit((values) => {
     mutate(values, {
         onError: (error) => {
             if (isAxiosError(error)) {
                 const axiosErorr = error as LaravelError<RegistrationPayload>
-                setErrors(axiosErorr.response?.data?.errors!)
+                if (error.response?.status === 422)
+                    setErrors(axiosErorr.response?.data?.errors!)
+                else
+                    toast.error('Something went wrong. Please try again later.')
             }
         }
     })
@@ -81,8 +86,10 @@ const submit = handleSubmit((values) => {
                         <FormMessage />
                     </FormItem>
                 </FormField>
-                <Button type="submit" class="w-full">
-                    <UserPlus data-icon="inline-start" />
+                <Button type="submit" class="w-full" :disabled="isPending">
+                    <AppButtonLoaderSwap :loading="isPending">
+                        <UserPlus data-icon="inline-start" />
+                    </AppButtonLoaderSwap>
                     Create account
                 </Button>
             </form>
