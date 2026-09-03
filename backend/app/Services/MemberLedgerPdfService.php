@@ -40,12 +40,11 @@ class MemberLedgerPdfService
             ->showBackground()
             ->format('A4')
             ->timeout(60)
-            ->setEnvironmentOptions(['HOME' => '/tmp'])
+            ->setNodeEnv(['HOME' => '/tmp'])
             ->addChromiumArguments([
                 'user-data-dir' => '/tmp/browsershot-chrome-' . uniqid(),
                 'disable-crash-reporter',
-            ])
-            ->pdf();
+            ])->pdf();
     }
 
     public function filenameFor(Member $member): string
