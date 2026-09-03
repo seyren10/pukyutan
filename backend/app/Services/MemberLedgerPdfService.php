@@ -42,7 +42,6 @@ class MemberLedgerPdfService
             ->timeout(60)
             ->setNodeEnv(['HOME' => '/tmp'])
             ->addChromiumArguments([
-                'user-data-dir' => '/tmp/browsershot-chrome-' . uniqid(),
                 'disable-crash-reporter',
             ])->pdf();
     }
