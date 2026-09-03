@@ -4,6 +4,7 @@ use App\Http\Controllers\V1\ContributionController;
 use App\Http\Controllers\V1\CycleDisburseController;
 use App\Http\Controllers\V1\DashboardController;
 use App\Http\Controllers\V1\DicebearSeedController;
+use App\Http\Controllers\V1\GenerateMemberLedgerPdfController;
 use App\Http\Controllers\V1\GroupActivateController;
 use App\Http\Controllers\V1\GroupActivityController;
 use App\Http\Controllers\V1\GroupCompleteController;
@@ -15,6 +16,8 @@ use App\Http\Controllers\V1\GroupShareController;
 use App\Http\Controllers\V1\MemberController;
 use App\Http\Controllers\V1\MemberLedgerController;
 use App\Http\Controllers\V1\MemberLedgerPdfController;
+use App\Http\Controllers\V1\MemberLedgerPdfDownloadController;
+use App\Http\Controllers\V1\MemberLedgerPdfStatusController;
 use App\Http\Controllers\V1\MemberLedgerSummaryController;
 use App\Http\Controllers\V1\MemberReorderController;
 use App\Http\Controllers\V1\NotificationController;
@@ -48,9 +51,15 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::post("notifications/read-all", [NotificationController::class, "markAllAsRead"])->withoutMiddleware('verified');
 
     Route::apiResource("groups.members", MemberController::class)->shallow()->withoutMiddlewareFor(['index', 'show'], 'verified');
-    Route::get("members/{member}/ledger", MemberLedgerController::class)->withoutMiddleware('verified');
-    Route::get("members/{member}/ledger/summary", MemberLedgerSummaryController::class)->withoutMiddleware('verified');
-    Route::get("members/{member}/ledger/pdf", MemberLedgerPdfController::class)->withoutMiddleware('verified');
+    Route::withoutMiddleware('verified')->group(function () {
+        Route::get("members/{member}/ledger", MemberLedgerController::class);
+        Route::get("members/{member}/ledger/summary", MemberLedgerSummaryController::class);
+        Route::post('members/{member}/ledger-pdf', GenerateMemberLedgerPdfController::class);
+        Route::get('members/{member}/ledger-pdf/{export}', MemberLedgerPdfStatusController::class);
+        Route::get('members/{member}/ledger-pdf/{export}/download', MemberLedgerPdfDownloadController::class)
+            ->name('v1.members.ledger-pdf.download');
+    });
+
 
     Route::post("cycles/{cycle}/disburse", CycleDisburseController::class);
     Route::apiResource('cycles.contributions', ContributionController::class)->shallow()->only(['index', 'store', 'destroy'])->withoutMiddlewareFor(['index'], 'verified');
