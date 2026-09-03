@@ -39,9 +39,13 @@ class MemberLedgerPdfService
             ->noSandbox()
             ->showBackground()
             ->format('A4')
-            // ->margins(15, 15, 15, 15)
             ->timeout(60)
-        ->pdf();
+            ->setEnvironmentOptions(['HOME' => '/tmp'])
+            ->addChromiumArguments([
+                'user-data-dir' => '/tmp/browsershot-chrome-' . uniqid(),
+                'disable-crash-reporter',
+            ])
+            ->pdf();
     }
 
     public function filenameFor(Member $member): string
