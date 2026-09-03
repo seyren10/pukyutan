@@ -2,8 +2,10 @@ import { httpClient } from "@/services/axios/axios";
 import type {
   CreateMemberPayload,
   DownloadMemberLedgerPdfPayload,
+  GenerateMemberLedgerPdfResponse,
   Member,
   MemberLedgerCycle,
+  MemberLedgerPdfExportStatusResponse,
   MemberWithSummary,
   UpdateMemberPayload,
 } from "./type";
@@ -76,13 +78,59 @@ export const reorderMembers = async (groupId: number, memberIds: number[]) => {
   return res.data;
 };
 
-export const downloadMemberLedgerPdf = async ({
-  memberId,
-  memberName,
-}: DownloadMemberLedgerPdfPayload) => {
-  const response = await httpClient.get(`/api/v1/members/${memberId}/ledger/pdf`, {
-    responseType: "blob",
-  });
+// #region PDF Export
+export const generateMemberLedgerPdf = async (memberId: number) => {
+  const res = await httpClient.post<GenerateMemberLedgerPdfResponse>(
+    `/api/v1/members/${memberId}/ledger-pdf`,
+  );
+
+  return res.data;
+};
+
+export const getMemberLedgerPdfExportStatus = async (
+  memberId: number,
+  exportId: number,
+) => {
+  const res = await httpClient.get<MemberLedgerPdfExportStatusResponse>(
+    `/api/v1/members/${memberId}/ledger-pdf/${exportId}`,
+  );
+
+  return res.data;
+};
+
+const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// Matches the queue's retry_after (120s) with a little headroom, so we
+// never give up on a job the backend is still legitimately retrying.
+const POLL_INTERVAL_MS = 2000;
+const MAX_POLL_ATTEMPTS = 65;
+
+const pollMemberLedgerPdfExport = async (
+  memberId: number,
+  exportId: number,
+): Promise<MemberLedgerPdfExportStatusResponse> => {
+  for (let attempt = 0; attempt < MAX_POLL_ATTEMPTS; attempt++) {
+    const result = await getMemberLedgerPdfExportStatus(memberId, exportId);
+
+    if (result.status === "completed" || result.status === "failed") {
+      return result;
+    }
+
+    await wait(POLL_INTERVAL_MS);
+  }
+
+  throw new Error("Timed out waiting for the PDF to finish generating.");
+};
+
+const downloadMemberLedgerPdfFile = async (
+  memberId: number,
+  exportId: number,
+  memberName: string,
+) => {
+  const response = await httpClient.get(
+    `/api/v1/members/${memberId}/ledger-pdf/${exportId}/download`,
+    { responseType: "blob" },
+  );
 
   const filename = filenameFromContentDisposition(
     response.headers["content-disposition"],
@@ -96,3 +144,19 @@ export const downloadMemberLedgerPdf = async ({
   link.click();
   URL.revokeObjectURL(url);
 };
+
+export const generateAndDownloadMemberLedgerPdf = async ({
+  memberId,
+  memberName,
+}: DownloadMemberLedgerPdfPayload) => {
+  const { export_id } = await generateMemberLedgerPdf(memberId);
+  const result = await pollMemberLedgerPdfExport(memberId, export_id);
+
+  if (result.status === "failed") {
+    throw new Error(result.error ?? "PDF generation failed.");
+  }
+
+  await downloadMemberLedgerPdfFile(memberId, export_id, memberName);
+};
+
+// #endregion PDF Export

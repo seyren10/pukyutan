@@ -1,6 +1,7 @@
 import type z from "zod";
 import type { memberSchema } from "./schema";
 import type { TimeStamp } from "@/types/common";
+import type { MEMBER_LEDGER_PDF_EXPORT_STATUS } from "./constant";
 
 export type Member = TimeStamp & {
   id: number;
@@ -54,6 +55,20 @@ export type MemberLedgerCycle = {
     paid_at: string | null;
     notes: string | null;
   }[];
+};
+
+export type MemberLedgerPdfExportStatus =
+  (typeof MEMBER_LEDGER_PDF_EXPORT_STATUS)[number];
+  
+export type GenerateMemberLedgerPdfResponse = {
+  export_id: number;
+  status: MemberLedgerPdfExportStatus;
+};
+
+export type MemberLedgerPdfExportStatusResponse = {
+  status: MemberLedgerPdfExportStatus;
+  download_url: string | null;
+  error: string | null;
 };
 
 export type MemberSchema = z.infer<typeof memberSchema>;
